@@ -20,6 +20,7 @@ function siteUrl(): string {
 /** Ensure the company has a Stripe customer for platform billing; create one if needed. */
 async function getOrCreateCustomer(companyId: string, companyName: string, email: string | null) {
   const stripe = getStripe();
+  if (!stripe) throw new Error("Stripe is not configured.");
   const svc = await createServiceClient();
   const { data: company } = await svc
     .from("companies")
@@ -53,7 +54,7 @@ export async function createPlanCheckout(planId: string) {
     return { error: `Missing ${PRICE_ENV[planId]} — ask the platform owner to configure plan prices.` };
   }
 
-  const customerId = await getOrCreateCustomer(ctx.company.id, ctx.company.name, ctx.user.email);
+  const customerId = await getOrCreateCustomer(ctx.company.id, ctx.company.name, ctx.user.email ?? null);
 
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",

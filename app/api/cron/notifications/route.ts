@@ -2,12 +2,15 @@ import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { processNotificationQueue } from "@/lib/notifications/send";
 import { enqueueNotification } from "@/lib/notifications/queue";
+import { getPortalLinkForCron } from "@/lib/followups";
+import { one } from "@/lib/relations";
 import { formatDate, formatTime } from "@/lib/format";
 
 /**
- * Cron endpoint: drains the notification queue and enqueues reminders for
- * tomorrow's jobs. Schedule it daily (e.g. Vercel Cron, or any scheduler
- * hitting this URL with the CRON_SECRET bearer token).
+ * Cron endpoint: drains the notification queue, enqueues reminders for
+ * tomorrow's jobs, and sends due quote follow-ups. Schedule it daily
+ * (e.g. Vercel Cron, or any scheduler hitting this URL with the
+ * CRON_SECRET bearer token).
  *
  *   GET /api/cron/notifications  Authorization: Bearer <CRON_SECRET>
  */
@@ -72,5 +75,57 @@ export async function GET(request: Request) {
 
   const result = await processNotificationQueue(svc);
 
-  return NextResponse.json({ reminders_queued: reminders, ...result });
+  // Send due quote follow-ups — only while the quote is still "sent".
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
+  const { data: dueFollowups } = await svc
+    .from("quote_followups")
+    .select(
+      "id, company_id, quote_id, step, quotes!inner(status, quote_number, total_cents, valid_until, customer_id, customers(name, email), companies(name))",
+    )
+    .is("sent_at", null)
+    .lte("scheduled_for", now.toISOString())
+    .limit(100);
+
+  let followups = 0;
+  type DueQuote = {
+    status: string;
+    quote_number: string;
+    total_cents: number;
+    valid_until: string | null;
+    customer_id: string;
+    customers: { name: string; email: string | null } | { name: string; email: string | null }[] | null;
+    companies: { name: string } | { name: string }[] | null;
+  };
+  for (const f of dueFollowups ?? []) {
+    const quote = one((f as { quotes: DueQuote | DueQuote[] | null }).quotes);
+    const customer = one(quote?.customers);
+    const company = one(quote?.companies);
+    // Stale (quote moved on) or no email → drop the touch.
+    if (quote?.status !== "sent" || !customer?.email) {
+      await svc.from("quote_followups").delete().eq("id", f.id);
+      continue;
+    }
+    const portalLink =
+      (await getPortalLinkForCron(svc, f.company_id, quote.customer_id, siteUrl)) ?? undefined;
+    await enqueueNotification(svc, {
+      company_id: f.company_id,
+      recipient_type: "customer",
+      recipient_id: quote.customer_id,
+      channel: "email",
+      template: "quote_followup",
+      payload: {
+        email: customer.email,
+        recipient_name: customer.name,
+        company_name: company?.name ?? "Your cleaning company",
+        quote_number: quote.quote_number,
+        total_cents: quote.total_cents,
+        valid_until: quote.valid_until ? formatDate(quote.valid_until) : undefined,
+        portal_link: portalLink,
+      },
+    });
+    await svc.from("quote_followups").update({ sent_at: new Date().toISOString() }).eq("id", f.id);
+    followups++;
+  }
+
+  return NextResponse.json({ reminders_queued: reminders, followups_sent: followups, ...result });
 }
