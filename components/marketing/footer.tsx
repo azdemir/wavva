@@ -61,8 +61,8 @@ export function Footer() {
           <p className="text-sm text-slate-400">
             © 2026 {site.name}. All rights reserved.
           </p>
-          <p className="text-sm text-slate-400">
-            Made for cleaning businesses in Upstate New York.
+          <p className="text-center text-sm text-slate-400">
+            Proudly locally owned in Upstate New York · Made for cleaning businesses here.
           </p>
         </div>
       </Container>
