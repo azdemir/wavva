@@ -54,7 +54,8 @@ export default async function PortalQuotePage({
 
         <Card>
           <CardContent className="p-0">
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto">
+            <table className="w-full min-w-[420px] text-sm">
               <tbody className="divide-y divide-slate-100">
                 {(items ?? []).map((it) => (
                   <tr key={it.id}>
@@ -71,6 +72,7 @@ export default async function PortalQuotePage({
                 ))}
               </tbody>
             </table>
+            </div>
             <div className="space-y-1 border-t border-slate-200 px-5 py-4 text-sm">
               <div className="flex justify-between"><span className="text-slate-500">Subtotal</span><span>{formatCents(quote.subtotal_cents)}</span></div>
               {quote.discount_cents > 0 && (

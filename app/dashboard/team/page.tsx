@@ -48,13 +48,13 @@ export default async function TeamPage() {
           <ul className="divide-y divide-slate-100">
             {(members ?? []).map((m) => (
               <li key={m.id} className="flex items-center justify-between gap-3 py-3">
-                <div>
-                  <p className="font-medium text-slate-900">{m.email}</p>
+                <div className="min-w-0">
+                  <p className="truncate font-medium text-slate-900">{m.email}</p>
                   <p className="text-sm text-slate-500">
                     Joined {new Date(m.created_at).toLocaleDateString("en-US")}
                   </p>
                 </div>
-                <Badge tone={roleTones[m.role as keyof typeof roleTones] ?? "slate"}>
+                <Badge tone={roleTones[m.role as keyof typeof roleTones] ?? "slate"} className="shrink-0">
                   {statusLabel(m.role)}
                 </Badge>
               </li>

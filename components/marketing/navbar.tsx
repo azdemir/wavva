@@ -51,7 +51,7 @@ export function Navbar() {
 
           {/* No-JS mobile menu */}
           <details className="relative md:hidden">
-            <summary className="cursor-pointer list-none rounded-lg border border-slate-300 px-3.5 py-2 text-sm font-semibold text-slate-700 [&::-webkit-details-marker]:hidden">
+            <summary className="cursor-pointer list-none rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 [&::-webkit-details-marker]:hidden">
               Menu
             </summary>
             <div className="absolute top-12 right-0 w-56 rounded-xl border border-slate-200 bg-white p-2 shadow-lg">

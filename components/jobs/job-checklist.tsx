@@ -44,23 +44,26 @@ export function JobChecklist({
       )}
       <ul className="space-y-2">
         {items.map((item, i) => (
-          <li key={i} className="flex items-center gap-3 rounded-lg border border-slate-200 px-3 py-2.5">
-            <input
-              type="checkbox"
-              checked={item.done}
-              disabled={readOnly}
-              onChange={() => persist(items.map((it, j) => (j === i ? { ...it, done: !it.done } : it)))}
-              className="h-5 w-5 rounded border-slate-300 text-brand-600"
-              aria-label={item.label}
-            />
-            <span className={`flex-1 text-sm ${item.done ? "text-slate-400 line-through" : "text-slate-900"}`}>
-              {item.label}
-            </span>
+          <li key={i} className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2">
+            <label className={`flex min-h-[44px] flex-1 cursor-pointer items-center gap-3 ${readOnly ? "cursor-default" : ""}`}>
+              <input
+                type="checkbox"
+                checked={item.done}
+                disabled={readOnly}
+                onChange={() => persist(items.map((it, j) => (j === i ? { ...it, done: !it.done } : it)))}
+                className="h-6 w-6 shrink-0 rounded border-slate-300 text-brand-600"
+                aria-label={item.label}
+              />
+              <span className={`flex-1 text-sm ${item.done ? "text-slate-400 line-through" : "text-slate-900"}`}>
+                {item.label}
+              </span>
+            </label>
             {!readOnly && (
               <button
                 type="button"
                 onClick={() => persist(items.filter((_, j) => j !== i))}
-                className="text-xs font-medium text-slate-400 hover:text-red-600"
+                className="shrink-0 rounded-md px-3 py-2 text-xs font-medium text-slate-400 hover:text-red-600"
+                aria-label={`Remove ${item.label}`}
               >
                 Remove
               </button>

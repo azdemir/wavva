@@ -62,7 +62,8 @@ export function Hero() {
           </div>
 
           {/* Illustrative product preview — sample data, not a screenshot */}
-          <div className="animate-fade-in">
+          {/* min-w-0: lets the grid track shrink so long row content truncates instead of blowing out the card */}
+          <div className="animate-fade-in min-w-0">
             <div
               aria-hidden="true"
               className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xl shadow-brand-600/5"

@@ -68,7 +68,8 @@ export default async function PortalInvoicePage({
 
         <Card>
           <CardContent className="p-0">
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto">
+            <table className="w-full min-w-[420px] text-sm">
               <tbody className="divide-y divide-slate-100">
                 {(items ?? []).map((it) => (
                   <tr key={it.id}>
@@ -85,6 +86,7 @@ export default async function PortalInvoicePage({
                 ))}
               </tbody>
             </table>
+            </div>
             <div className="space-y-1 border-t border-slate-200 px-5 py-4 text-sm">
               <div className="flex justify-between"><span className="text-slate-500">Subtotal</span><span>{formatCents(invoice.subtotal_cents)}</span></div>
               <div className="flex justify-between"><span className="text-slate-500">Tax</span><span>{formatCents(invoice.tax_cents)}</span></div>
