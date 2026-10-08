@@ -1,0 +1,101 @@
+import Link from "next/link";
+import { requireCompany } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
+import { one } from "@/lib/relations";
+import { Heading } from "@/components/ui/heading";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
+import { PlusIcon } from "@/components/ui/icons";
+import { formatCents, formatDate } from "@/lib/format";
+
+export const instant = false;
+
+const statuses = ["all", "draft", "sent", "overdue", "paid", "void"] as const;
+const tones = { draft: "slate", sent: "brand", overdue: "red", paid: "accent", void: "slate" } as const;
+
+export default async function InvoicesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
+  const { company } = await requireCompany();
+  const supabase = await createClient();
+  const status = (await searchParams).status ?? "all";
+  const valid = (statuses as readonly string[]).includes(status) ? status : "all";
+
+  let query = supabase
+    .from("invoices")
+    .select("id, invoice_number, status, total_cents, amount_paid_cents, due_date, customers(name)")
+    .eq("company_id", company.id)
+    .order("created_at", { ascending: false });
+  if (valid !== "all") query = query.eq("status", valid);
+  const { data: invoices } = await query;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <Heading title="Invoices" description="Bill customers and track payments." />
+        <Button href="/dashboard/invoices/new">
+          <PlusIcon className="h-4 w-4" /> New invoice
+        </Button>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {statuses.map((s) => (
+          <Link
+            key={s}
+            href={s === "all" ? "/dashboard/invoices" : `/dashboard/invoices?status=${s}`}
+            className={`rounded-full px-3.5 py-1.5 text-sm font-medium capitalize ${
+              valid === s ? "bg-brand-600 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
+            }`}
+          >
+            {s}
+          </Link>
+        ))}
+      </div>
+
+      {(invoices ?? []).length === 0 ? (
+        <Card>
+          <CardContent>
+            <EmptyState
+              title="No invoices here"
+              description="Create an invoice to bill a customer."
+              action={<Button href="/dashboard/invoices/new">New invoice</Button>}
+            />
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardContent className="p-0">
+            <ul className="divide-y divide-slate-100">
+              {(invoices ?? []).map((inv) => {
+                const due = inv.total_cents - inv.amount_paid_cents;
+                return (
+                  <li key={inv.id}>
+                    <Link href={`/dashboard/invoices/${inv.id}`} className="flex items-center justify-between gap-3 px-5 py-4 hover:bg-slate-50">
+                      <div>
+                        <p className="font-medium text-slate-900">
+                          {inv.invoice_number} · {one(inv.customers)?.name}
+                        </p>
+                        <p className="text-sm text-slate-500">
+                          {inv.due_date ? `Due ${formatDate(inv.due_date)}` : "No due date"}
+                          {due > 0 && inv.status !== "draft" && ` · ${formatCents(due)} due`}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="font-semibold text-slate-900">{formatCents(inv.total_cents)}</span>
+                        <Badge tone={tones[inv.status as keyof typeof tones] ?? "slate"}>{inv.status}</Badge>
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}

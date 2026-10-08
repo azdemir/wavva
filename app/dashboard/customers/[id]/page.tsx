@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { requireCompany } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -9,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CustomerForm } from "@/components/customers/customer-form";
 import { AddressForm } from "@/components/customers/address-form";
+import { PortalLinkButton } from "@/components/portal/portal-link-button";
 import { formatCents, formatDate } from "@/lib/format";
 
 export default async function CustomerDetailPage({
@@ -27,6 +29,9 @@ export default async function CustomerDetailPage({
     .eq("company_id", company.id)
     .single();
   if (!customer) notFound();
+
+  const h = await headers();
+  const baseUrl = `${h.get("x-forwarded-proto") ?? "http"}://${h.get("host")}`;
 
   const [{ data: addresses }, { data: bookings }, { data: quotes }] = await Promise.all([
     supabase
@@ -108,6 +113,19 @@ export default async function CustomerDetailPage({
             </div>
           ))}
           <AddressForm customerId={id} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Customer portal</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="mb-3 text-sm text-slate-600">
+            Share a private link so this customer can approve quotes, see
+            upcoming visits, and pay invoices — no login needed.
+          </p>
+          <PortalLinkButton customerId={id} baseUrl={baseUrl} />
         </CardContent>
       </Card>
 

@@ -16,6 +16,7 @@ import {
   ClockIcon,
   CardIcon,
   GearIcon,
+  BellIcon,
 } from "@/components/ui/icons";
 
 type NavItem = {
@@ -31,10 +32,13 @@ const nav: NavItem[] = [
   { href: "/dashboard/services", label: "Services & Pricing", icon: TagIcon },
   { href: "/dashboard/quotes", label: "Quotes", icon: QuoteIcon },
   { href: "/dashboard/bookings", label: "Bookings", icon: CalendarIcon },
-  { href: "/dashboard/jobs", label: "Jobs", icon: ClockIcon, soon: true },
-  { href: "/dashboard/invoices", label: "Invoices", icon: CardIcon, soon: true },
+  { href: "/dashboard/schedule", label: "Schedule", icon: CalendarIcon },
+  { href: "/dashboard/my-jobs", label: "My jobs", icon: ClockIcon },
+  { href: "/dashboard/invoices", label: "Invoices", icon: CardIcon },
+  { href: "/dashboard/billing", label: "Billing", icon: CardIcon },
   { href: "/dashboard/team", label: "Team", icon: UsersIcon },
   { href: "/dashboard/settings", label: "Settings", icon: GearIcon },
+  { href: "/dashboard/audit", label: "Audit log", icon: BellIcon },
 ];
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
