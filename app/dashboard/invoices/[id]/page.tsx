@@ -30,18 +30,35 @@ export default async function InvoiceDetailPage({
   const { company } = await requireCompany();
   const supabase = await createClient();
 
+  // One round trip: line items and payments come embedded with the
+  // parent invoice, ordered server-side via the referenced tables.
   const { data: invoice } = await supabase
     .from("invoices")
-    .select("*, customers(id, name, email, phone), bookings(booking_number)")
+    .select(
+      "*, customers(id, name, email, phone), bookings(booking_number), invoice_line_items(*), payments(*)",
+    )
     .eq("id", id)
     .eq("company_id", company.id)
+    .order("sort", { referencedTable: "invoice_line_items", ascending: true })
+    .order("created_at", { referencedTable: "payments", ascending: false })
     .single();
   if (!invoice) notFound();
 
-  const [{ data: items }, { data: payments }] = await Promise.all([
-    supabase.from("invoice_line_items").select("*").eq("invoice_id", id).order("sort"),
-    supabase.from("payments").select("*").eq("invoice_id", id).order("created_at", { ascending: false }),
-  ]);
+  const items = (invoice.invoice_line_items ?? []) as {
+    id: string;
+    label: string;
+    qty: number;
+    unit_price_cents: number;
+    line_total_cents: number;
+  }[];
+  const payments = (invoice.payments ?? []) as {
+    id: string;
+    amount_cents: number;
+    provider: string;
+    provider_ref: string | null;
+    created_at: string;
+    status: string;
+  }[];
 
   const customer = one(invoice.customers);
   const due = invoice.total_cents - invoice.amount_paid_cents;

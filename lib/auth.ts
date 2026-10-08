@@ -1,6 +1,8 @@
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { one } from "@/lib/relations";
 
 export type Membership = {
   id: string;
@@ -23,52 +25,58 @@ export type Company = {
   onboarding_completed: boolean;
 };
 
-/** The signed-in user, or null (also null when Supabase isn't configured). */
-export async function getSessionUser() {
+/**
+ * The signed-in user, or null (also null when Supabase isn't configured).
+ *
+ * Cached per request: the dashboard layout and the page under it both call
+ * requireCompany(), and each auth check would otherwise cost a separate
+ * `auth.getUser()` round trip to the Supabase auth server.
+ */
+export const getSessionUser = cache(async function getSessionUser() {
   if (!isSupabaseConfigured()) return null;
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   return user;
-}
+});
 
 /**
  * The user's first membership + company.
  * NOTE (MVP): users with several companies always land in their first.
  * Company switching is a later-stage feature.
+ *
+ * Cached per request (the dashboard layout and its pages all call this), and
+ * fetched with a single join query instead of sequential membership +
+ * company round trips.
  */
-export async function getActiveMembership(): Promise<{
+export const getActiveMembership = cache(async function getActiveMembership(): Promise<{
   membership: Membership;
   company: Company;
 } | null> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSessionUser();
   if (!user) return null;
+  const supabase = await createClient();
 
   const { data: membership } = await supabase
     .from("memberships")
-    .select("id, user_id, company_id, email, role")
+    .select(
+      "id, user_id, company_id, email, role, companies(id, name, logo_url, phone, email, website, timezone, currency, settings, onboarding_completed)",
+    )
     .eq("user_id", user.id)
     .order("created_at", { ascending: true })
     .limit(1)
     .maybeSingle();
 
   if (!membership) return null;
-
-  const { data: company } = await supabase
-    .from("companies")
-    .select(
-      "id, name, logo_url, phone, email, website, timezone, currency, settings, onboarding_completed",
-    )
-    .eq("id", membership.company_id)
-    .single();
-
+  const company = one(membership.companies) as Company | null;
   if (!company) return null;
-  return { membership: membership as Membership, company: company as Company };
-}
+  const { id, user_id, company_id, email, role } = membership;
+  return {
+    membership: { id, user_id, company_id, email, role } as Membership,
+    company,
+  };
+});
 
 /** Require a signed-in user; otherwise send to /signin (preserving destination). */
 export async function requireUser() {

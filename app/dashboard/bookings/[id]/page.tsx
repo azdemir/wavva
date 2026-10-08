@@ -27,22 +27,24 @@ export default async function BookingDetailPage({
   const supabase = await createClient();
   const tz = company.timezone || "America/New_York";
 
+  // One round trip: the visits come embedded with the parent booking.
   const { data: booking } = await supabase
     .from("bookings")
     .select(
-      "*, customers(id, name, phone, email), service_addresses(label, address_line1, address_line2, city, state, zip), services(name), quotes(quote_number)",
+      "*, customers(id, name, phone, email), service_addresses(label, address_line1, address_line2, city, state, zip), services(name), quotes(quote_number), jobs(id, scheduled_start, scheduled_end, status)",
     )
     .eq("id", id)
     .eq("company_id", company.id)
+    .order("scheduled_start", { referencedTable: "jobs", ascending: true })
     .single();
   if (!booking) notFound();
 
-  const { data: jobs } = await supabase
-    .from("jobs")
-    .select("id, scheduled_start, scheduled_end, status")
-    .eq("booking_id", id)
-    .eq("company_id", company.id)
-    .order("scheduled_start", { ascending: true });
+  const jobs = (booking.jobs ?? []) as {
+    id: string;
+    scheduled_start: string;
+    scheduled_end: string;
+    status: string;
+  }[];
 
   const customer = one(booking.customers) as { id: string; name: string; phone: string | null; email: string | null } | null;
   const address = one(booking.service_addresses) as {

@@ -32,19 +32,25 @@ export default async function QuoteDetailPage({
   const { company } = await requireCompany();
   const supabase = await createClient();
 
+  // One round trip: line items come embedded with the parent quote,
+  // ordered server-side via the referenced table.
   const { data: quote } = await supabase
     .from("quotes")
-    .select("*, customers(id, name, email, phone)")
+    .select("*, customers(id, name, email, phone), quote_line_items(*)")
     .eq("id", id)
     .eq("company_id", company.id)
+    .order("sort", { referencedTable: "quote_line_items", ascending: true })
     .single();
   if (!quote) notFound();
 
-  const { data: items } = await supabase
-    .from("quote_line_items")
-    .select("*")
-    .eq("quote_id", id)
-    .order("sort", { ascending: true });
+  const items = (quote.quote_line_items ?? []) as {
+    id: string;
+    label: string;
+    kind: string;
+    qty: number;
+    unit_price_cents: number;
+    line_total_cents: number;
+  }[];
 
   const customer = one(quote.customers) as { id: string; name: string; email: string | null; phone: string | null } | null;
 
