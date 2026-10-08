@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { QuoteStatusPill, statusLabel, type QuoteStatus } from "@/components/ui/badge";
 import { formatCents, formatDate } from "@/lib/format";
 import { one } from "@/lib/relations";
+import { FollowupStatus } from "@/components/quotes/followup-status";
 
 const nextActions: Record<string, { status: string; label: string; variant?: "primary" | "outline" }[]> = {
   draft: [{ status: "sent", label: "Mark as sent" }, { status: "expired", label: "Expire", variant: "outline" }],
@@ -109,6 +110,10 @@ export default async function QuoteDetailPage({
             )}
           </CardContent>
         </Card>
+      )}
+
+      {quote.status === "sent" && (
+        <FollowupStatus quoteId={id} companyId={company.id} />
       )}
 
       <Card>

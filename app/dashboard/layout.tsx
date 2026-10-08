@@ -161,9 +161,13 @@ export default async function DashboardLayout({
       <main className="min-w-0 flex-1">
         <div className="mx-auto max-w-6xl px-4 py-6 md:px-8 md:py-8">
           <SubscriptionBanner
-            status={(company as { subscription_status?: string }).subscription_status ?? "none"}
+            status={(company as unknown as { subscription_status?: string }).subscription_status ?? "none"}
             planName={
-              PLANS[isPlanId((company as { plan?: string }).plan) ? (company as { plan: "starter" | "growth" | "pro" }).plan : "starter"].name
+              PLANS[
+                isPlanId((company as unknown as { plan?: string }).plan)
+                  ? (company as unknown as { plan: "starter" | "growth" | "pro" }).plan
+                  : "starter"
+              ].name
             }
           />
           {children}
