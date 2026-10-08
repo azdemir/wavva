@@ -3,12 +3,20 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Field, TextareaField } from "@/components/ui/input";
+import {
+  AddressAutocomplete,
+  type ParsedAddress,
+} from "@/components/customers/address-autocomplete";
 import { createAddress } from "@/lib/actions/customers";
 
 export function AddressForm({ customerId }: { customerId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [open, setOpen] = useState(false);
+  // Controlled so a picked Google suggestion can fill them in.
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [zip, setZip] = useState("");
 
   if (!open) {
     return (
@@ -17,6 +25,12 @@ export function AddressForm({ customerId }: { customerId: string }) {
       </Button>
     );
   }
+
+  const handleSelect = (addr: ParsedAddress) => {
+    if (addr.city) setCity(addr.city);
+    if (addr.state) setState(addr.state);
+    if (addr.zip) setZip(addr.zip);
+  };
 
   return (
     <form
@@ -39,14 +53,45 @@ export function AddressForm({ customerId }: { customerId: string }) {
       <div className="grid gap-4 sm:grid-cols-3">
         <Field id="addr-label" name="label" label="Label" defaultValue="Home" placeholder="Home" />
         <div className="sm:col-span-2">
-          <Field id="addr-line1" name="address_line1" label="Street address" required placeholder="123 Main St" />
+          <AddressAutocomplete
+            id="addr-line1"
+            name="address_line1"
+            label="Street address"
+            required
+            placeholder="Start typing an address…"
+            onSelect={handleSelect}
+          />
         </div>
       </div>
       <Field id="addr-line2" name="address_line2" label="Apt / unit (optional)" placeholder="Apt 4B" />
       <div className="grid gap-4 sm:grid-cols-3">
-        <Field id="addr-city" name="city" label="City" required placeholder="Albany" />
-        <Field id="addr-state" name="state" label="State" required placeholder="NY" />
-        <Field id="addr-zip" name="zip" label="ZIP" required placeholder="12203" />
+        <Field
+          id="addr-city"
+          name="city"
+          label="City"
+          required
+          placeholder="Albany"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+        />
+        <Field
+          id="addr-state"
+          name="state"
+          label="State"
+          required
+          placeholder="NY"
+          value={state}
+          onChange={(e) => setState(e.target.value)}
+        />
+        <Field
+          id="addr-zip"
+          name="zip"
+          label="ZIP"
+          required
+          placeholder="12203"
+          value={zip}
+          onChange={(e) => setZip(e.target.value)}
+        />
       </div>
       <TextareaField
         id="addr-access"
