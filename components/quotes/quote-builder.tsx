@@ -116,11 +116,11 @@ export function QuoteBuilder({
       </div>
 
       <div className="space-y-4">
-        <h3 className="text-base font-semibold text-slate-900">Line items</h3>
+        <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">Line items</h3>
         {items.map((it, i) => (
-          <div key={i} className="space-y-3 rounded-xl border border-slate-200 p-4">
+          <div key={i} className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-800 p-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-slate-700">Item {i + 1}</span>
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Item {i + 1}</span>
               {items.length > 1 && (
                 <button type="button" onClick={() => setItems((rs) => rs.filter((_, j) => j !== i))} className="text-sm font-medium text-red-600 hover:text-red-700">
                   Remove
@@ -173,11 +173,11 @@ export function QuoteBuilder({
 
       <TextareaField id="qb-notes" label="Notes for the customer" rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="What's included, arrival window…" />
 
-      <div className="rounded-xl bg-slate-100 p-4 text-sm">
-        <div className="flex justify-between py-1"><span className="text-slate-600">Subtotal</span><span className="font-medium">{formatCents(totals.subtotal)}</span></div>
-        <div className="flex justify-between py-1"><span className="text-slate-600">Discount</span><span className="font-medium">−{formatCents(totals.discount)}</span></div>
-        <div className="flex justify-between py-1"><span className="text-slate-600">Tax</span><span className="font-medium">{formatCents(totals.tax)}</span></div>
-        <div className="flex justify-between border-t border-slate-200 pt-2 text-base font-bold text-slate-900"><span>Total</span><span>{formatCents(totals.total)}</span></div>
+      <div className="rounded-xl bg-slate-100 dark:bg-slate-800 p-4 text-sm">
+        <div className="flex justify-between py-1"><span className="text-slate-600 dark:text-slate-400 dark:text-slate-500">Subtotal</span><span className="font-medium">{formatCents(totals.subtotal)}</span></div>
+        <div className="flex justify-between py-1"><span className="text-slate-600 dark:text-slate-400 dark:text-slate-500">Discount</span><span className="font-medium">−{formatCents(totals.discount)}</span></div>
+        <div className="flex justify-between py-1"><span className="text-slate-600 dark:text-slate-400 dark:text-slate-500">Tax</span><span className="font-medium">{formatCents(totals.tax)}</span></div>
+        <div className="flex justify-between border-t border-slate-200 dark:border-slate-800 pt-2 text-base font-bold text-slate-900 dark:text-slate-100"><span>Total</span><span>{formatCents(totals.total)}</span></div>
       </div>
 
       <Button onClick={submit} disabled={pending || !customerId} className="w-full sm:w-auto">

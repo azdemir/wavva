@@ -66,7 +66,7 @@ export function ServiceManager({ initial }: { initial: ServiceRow[] }) {
   return (
     <div className="space-y-4">
       <ErrorNote message={error} />
-      <ul className="divide-y divide-slate-100">
+      <ul className="divide-y divide-slate-100 dark:divide-slate-800">
         {initial.map((s) => (
           <li key={s.id} className="py-4">
             {editing === s.id ? (
@@ -77,7 +77,7 @@ export function ServiceManager({ initial }: { initial: ServiceRow[] }) {
                     if (ok) setEditing(null);
                   })();
                 }}
-                className="space-y-3 rounded-xl border border-slate-200 p-4"
+                className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-800 p-4"
               >
                 <div className="grid gap-3 sm:grid-cols-2">
                   <Field id={`se-name-${s.id}`} name="name" label="Name" required defaultValue={s.name} />
@@ -103,12 +103,12 @@ export function ServiceManager({ initial }: { initial: ServiceRow[] }) {
             ) : (
               <div className="flex flex-wrap items-center gap-3">
                 <div className="min-w-0 flex-1">
-                  <p className="font-medium text-slate-900">
+                  <p className="font-medium text-slate-900 dark:text-slate-100">
                     {s.name}{" "}
                     <Badge tone={s.category === "residential" ? "brand" : "accent"}>{s.category}</Badge>{" "}
                     {!s.is_active && <Badge tone="slate">inactive</Badge>}
                   </p>
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
                     {formatCents(s.base_price_cents)} {unitLabels[s.unit]}
                     {s.description ? ` · ${s.description}` : ""}
                   </p>
@@ -128,8 +128,8 @@ export function ServiceManager({ initial }: { initial: ServiceRow[] }) {
         ))}
       </ul>
 
-      <form action={(fd) => { void run(() => createService(fd)); }} className="space-y-3 rounded-xl border border-dashed border-slate-300 p-4">
-        <p className="text-sm font-semibold text-slate-700">Add a service</p>
+      <form action={(fd) => { void run(() => createService(fd)); }} className="space-y-3 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 p-4">
+        <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">Add a service</p>
         <div className="grid gap-3 sm:grid-cols-2">
           <Field id="ns-name" name="name" label="Name" required placeholder="Standard home cleaning" />
           <SelectField id="ns-cat" name="category" label="Type">
@@ -158,7 +158,7 @@ export function AddonManager({ initial }: { initial: AddonRow[] }) {
   return (
     <div className="space-y-4">
       <ErrorNote message={error} />
-      <ul className="divide-y divide-slate-100">
+      <ul className="divide-y divide-slate-100 dark:divide-slate-800">
         {initial.map((a) => (
           <li key={a.id} className="py-3">
             {editing === a.id ? (
@@ -169,7 +169,7 @@ export function AddonManager({ initial }: { initial: AddonRow[] }) {
                     if (ok) setEditing(null);
                   })();
                 }}
-                className="flex flex-wrap items-end gap-3 rounded-xl border border-slate-200 p-4"
+                className="flex flex-wrap items-end gap-3 rounded-xl border border-slate-200 dark:border-slate-800 p-4"
               >
                 <div className="min-w-40 flex-1">
                   <Field id={`ae-name-${a.id}`} name="name" label="Name" required defaultValue={a.name} />
@@ -182,9 +182,9 @@ export function AddonManager({ initial }: { initial: AddonRow[] }) {
               </form>
             ) : (
               <div className="flex flex-wrap items-center gap-3">
-                <p className="min-w-0 flex-1 font-medium text-slate-900">
+                <p className="min-w-0 flex-1 font-medium text-slate-900 dark:text-slate-100">
                   {a.name}{" "}
-                  <span className="text-sm font-normal text-slate-500">{formatCents(a.price_cents)}</span>{" "}
+                  <span className="text-sm font-normal text-slate-500 dark:text-slate-400 dark:text-slate-500">{formatCents(a.price_cents)}</span>{" "}
                   {!a.is_active && <Badge tone="slate">inactive</Badge>}
                 </p>
                 <div className="flex gap-2">
@@ -202,7 +202,7 @@ export function AddonManager({ initial }: { initial: AddonRow[] }) {
         ))}
       </ul>
 
-      <form action={(fd) => { void run(() => createAddon(fd)); }} className="flex flex-wrap items-end gap-3 rounded-xl border border-dashed border-slate-300 p-4">
+      <form action={(fd) => { void run(() => createAddon(fd)); }} className="flex flex-wrap items-end gap-3 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 p-4">
         <div className="min-w-40 flex-1">
           <Field id="na-name" name="name" label="Add-on name" required placeholder="Inside fridge" />
         </div>
@@ -211,7 +211,7 @@ export function AddonManager({ initial }: { initial: AddonRow[] }) {
         </div>
         <Button type="submit" disabled={pending}>Add add-on</Button>
       </form>
-      <p className="text-xs text-slate-500">
+      <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">
         Recurring-visit discounts (weekly / biweekly / monthly) live in Settings.
       </p>
     </div>

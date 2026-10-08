@@ -53,7 +53,7 @@ export function SettingsForm({ company }: { company: Company }) {
       )}
 
       <section className="space-y-4">
-        <h3 className="text-base font-semibold text-slate-900">Company profile</h3>
+        <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">Company profile</h3>
         <Field id="set-name" name="name" label="Business name" defaultValue={company.name} required />
         <div className="grid gap-4 sm:grid-cols-2">
           <Field id="set-phone" name="phone" label="Phone" type="tel" defaultValue={company.phone ?? ""} />
@@ -75,7 +75,7 @@ export function SettingsForm({ company }: { company: Company }) {
       </section>
 
       <section className="space-y-4">
-        <h3 className="text-base font-semibold text-slate-900">Pricing & policies</h3>
+        <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">Pricing & policies</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field
             id="set-tax"
@@ -97,8 +97,8 @@ export function SettingsForm({ company }: { company: Company }) {
           defaultValue={settings.cancellation_policy ?? ""}
         />
         <div>
-          <p className="text-sm font-medium text-slate-700">Recurring-visit price multipliers</p>
-          <p className="text-xs text-slate-500">1 = full price, 0.95 = 5% off. Applied when quoting recurring work.</p>
+          <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Recurring-visit price multipliers</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">1 = full price, 0.95 = 5% off. Applied when quoting recurring work.</p>
           <div className="mt-2 grid gap-4 sm:grid-cols-3">
             <Field
               id="set-weekly"
@@ -126,8 +126,8 @@ export function SettingsForm({ company }: { company: Company }) {
       </section>
 
       <section className="space-y-4">
-        <h3 className="text-base font-semibold text-slate-900">Automatic quote follow-ups</h3>
-        <p className="text-sm text-slate-500">
+        <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">Automatic quote follow-ups</h3>
+        <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
           When you send a quote, TidyPro automatically nudges the customer if they go quiet —
           only the big expensive tools do this. Sending stops the moment they approve, decline,
           or the quote expires.
@@ -139,7 +139,7 @@ export function SettingsForm({ company }: { company: Company }) {
             defaultChecked={settings.followup_enabled !== false}
             className="h-5 w-5 rounded accent-brand-600"
           />
-          <span className="text-sm font-medium text-slate-700">Send automatic follow-ups</span>
+          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Send automatic follow-ups</span>
         </label>
         <Field
           id="set-followup-days"

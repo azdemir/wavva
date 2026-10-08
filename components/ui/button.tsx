@@ -14,8 +14,9 @@ const variantStyles: Record<Variant, string> = {
   accent:
     "bg-accent-600 text-white shadow-sm hover:bg-accent-700 focus-visible:outline-accent-600",
   outline:
-    "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:outline-brand-600",
-  ghost: "text-brand-700 hover:bg-brand-50 focus-visible:outline-brand-600",
+    "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:outline-brand-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800",
+  ghost:
+    "text-brand-700 hover:bg-brand-50 focus-visible:outline-brand-600 dark:text-brand-400 dark:hover:bg-brand-950",
   danger:
     "bg-red-600 text-white shadow-sm hover:bg-red-700 focus-visible:outline-red-600",
 };

@@ -40,8 +40,8 @@ export function Logo({ className = "", markClassName = "h-8 w-8" }: LogoProps) {
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
       <LogoMark className={markClassName} />
-      <span className="text-lg font-bold tracking-tight text-slate-900">
-        Tidy<span className="text-brand-600">Pro</span>
+      <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+        Tidy<span className="text-brand-600 dark:text-brand-400">Pro</span>
       </span>
     </span>
   );
