@@ -1,18 +1,16 @@
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { CheckIcon } from "@/components/ui/icons";
 import {
-  createPlanCheckout,
-  createBillingPortalSession,
   getBillingState,
 } from "@/lib/actions/platform-billing";
+import { PlanButton, ManageSubscriptionButton } from "@/components/billing/billing-buttons";
 import { PLANS, PLAN_IDS, formatPrice, seatLimitLabel, subscriptionInGoodStanding } from "@/lib/plans";
 
-const STATUS_LABEL: Record<string, { label: string; tone: "green" | "amber" | "slate" | "red" }> = {
-  trialing: { label: "Trial", tone: "green" },
-  active: { label: "Active", tone: "green" },
+const STATUS_LABEL: Record<string, { label: string; tone: "accent" | "amber" | "slate" | "red" }> = {
+  trialing: { label: "Trial", tone: "accent" },
+  active: { label: "Active", tone: "accent" },
   past_due: { label: "Past due", tone: "amber" },
   unpaid: { label: "Unpaid", tone: "red" },
   canceled: { label: "Canceled", tone: "slate" },
@@ -66,11 +64,7 @@ export default async function BillingPage({
               </p>
             </div>
             {state.hasSubscription ? (
-              <form action={createBillingPortalSession}>
-                <Button type="submit" variant="outline">
-                  Manage subscription
-                </Button>
-              </form>
+              <ManageSubscriptionButton />
             ) : (
               <p className="max-w-xs text-sm text-slate-500">
                 Start a plan below — every plan begins with a 14-day free trial, no card required up front
@@ -98,7 +92,7 @@ export default async function BillingPage({
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <h3 className="font-bold text-slate-900">{p.name}</h3>
-                    {isCurrent && <Badge tone="green">Current</Badge>}
+                    {isCurrent && <Badge tone="accent">Current</Badge>}
                   </div>
                   <p className="mt-1 text-3xl font-bold text-slate-900">
                     {formatPrice(p.priceCents)}
@@ -114,11 +108,11 @@ export default async function BillingPage({
                     ))}
                   </ul>
                   {!isCurrent && (
-                    <form action={createPlanCheckout.bind(null, id)} className="mt-5">
-                      <Button type="submit" className="w-full" variant={good ? "outline" : "primary"}>
-                        {state.hasSubscription ? `Switch to ${p.name}` : `Start 14-day trial`}
-                      </Button>
-                    </form>
+                    <PlanButton
+                      planId={id}
+                      label={state.hasSubscription ? `Switch to ${p.name}` : "Start 14-day trial"}
+                      outline={good}
+                    />
                   )}
                 </CardContent>
               </Card>
