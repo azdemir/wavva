@@ -72,15 +72,15 @@ export default async function QuotesPage({
               {(quotes ?? []).map((q) => (
                 <li key={q.id}>
                   <Link href={`/dashboard/quotes/${q.id}`} className="flex items-center justify-between gap-3 px-5 py-4 hover:bg-slate-50">
-                    <div>
-                      <p className="font-medium text-slate-900">
+                    <div className="min-w-0">
+                      <p className="truncate font-medium text-slate-900">
                         {q.quote_number} · {one(q.customers)?.name}
                       </p>
-                      <p className="text-sm text-slate-500">
+                      <p className="truncate text-sm text-slate-500">
                         {q.valid_until ? `Valid until ${formatDate(q.valid_until)}` : "No expiry set"}
                       </p>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex shrink-0 items-center gap-3">
                       <span className="font-semibold text-slate-900">{formatCents(q.total_cents)}</span>
                       <QuoteStatusPill status={q.status as QuoteStatus} />
                     </div>

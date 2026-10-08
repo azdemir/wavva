@@ -26,17 +26,17 @@ function BookingList({ bookings, tz }: { bookings: BookingRow[]; tz: string }) {
       {bookings.map((b) => (
         <li key={b.id}>
           <Link href={`/dashboard/bookings/${b.id}`} className="flex items-center justify-between gap-3 px-5 py-4 hover:bg-slate-50">
-            <div>
-              <p className="font-medium text-slate-900">
+            <div className="min-w-0">
+              <p className="truncate font-medium text-slate-900">
                 {b.booking_number} · {b.customers?.name}
               </p>
-              <p className="text-sm text-slate-500">
+              <p className="truncate text-sm text-slate-500">
                 {formatDate(b.scheduled_start)}, {formatTime(b.scheduled_start, tz)} – {formatTime(b.scheduled_end, tz)}
                 {" · "}{b.service_addresses?.address_line1}, {b.service_addresses?.city}
                 {b.recurrence !== "none" && ` · repeats ${b.recurrence}`}
               </p>
             </div>
-            <JobStatusPill status={b.status as JobStatus} />
+            <JobStatusPill status={b.status as JobStatus} className="shrink-0" />
           </Link>
         </li>
       ))}

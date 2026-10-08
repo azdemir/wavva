@@ -75,16 +75,16 @@ export default async function InvoicesPage({
                 return (
                   <li key={inv.id}>
                     <Link href={`/dashboard/invoices/${inv.id}`} className="flex items-center justify-between gap-3 px-5 py-4 hover:bg-slate-50">
-                      <div>
-                        <p className="font-medium text-slate-900">
+                      <div className="min-w-0">
+                        <p className="truncate font-medium text-slate-900">
                           {inv.invoice_number} · {one(inv.customers)?.name}
                         </p>
-                        <p className="text-sm text-slate-500">
+                        <p className="truncate text-sm text-slate-500">
                           {inv.due_date ? `Due ${formatDate(inv.due_date)}` : "No due date"}
                           {due > 0 && inv.status !== "draft" && ` · ${formatCents(due)} due`}
                         </p>
                       </div>
-                      <div className="flex items-center gap-3">
+                      <div className="flex shrink-0 items-center gap-3">
                         <span className="font-semibold text-slate-900">{formatCents(inv.total_cents)}</span>
                         <InvoiceStatusPill status={inv.status as InvoiceStatus} />
                       </div>

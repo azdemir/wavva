@@ -77,7 +77,7 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {stats.map((s) => {
           const Icon = s.icon;
           return (
@@ -113,17 +113,17 @@ export default async function DashboardPage() {
               <ul className="divide-y divide-slate-100">
                 {todaysJobs.map((job) => (
                   <li key={job.id} className="flex items-center justify-between gap-3 py-3">
-                    <div>
-                      <p className="font-medium text-slate-900">
+                    <div className="min-w-0">
+                      <p className="truncate font-medium text-slate-900">
                         {one(job.customers)?.name ?? "Customer"}
                       </p>
-                      <p className="text-sm text-slate-500">
+                      <p className="truncate text-sm text-slate-500">
                         {formatTime(job.scheduled_start, tz)} – {formatTime(job.scheduled_end, tz)}
                         {" · "}
                         {one(job.service_addresses)?.address_line1}
                       </p>
                     </div>
-                    <JobStatusPill status={job.status as JobStatus} />
+                    <JobStatusPill status={job.status as JobStatus} className="shrink-0" />
                   </li>
                 ))}
               </ul>
@@ -153,15 +153,15 @@ export default async function DashboardPage() {
                 {openQuotes.map((q) => (
                   <li key={q.id}>
                     <Link href={`/dashboard/quotes/${q.id}`} className="flex items-center justify-between gap-3 py-3 hover:bg-slate-50">
-                      <div>
-                        <p className="font-medium text-slate-900">
+                      <div className="min-w-0">
+                        <p className="truncate font-medium text-slate-900">
                           {q.quote_number} · {one(q.customers)?.name}
                         </p>
-                        <p className="text-sm text-slate-500">
+                        <p className="truncate text-sm text-slate-500">
                           Valid until {formatDate(q.valid_until)}
                         </p>
                       </div>
-                      <div className="text-right">
+                      <div className="shrink-0 text-right">
                         <p className="font-semibold text-slate-900">{formatCents(q.total_cents)}</p>
                         <QuoteStatusPill status={q.status as QuoteStatus} />
                       </div>

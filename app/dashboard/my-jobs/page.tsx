@@ -54,8 +54,8 @@ export default async function MyJobsPage() {
                 className="block rounded-xl border border-slate-200 bg-white p-4 shadow-sm hover:border-brand-300"
               >
                 <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-semibold text-slate-900">{one(job.customers)?.name}</p>
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold text-slate-900">{one(job.customers)?.name}</p>
                     <p className="mt-0.5 text-sm text-slate-600">
                       {formatDate(job.scheduled_start)} · {formatTime(job.scheduled_start, tz)} –{" "}
                       {formatTime(job.scheduled_end, tz)}
@@ -64,7 +64,9 @@ export default async function MyJobsPage() {
                       {one(job.service_addresses)?.address_line1}, {one(job.service_addresses)?.city}
                     </p>
                   </div>
-                  <JobStatusPill status={job.status as JobStatus} />
+                  <span className="shrink-0">
+                    <JobStatusPill status={job.status as JobStatus} />
+                  </span>
                 </div>
                 <span className="mt-3 inline-block rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white">
                   {job.status === "in_progress" ? "Continue job →" : "Open job →"}

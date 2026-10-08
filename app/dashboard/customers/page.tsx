@@ -74,13 +74,13 @@ export default async function CustomersPage({
                     href={`/dashboard/customers/${c.id}`}
                     className="flex items-center justify-between gap-3 px-5 py-4 hover:bg-slate-50"
                   >
-                    <div>
-                      <p className="font-medium text-slate-900">{c.name}</p>
-                      <p className="text-sm text-slate-500">
+                    <div className="min-w-0">
+                      <p className="truncate font-medium text-slate-900">{c.name}</p>
+                      <p className="truncate text-sm text-slate-500">
                         {[c.email, c.phone].filter(Boolean).join(" · ") || "No contact info"}
                       </p>
                     </div>
-                    <span className="text-sm text-slate-400" aria-hidden="true">→</span>
+                    <span className="shrink-0 text-sm text-slate-400" aria-hidden="true">→</span>
                   </Link>
                 </li>
               ))}

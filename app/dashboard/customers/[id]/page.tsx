@@ -95,7 +95,7 @@ export default async function CustomerDetailPage({
         <CardContent className="space-y-4">
           {(addresses ?? []).map((a) => (
             <div key={a.id} className="flex items-start justify-between gap-3 rounded-xl border border-slate-200 p-4">
-              <div>
+              <div className="min-w-0">
                 <p className="font-medium text-slate-900">
                   {a.label}{" "}
                   {a.is_default && <Badge tone="brand">Default</Badge>}

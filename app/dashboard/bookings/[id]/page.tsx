@@ -116,11 +116,11 @@ export default async function BookingDetailPage({
           <ul className="divide-y divide-slate-100">
             {(jobs ?? []).map((j, i) => (
               <li key={j.id} className="flex items-center justify-between gap-3 px-5 py-3 text-sm">
-                <span className="font-medium text-slate-900">
+                <span className="min-w-0 truncate font-medium text-slate-900">
                   Visit {i + 1} — {formatDate(j.scheduled_start)},{" "}
                   {formatTime(j.scheduled_start, tz)} – {formatTime(j.scheduled_end, tz)}
                 </span>
-                <JobStatusPill status={j.status as JobStatus} />
+                <JobStatusPill status={j.status as JobStatus} className="shrink-0" />
               </li>
             ))}
           </ul>
