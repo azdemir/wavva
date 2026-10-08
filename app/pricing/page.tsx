@@ -1,0 +1,162 @@
+import type { Metadata } from "next";
+import { plans } from "@/lib/site";
+import { Navbar } from "@/components/marketing/navbar";
+import { Footer } from "@/components/marketing/footer";
+import { Cta } from "@/components/marketing/cta";
+import { PageHero } from "@/components/marketing/page-hero";
+import {
+  PlanCards,
+  PricingDisclaimer,
+} from "@/components/marketing/pricing";
+import { Container } from "@/components/ui/container";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { Card, CardContent } from "@/components/ui/card";
+import { CheckIcon } from "@/components/ui/icons";
+
+export const metadata: Metadata = {
+  title: "Pricing",
+  description:
+    "Simple monthly plans for cleaning businesses: Starter $49, Growth $99, Pro $199. Start free for 14 days, no credit card required.",
+};
+
+const comparisonRows: { label: string; values: (string | boolean)[] }[] = [
+  { label: "Users", values: ["1", "Up to 5", "Unlimited"] },
+  { label: "Active customers", values: ["Up to 50", "Unlimited", "Unlimited"] },
+  { label: "Quotes & bookings", values: [true, true, true] },
+  { label: "Recurring bookings", values: [false, true, true] },
+  { label: "Customer portal", values: [false, true, true] },
+  { label: "Crew scheduling & conflict alerts", values: [false, true, true] },
+  { label: "Before/after photo uploads", values: [false, false, true] },
+  { label: "Business reports", values: [false, false, true] },
+  { label: "Support", values: ["Email", "Priority", "Dedicated onboarding"] },
+];
+
+const billingFaqs = [
+  {
+    q: "How does billing work?",
+    a: "TidyPro is a monthly subscription per cleaning company — not per customer. Your subscription is completely separate from the payments your customers make to you, which go directly to your business.",
+  },
+  {
+    q: "Can I cancel anytime?",
+    a: "Yes. Plans are month-to-month with no contracts. If you cancel, you keep access until the end of your billing period.",
+  },
+  {
+    q: "What counts as a user?",
+    a: "Each team member who logs in — owners, managers, and cleaners. Your customers don't count as users; they use the free customer portal.",
+  },
+  {
+    q: "Do my customers pay extra to use the portal?",
+    a: "No. The customer portal is included in your plan at no extra cost to your customers.",
+  },
+];
+
+export default function PricingPage() {
+  return (
+    <>
+      <Navbar />
+      <main>
+        <PageHero
+          eyebrow="Pricing"
+          title="Simple pricing that pays for itself"
+          description="One extra booking a month covers TidyPro for most companies. Start free for 14 days — no credit card required."
+        />
+
+        <section className="bg-white pt-4 pb-16 sm:pb-20">
+          <Container>
+            <PlanCards />
+            <PricingDisclaimer className="mt-8" />
+          </Container>
+        </section>
+
+        <section className="bg-slate-50 py-16 sm:py-20">
+          <Container>
+            <SectionHeading
+              eyebrow="Compare plans"
+              title="What's included in each plan"
+              description="Every plan includes quotes, bookings, basic invoicing, and email support."
+            />
+            <Card className="mx-auto mt-10 max-w-4xl overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[560px] text-left text-sm">
+                  <caption className="sr-only">
+                    Feature comparison across Starter, Growth, and Pro plans
+                  </caption>
+                  <thead>
+                    <tr className="border-b border-slate-200 bg-slate-50">
+                      <th scope="col" className="px-6 py-4 font-semibold text-slate-900">
+                        Feature
+                      </th>
+                      {plans.map((p) => (
+                        <th
+                          key={p.name}
+                          scope="col"
+                          className="px-6 py-4 text-center font-semibold text-slate-900"
+                        >
+                          {p.name}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {comparisonRows.map((row) => (
+                      <tr key={row.label}>
+                        <th
+                          scope="row"
+                          className="px-6 py-3.5 font-medium text-slate-700"
+                        >
+                          {row.label}
+                        </th>
+                        {row.values.map((v, i) => (
+                          <td
+                            key={i}
+                            className="px-6 py-3.5 text-center text-slate-600"
+                          >
+                            {v === true ? (
+                              <CheckIcon className="mx-auto h-5 w-5 text-accent-600" />
+                            ) : v === false ? (
+                              <span aria-label="Not included" className="text-slate-300">
+                                —
+                              </span>
+                            ) : (
+                              v
+                            )}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </Container>
+        </section>
+
+        <section className="bg-white py-16 sm:py-20">
+          <Container>
+            <SectionHeading
+              eyebrow="Billing questions"
+              title="How billing works"
+            />
+            <div className="mx-auto mt-10 grid max-w-4xl gap-6 md:grid-cols-2">
+              {billingFaqs.map((f) => (
+                <Card key={f.q}>
+                  <CardContent>
+                    <h3 className="text-base font-semibold text-slate-900">
+                      {f.q}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                      {f.a}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </Container>
+        </section>
+
+        <Cta />
+      </main>
+      <Footer />
+    </>
+  );
+}
