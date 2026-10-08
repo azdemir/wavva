@@ -18,7 +18,7 @@ export const metadata: Metadata = {
  */
 export default function DemoPage() {
   return (
-    <div className="bg-slate-50">
+    <div className="bg-slate-50 dark:bg-slate-900">
       <Container>
         <div className="flex min-h-screen flex-col items-center justify-center py-16">
           <Link href="/" className="mb-8 flex items-center gap-2.5">
@@ -36,7 +36,7 @@ export default function DemoPage() {
             <CardContent className="space-y-4">
               <div
                 role="note"
-                className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"
+                className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200"
               >
                 Preview only — trial sign-ups aren&apos;t being collected yet.
                 Email{" "}
@@ -89,11 +89,11 @@ export default function DemoPage() {
                   </Button>
                 </div>
               </form>
-              <p className="text-center text-sm text-slate-500">
+              <p className="text-center text-sm text-slate-500 dark:text-slate-400">
                 Already have an account?{" "}
                 <Link
                   href="/signin"
-                  className="font-semibold text-brand-600 hover:text-brand-700"
+                  className="font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400"
                 >
                   Sign in
                 </Link>

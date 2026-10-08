@@ -51,16 +51,16 @@ export default async function MyJobsPage() {
             <li key={job.id}>
               <Link
                 href={`/dashboard/jobs/${job.id}`}
-                className="block rounded-xl border border-slate-200 bg-white p-4 shadow-sm hover:border-brand-300"
+                className="block rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm hover:border-brand-300"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="truncate font-semibold text-slate-900">{one(job.customers)?.name}</p>
-                    <p className="mt-0.5 text-sm text-slate-600">
+                    <p className="truncate font-semibold text-slate-900 dark:text-slate-100">{one(job.customers)?.name}</p>
+                    <p className="mt-0.5 text-sm text-slate-600 dark:text-slate-400 dark:text-slate-500">
                       {formatDate(job.scheduled_start)} · {formatTime(job.scheduled_start, tz)} –{" "}
                       {formatTime(job.scheduled_end, tz)}
                     </p>
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
                       {one(job.service_addresses)?.address_line1}, {one(job.service_addresses)?.city}
                     </p>
                   </div>

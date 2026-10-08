@@ -127,17 +127,17 @@ export default function FeaturesPage() {
                 <Card key={f.title}>
                   <CardContent>
                     <CardIcon>{f.icon}</CardIcon>
-                    <h2 className="text-xl font-semibold text-slate-900">
+                    <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
                       {f.title}
                     </h2>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                       {f.description}
                     </p>
                     <ul className="mt-4 space-y-2.5">
                       {f.bullets.map((b) => (
                         <li
                           key={b}
-                          className="flex items-start gap-2.5 text-sm text-slate-600"
+                          className="flex items-start gap-2.5 text-sm text-slate-600 dark:text-slate-400"
                         >
                           <CheckIcon className="mt-0.5 h-5 w-5 shrink-0 text-accent-600" />
                           {b}
@@ -151,7 +151,7 @@ export default function FeaturesPage() {
           </Container>
         </section>
 
-        <section className="bg-slate-50 py-16 sm:py-20">
+        <section className="bg-slate-50 dark:bg-slate-900 py-16 sm:py-20">
           <Container>
             <SectionHeading
               eyebrow="Who it's for"
@@ -162,10 +162,10 @@ export default function FeaturesPage() {
               {audiences.map((a) => (
                 <Card key={a.title}>
                   <CardContent>
-                    <h3 className="text-lg font-semibold text-slate-900">
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                       {a.title}
                     </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                       {a.description}
                     </p>
                   </CardContent>

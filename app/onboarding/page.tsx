@@ -45,7 +45,7 @@ export default async function OnboardingPage({
   const baseUrl = `${proto}://${h.get("host")}`;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       <Container>
         <div className="mx-auto max-w-2xl py-10">
           <div className="mb-8 flex items-center gap-2.5">

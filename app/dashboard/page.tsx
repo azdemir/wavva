@@ -83,12 +83,12 @@ export default async function DashboardPage() {
           return (
             <Card key={s.label}>
               <CardContent className="flex items-center gap-4 pt-6">
-                <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+                <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 dark:text-brand-400">
                   <Icon className="h-6 w-6" />
                 </span>
                 <div>
-                  <p className="text-2xl font-bold text-slate-900">{s.value}</p>
-                  <p className="text-sm text-slate-500">{s.label}</p>
+                  <p className="text-2xl font-bold text-slate-900 dark:text-slate-100 dark:text-slate-100">{s.value}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-500">{s.label}</p>
                 </div>
               </CardContent>
             </Card>
@@ -110,14 +110,14 @@ export default async function DashboardPage() {
                 icon={<CalendarIcon className="h-10 w-10" />}
               />
             ) : (
-              <ul className="divide-y divide-slate-100">
+              <ul className="divide-y divide-slate-100 dark:divide-slate-800 dark:divide-slate-800">
                 {todaysJobs.map((job) => (
                   <li key={job.id} className="flex items-center justify-between gap-3 py-3">
                     <div className="min-w-0">
-                      <p className="truncate font-medium text-slate-900">
+                      <p className="truncate font-medium text-slate-900 dark:text-slate-100 dark:text-slate-100">
                         {one(job.customers)?.name ?? "Customer"}
                       </p>
-                      <p className="truncate text-sm text-slate-500">
+                      <p className="truncate text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-500">
                         {formatTime(job.scheduled_start, tz)} – {formatTime(job.scheduled_end, tz)}
                         {" · "}
                         {one(job.service_addresses)?.address_line1}
@@ -135,7 +135,7 @@ export default async function DashboardPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Open quotes</CardTitle>
-              <Link href="/dashboard/quotes" className="text-sm font-semibold text-brand-600 hover:text-brand-700">
+              <Link href="/dashboard/quotes" className="text-sm font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400">
                 View all
               </Link>
             </div>
@@ -149,20 +149,20 @@ export default async function DashboardPage() {
                 icon={<QuoteIcon className="h-10 w-10" />}
               />
             ) : (
-              <ul className="divide-y divide-slate-100">
+              <ul className="divide-y divide-slate-100 dark:divide-slate-800 dark:divide-slate-800">
                 {openQuotes.map((q) => (
                   <li key={q.id}>
-                    <Link href={`/dashboard/quotes/${q.id}`} className="flex items-center justify-between gap-3 py-3 hover:bg-slate-50">
+                    <Link href={`/dashboard/quotes/${q.id}`} className="flex items-center justify-between gap-3 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-900 dark:bg-slate-900">
                       <div className="min-w-0">
-                        <p className="truncate font-medium text-slate-900">
+                        <p className="truncate font-medium text-slate-900 dark:text-slate-100 dark:text-slate-100">
                           {q.quote_number} · {one(q.customers)?.name}
                         </p>
-                        <p className="truncate text-sm text-slate-500">
+                        <p className="truncate text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-500">
                           Valid until {formatDate(q.valid_until)}
                         </p>
                       </div>
                       <div className="shrink-0 text-right">
-                        <p className="font-semibold text-slate-900">{formatCents(q.total_cents)}</p>
+                        <p className="font-semibold text-slate-900 dark:text-slate-100 dark:text-slate-100">{formatCents(q.total_cents)}</p>
                         <QuoteStatusPill status={q.status as QuoteStatus} />
                       </div>
                     </Link>

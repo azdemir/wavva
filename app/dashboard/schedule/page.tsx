@@ -94,34 +94,34 @@ export default async function SchedulePage({
         {days.map(({ date, jobs: dayJobs }) => (
           <Card key={date.toISOString()}>
             <CardContent className="p-0">
-              <p className="border-b border-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">
+              <p className="border-b border-slate-100 dark:border-slate-800 px-4 py-3 text-sm font-semibold text-slate-700 dark:text-slate-300">
                 {fmtDay(date)}
               </p>
-              <ul className="divide-y divide-slate-100">
+              <ul className="divide-y divide-slate-100 dark:divide-slate-800">
                 {dayJobs.length === 0 && (
-                  <li className="px-4 py-3 text-xs text-slate-400">No visits</li>
+                  <li className="px-4 py-3 text-xs text-slate-400 dark:text-slate-500">No visits</li>
                 )}
                 {dayJobs.map((job) => {
                   const assigned: string[] = job.assigned_user_ids ?? [];
                   if (isCleaner && !assigned.includes(membership.user_id)) return null;
                   return (
                     <li key={job.id}>
-                      <Link href={`/dashboard/jobs/${job.id}`} className="block px-4 py-3 hover:bg-slate-50">
-                        <p className="text-sm font-medium text-slate-900">
+                      <Link href={`/dashboard/jobs/${job.id}`} className="block px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-900">
+                        <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
                           {formatTime(job.scheduled_start, tz)} · {one(job.customers)?.name}
                         </p>
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">
                           {one(job.service_addresses)?.address_line1}, {one(job.service_addresses)?.city}
                         </p>
                         <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                           <JobStatusPill status={job.status as JobStatus} />
                           {assigned.slice(0, 2).map((uid) => (
-                            <span key={uid} className="text-[11px] text-slate-500">
+                            <span key={uid} className="text-[11px] text-slate-500 dark:text-slate-400 dark:text-slate-500">
                               {emailOf(uid).split("@")[0]}
                             </span>
                           ))}
                           {assigned.length > 2 && (
-                            <span className="text-[11px] text-slate-500">+{assigned.length - 2}</span>
+                            <span className="text-[11px] text-slate-500 dark:text-slate-400 dark:text-slate-500">+{assigned.length - 2}</span>
                           )}
                         </div>
                       </Link>

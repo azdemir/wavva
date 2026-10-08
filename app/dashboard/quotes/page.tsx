@@ -68,20 +68,20 @@ export default async function QuotesPage({
       ) : (
         <Card>
           <CardContent className="p-0">
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-slate-100 dark:divide-slate-800">
               {(quotes ?? []).map((q) => (
                 <li key={q.id}>
-                  <Link href={`/dashboard/quotes/${q.id}`} className="flex items-center justify-between gap-3 px-5 py-4 hover:bg-slate-50">
+                  <Link href={`/dashboard/quotes/${q.id}`} className="flex items-center justify-between gap-3 px-5 py-4 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-900">
                     <div className="min-w-0">
-                      <p className="truncate font-medium text-slate-900">
+                      <p className="truncate font-medium text-slate-900 dark:text-slate-100">
                         {q.quote_number} · {one(q.customers)?.name}
                       </p>
-                      <p className="truncate text-sm text-slate-500">
+                      <p className="truncate text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
                         {q.valid_until ? `Valid until ${formatDate(q.valid_until)}` : "No expiry set"}
                       </p>
                     </div>
                     <div className="flex shrink-0 items-center gap-3">
-                      <span className="font-semibold text-slate-900">{formatCents(q.total_cents)}</span>
+                      <span className="font-semibold text-slate-900 dark:text-slate-100">{formatCents(q.total_cents)}</span>
                       <QuoteStatusPill status={q.status as QuoteStatus} />
                     </div>
                   </Link>

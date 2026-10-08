@@ -66,19 +66,19 @@ export default async function QuoteDetailPage({
           <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-200 text-left text-xs uppercase tracking-wide text-slate-500">
+              <tr className="border-b border-slate-200 dark:border-slate-800 text-left text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 dark:text-slate-500">
                 <th className="px-5 py-3 font-medium">Description</th>
                 <th className="px-5 py-3 text-right font-medium">Qty</th>
                 <th className="px-5 py-3 text-right font-medium">Unit price</th>
                 <th className="px-5 py-3 text-right font-medium">Total</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {(items ?? []).map((it) => (
                 <tr key={it.id}>
                   <td className="px-5 py-3">
                     {it.label}
-                    <span className="ml-2 text-xs text-slate-400">{statusLabel(it.kind)}</span>
+                    <span className="ml-2 text-xs text-slate-400 dark:text-slate-500">{statusLabel(it.kind)}</span>
                   </td>
                   <td className="px-5 py-3 text-right">{Number(it.qty)}</td>
                   <td className="px-5 py-3 text-right">{formatCents(it.unit_price_cents)}</td>
@@ -88,13 +88,13 @@ export default async function QuoteDetailPage({
             </tbody>
           </table>
           </div>
-          <div className="space-y-1 border-t border-slate-200 px-5 py-4 text-sm">
-            <div className="flex justify-between"><span className="text-slate-500">Subtotal</span><span>{formatCents(quote.subtotal_cents)}</span></div>
+          <div className="space-y-1 border-t border-slate-200 dark:border-slate-800 px-5 py-4 text-sm">
+            <div className="flex justify-between"><span className="text-slate-500 dark:text-slate-400 dark:text-slate-500">Subtotal</span><span>{formatCents(quote.subtotal_cents)}</span></div>
             {quote.discount_cents > 0 && (
-              <div className="flex justify-between"><span className="text-slate-500">Discount</span><span>−{formatCents(quote.discount_cents)}</span></div>
+              <div className="flex justify-between"><span className="text-slate-500 dark:text-slate-400 dark:text-slate-500">Discount</span><span>−{formatCents(quote.discount_cents)}</span></div>
             )}
-            <div className="flex justify-between"><span className="text-slate-500">Tax ({(Number(quote.tax_rate) * 100).toFixed(2)}%)</span><span>{formatCents(quote.tax_cents)}</span></div>
-            <div className="flex justify-between pt-1 text-base font-bold text-slate-900"><span>Total</span><span>{formatCents(quote.total_cents)}</span></div>
+            <div className="flex justify-between"><span className="text-slate-500 dark:text-slate-400 dark:text-slate-500">Tax ({(Number(quote.tax_rate) * 100).toFixed(2)}%)</span><span>{formatCents(quote.tax_cents)}</span></div>
+            <div className="flex justify-between pt-1 text-base font-bold text-slate-900 dark:text-slate-100"><span>Total</span><span>{formatCents(quote.total_cents)}</span></div>
           </div>
         </CardContent>
       </Card>
@@ -103,10 +103,10 @@ export default async function QuoteDetailPage({
         <Card>
           <CardContent className="space-y-2 pt-6 text-sm">
             {quote.valid_until && (
-              <p><span className="font-medium text-slate-700">Valid until:</span> {formatDate(quote.valid_until)}</p>
+              <p><span className="font-medium text-slate-700 dark:text-slate-300">Valid until:</span> {formatDate(quote.valid_until)}</p>
             )}
             {quote.notes && (
-              <p><span className="font-medium text-slate-700">Notes:</span> {quote.notes}</p>
+              <p><span className="font-medium text-slate-700 dark:text-slate-300">Notes:</span> {quote.notes}</p>
             )}
           </CardContent>
         </Card>
@@ -146,7 +146,7 @@ export default async function QuoteDetailPage({
                 await deleteQuote(id);
               }}
             >
-              <Button type="submit" variant="outline" className="border-red-200 text-red-600 hover:bg-red-50">
+              <Button type="submit" variant="outline" className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950">
                 Delete draft
               </Button>
             </form>
@@ -155,7 +155,7 @@ export default async function QuoteDetailPage({
       </Card>
 
       <p className="text-sm">
-        <Link href="/dashboard/quotes" className="font-medium text-brand-600 hover:text-brand-700">
+        <Link href="/dashboard/quotes" className="font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400">
           ← All quotes
         </Link>
       </p>

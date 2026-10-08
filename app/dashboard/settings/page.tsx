@@ -17,12 +17,12 @@ export default async function SettingsPage() {
         <Card className="transition hover:border-brand-300 hover:shadow-sm">
           <CardContent className="flex items-center justify-between py-5">
             <div>
-              <p className="font-semibold text-slate-900">Billing & plan</p>
-              <p className="text-sm text-slate-500">
+              <p className="font-semibold text-slate-900 dark:text-slate-100">Billing & plan</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
                 Your TidyPro subscription, team seats, and invoices from us.
               </p>
             </div>
-            <span className="text-sm font-semibold text-brand-700">Manage →</span>
+            <span className="text-sm font-semibold text-brand-700 dark:text-brand-400">Manage →</span>
           </CardContent>
         </Card>
       </Link>

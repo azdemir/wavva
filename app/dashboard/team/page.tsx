@@ -45,12 +45,12 @@ export default async function TeamPage() {
           <CardTitle>Members ({members?.length ?? 0})</CardTitle>
         </CardHeader>
         <CardContent>
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-slate-100 dark:divide-slate-800">
             {(members ?? []).map((m) => (
               <li key={m.id} className="flex items-center justify-between gap-3 py-3">
                 <div className="min-w-0">
-                  <p className="truncate font-medium text-slate-900">{m.email}</p>
-                  <p className="text-sm text-slate-500">
+                  <p className="truncate font-medium text-slate-900 dark:text-slate-100">{m.email}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
                     Joined {new Date(m.created_at).toLocaleDateString("en-US")}
                   </p>
                 </div>
@@ -96,7 +96,7 @@ export default async function TeamPage() {
               </div>
               <Button type="submit">Send invite</Button>
             </form>
-            <p className="mt-3 text-xs text-slate-500">
+            <p className="mt-3 text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">
               Email delivery arrives in a later stage — for now, share the
               invite link below directly.
             </p>
@@ -110,17 +110,17 @@ export default async function TeamPage() {
             <CardTitle>Pending invites</CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-slate-100 dark:divide-slate-800">
               {(invites ?? []).map((inv) => (
                 <li key={inv.id} className="flex flex-wrap items-center gap-3 py-3">
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-slate-900">
+                    <p className="font-medium text-slate-900 dark:text-slate-100">
                       {inv.email}{" "}
                       <Badge tone={roleTones[inv.role as keyof typeof roleTones] ?? "slate"}>
                         {statusLabel(inv.role)}
                       </Badge>
                     </p>
-                    <code className="mt-1 block truncate rounded bg-slate-100 px-2 py-1 text-xs text-slate-600">
+                    <code className="mt-1 block truncate rounded bg-slate-100 dark:bg-slate-800 px-2 py-1 text-xs text-slate-600 dark:text-slate-400 dark:text-slate-500">
                       {baseUrl}/invite/{inv.token}
                     </code>
                   </div>
