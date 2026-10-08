@@ -75,6 +75,19 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
           </Link>
         );
       })}
+      <div className="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800">
+        <Link
+          href="/"
+          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+          onClick={onNavigate}
+          aria-label="Back to website home"
+        >
+          <svg className="h-5 w-5 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10 3 3 10h3v7h4v-5h4v5h4v-7h3L10 3z" />
+          </svg>
+          <span className="flex-1">Website home</span>
+        </Link>
+      </div>
     </nav>
   );
 }
@@ -139,6 +152,13 @@ export default async function DashboardLayout({
         </div>
         <div className="overflow-x-auto px-4 pb-3">
           <div className="flex gap-1">
+            <Link
+              href="/"
+              aria-label="Back to website home"
+              className="whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-500 hover:bg-slate-100 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+            >
+              ⌂ Home
+            </Link>
             {nav
               .filter((n) => !n.soon)
               .map((item) => (
