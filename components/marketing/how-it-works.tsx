@@ -27,7 +27,7 @@ export function HowItWorks() {
   return (
     <section
       id="how-it-works"
-      className="scroll-mt-20 bg-slate-50 py-20 sm:py-24"
+      className="scroll-mt-20 bg-slate-50 dark:bg-slate-900 py-20 sm:py-24"
     >
       <Container>
         <SectionHeading
@@ -42,10 +42,10 @@ export function HowItWorks() {
                 <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-brand-600 text-lg font-bold text-white">
                   {s.n}
                 </span>
-                <h3 className="mt-4 text-lg font-semibold text-slate-900">
+                <h3 className="mt-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
                   {s.title}
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                   {s.description}
                 </p>
               </CardContent>

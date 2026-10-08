@@ -34,7 +34,7 @@ export function AreasStep() {
 
   return (
     <div className="space-y-5">
-      <p className="text-sm text-slate-600">
+      <p className="text-sm text-slate-600 dark:text-slate-400">
         Where does your business work? Define it by city, county, ZIP code, or
         radius — add as many as you serve.
       </p>
@@ -46,14 +46,14 @@ export function AreasStep() {
       {rows.map((r, i) => (
         <div key={i} className="flex items-end gap-3">
           <div className="w-32 shrink-0">
-            <label htmlFor={`area-type-${i}`} className="block text-sm font-medium text-slate-700">
+            <label htmlFor={`area-type-${i}`} className="block text-sm font-medium text-slate-700 dark:text-slate-300">
               Type
             </label>
             <select
               id={`area-type-${i}`}
               value={r.area_type}
               onChange={(e) => set(i, { area_type: e.target.value as Row["area_type"] })}
-              className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm"
+              className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white px-3 text-sm"
             >
               <option value="city">City</option>
               <option value="county">County</option>

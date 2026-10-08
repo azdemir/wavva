@@ -26,21 +26,21 @@ export function PlanCards() {
             </div>
           )}
           <CardContent className="flex h-full flex-col">
-            <h3 className="text-lg font-semibold text-slate-900">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
               {plan.name}
             </h3>
-            <p className="mt-1 text-sm text-slate-500">{plan.blurb}</p>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{plan.blurb}</p>
             <p className="mt-4">
-              <span className="text-4xl font-bold tracking-tight text-slate-900">
+              <span className="text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
                 ${plan.price}
               </span>
-              <span className="text-sm text-slate-500"> /month</span>
+              <span className="text-sm text-slate-500 dark:text-slate-400"> /month</span>
             </p>
             <ul className="mt-6 flex-1 space-y-3">
               {plan.features.map((f) => (
                 <li
                   key={f}
-                  className="flex items-start gap-2.5 text-sm text-slate-600"
+                  className="flex items-start gap-2.5 text-sm text-slate-600 dark:text-slate-400"
                 >
                   <CheckIcon className="mt-0.5 h-5 w-5 shrink-0 text-accent-600" />
                   {f}
@@ -72,7 +72,7 @@ export function PricingDisclaimer({ className = "" }: { className?: string }) {
 
 export function Pricing() {
   return (
-    <section id="pricing" className="scroll-mt-20 bg-white py-20 sm:py-24">
+    <section id="pricing" className="scroll-mt-20 bg-white py-20 sm:py-24 dark:bg-slate-950">
       <Container>
         <SectionHeading
           eyebrow="Pricing"

@@ -27,9 +27,9 @@ export async function FollowupStatus({ quoteId, companyId }: { quoteId: string; 
         <ul className="space-y-2 text-sm">
           {touches.map((t) => (
             <li key={t.step} className="flex min-w-0 items-center justify-between gap-3">
-              <span className="min-w-0 truncate text-slate-600">
+              <span className="min-w-0 truncate text-slate-600 dark:text-slate-400 dark:text-slate-500">
                 Follow-up {t.step}
-                <span className="text-slate-400">
+                <span className="text-slate-400 dark:text-slate-500">
                   {" "}· {t.sent_at ? `sent ${formatDateTime(t.sent_at)}` : `scheduled ${formatDateTime(t.scheduled_for)}`}
                 </span>
               </span>
@@ -39,7 +39,7 @@ export async function FollowupStatus({ quoteId, companyId }: { quoteId: string; 
             </li>
           ))}
         </ul>
-        <p className="mt-3 text-xs text-slate-500">
+        <p className="mt-3 text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">
           Sending stops automatically if the customer approves, declines, or the quote expires.
           Configure this in Settings.
         </p>

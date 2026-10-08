@@ -51,7 +51,7 @@ const features = [
 
 export function Features() {
   return (
-    <section id="features" className="scroll-mt-20 bg-white py-20 sm:py-24">
+    <section id="features" className="scroll-mt-20 bg-white py-20 sm:py-24 dark:bg-slate-950">
       <Container>
         <SectionHeading
           eyebrow="Features"
@@ -63,10 +63,10 @@ export function Features() {
             <Card key={f.title} className="transition-shadow hover:shadow-md">
               <CardContent>
                 <CardIcon>{f.icon}</CardIcon>
-                <h3 className="text-lg font-semibold text-slate-900">
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                   {f.title}
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                   {f.description}
                 </p>
               </CardContent>

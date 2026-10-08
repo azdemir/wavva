@@ -49,7 +49,7 @@ export function TeamStep({ baseUrl }: { baseUrl: string }) {
 
   return (
     <div className="space-y-5">
-      <p className="text-sm text-slate-600">
+      <p className="text-sm text-slate-600 dark:text-slate-400">
         Invite managers and cleaners. They&apos;ll get a private link to join
         your workspace — share it with them directly for now.
       </p>
@@ -67,7 +67,7 @@ export function TeamStep({ baseUrl }: { baseUrl: string }) {
           {invites.map((inv) => (
             <div key={inv.link} className="flex items-center gap-2 text-sm">
               <Badge tone="accent">{inv.role}</Badge>
-              <code className="min-w-0 flex-1 truncate rounded bg-white px-2 py-1 text-xs text-slate-700">
+              <code className="min-w-0 flex-1 truncate rounded bg-white px-2 py-1 text-xs text-slate-700 dark:text-slate-300">
                 {inv.link}
               </code>
             </div>
@@ -95,7 +95,7 @@ export function TeamStep({ baseUrl }: { baseUrl: string }) {
               id={`inv-role-${i}`}
               value={r.role}
               onChange={(e) => set(i, { role: e.target.value as Row["role"] })}
-              className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm"
+              className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white px-3 text-sm"
             >
               <option value="cleaner">Cleaner</option>
               <option value="manager">Manager</option>
@@ -126,11 +126,11 @@ export function TeamStep({ baseUrl }: { baseUrl: string }) {
         </Button>
       </div>
 
-      <div className="border-t border-slate-200 pt-5">
+      <div className="border-t border-slate-200 dark:border-slate-800 pt-5">
         <Button onClick={finish} className="w-full" disabled={finishing}>
           {finishing ? "Finishing…" : "Finish setup →"}
         </Button>
-        <p className="mt-2 text-center text-xs text-slate-500">
+        <p className="mt-2 text-center text-xs text-slate-500 dark:text-slate-400">
           You can invite your team later from the Team page too.
         </p>
       </div>

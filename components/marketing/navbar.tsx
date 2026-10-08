@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Logo } from "@/components/ui/logo";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 const links = [
   { label: "Features", href: "/features" },
@@ -12,7 +13,7 @@ const links = [
 
 export function Navbar() {
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/85 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/85 backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
       <Container>
         <nav
           aria-label="Primary"
@@ -27,7 +28,7 @@ export function Navbar() {
               <Link
                 key={l.href}
                 href={l.href}
-                className="rounded-md px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                className="rounded-md px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 hover:text-slate-900 dark:hover:text-white dark:text-slate-100"
               >
                 {l.label}
               </Link>
@@ -35,6 +36,7 @@ export function Navbar() {
           </div>
 
           <div className="hidden items-center gap-2 md:flex">
+            <ThemeToggle />
             <Button href="/signin" variant="ghost" size="sm">
               Sign in
             </Button>
@@ -43,22 +45,24 @@ export function Navbar() {
             </Button>
           </div>
 
-          {/* No-JS mobile menu */}
-          <details className="relative md:hidden">
-            <summary className="cursor-pointer list-none rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 [&::-webkit-details-marker]:hidden">
-              Menu
-            </summary>
-            <div className="absolute top-12 right-0 w-56 rounded-xl border border-slate-200 bg-white p-2 shadow-lg">
+          {/* Mobile: theme toggle + no-JS menu */}
+          <div className="flex items-center gap-2 md:hidden">
+            <ThemeToggle />
+            <details className="relative">
+              <summary className="cursor-pointer list-none rounded-lg border border-slate-300 dark:border-slate-700 px-4 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 [&::-webkit-details-marker]:hidden">
+                Menu
+              </summary>
+            <div className="absolute top-12 right-0 w-56 rounded-xl border border-slate-200 bg-white p-2 shadow-lg dark:border-slate-800 dark:bg-slate-900">
               {links.map((l) => (
                 <Link
                   key={l.href}
                   href={l.href}
-                  className="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                  className="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800"
                 >
                   {l.label}
                 </Link>
               ))}
-              <div className="mt-2 space-y-2 border-t border-slate-200 pt-2">
+              <div className="mt-2 space-y-2 border-t border-slate-200 dark:border-slate-800 pt-2">
                 <Button href="/signin" variant="outline" size="sm" className="w-full">
                   Sign in
                 </Button>
@@ -68,6 +72,7 @@ export function Navbar() {
               </div>
             </div>
           </details>
+          </div>
         </nav>
       </Container>
     </header>

@@ -23,7 +23,7 @@ const placeholders = [
 
 export function Testimonials() {
   return (
-    <section id="stories" className="scroll-mt-20 bg-slate-50 py-20 sm:py-24">
+    <section id="stories" className="scroll-mt-20 bg-slate-50 dark:bg-slate-900 py-20 sm:py-24">
       <Container>
         <SectionHeading
           eyebrow="Customer stories"
@@ -34,12 +34,12 @@ export function Testimonials() {
           {placeholders.map((p, i) => (
             <figure
               key={i}
-              className="flex flex-col rounded-xl border-2 border-dashed border-slate-300 bg-white p-6"
+              className="flex flex-col rounded-xl border-2 border-dashed border-slate-300 bg-white p-6 dark:border-slate-700 dark:bg-slate-900"
             >
               <Badge tone="slate" className="mb-4 self-start">
                 Placeholder
               </Badge>
-              <blockquote className="flex-1 text-sm leading-relaxed text-slate-500 italic">
+              <blockquote className="flex-1 text-sm leading-relaxed text-slate-500 dark:text-slate-400 italic">
                 “{p.quote}”
               </blockquote>
               <figcaption className="mt-4 text-sm font-medium text-slate-400">

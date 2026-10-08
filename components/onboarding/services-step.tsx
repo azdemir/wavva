@@ -54,7 +54,7 @@ export function ServicesStep({ initial }: { initial?: Row[] }) {
 
   return (
     <div className="space-y-5">
-      <p className="text-sm text-slate-600">
+      <p className="text-sm text-slate-600 dark:text-slate-400">
         Add the cleaning services you sell. You can change these anytime later.
       </p>
       {error && (
@@ -63,9 +63,9 @@ export function ServicesStep({ initial }: { initial?: Row[] }) {
         </div>
       )}
       {rows.map((r, i) => (
-        <div key={i} className="space-y-3 rounded-xl border border-slate-200 p-4">
+        <div key={i} className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-800 p-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-slate-700">
+            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
               Service {i + 1}
             </span>
             {rows.length > 1 && (
@@ -87,14 +87,14 @@ export function ServicesStep({ initial }: { initial?: Row[] }) {
           />
           <div className="grid gap-3 sm:grid-cols-3">
             <div>
-              <label htmlFor={`svc-cat-${i}`} className="block text-sm font-medium text-slate-700">
+              <label htmlFor={`svc-cat-${i}`} className="block text-sm font-medium text-slate-700 dark:text-slate-300">
                 Type
               </label>
               <select
                 id={`svc-cat-${i}`}
                 value={r.category}
                 onChange={(e) => set(i, { category: e.target.value as Row["category"] })}
-                className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm"
+                className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white px-3 text-sm"
               >
                 <option value="residential">Residential</option>
                 <option value="commercial">Commercial</option>
@@ -111,14 +111,14 @@ export function ServicesStep({ initial }: { initial?: Row[] }) {
               placeholder="129.00"
             />
             <div>
-              <label htmlFor={`svc-unit-${i}`} className="block text-sm font-medium text-slate-700">
+              <label htmlFor={`svc-unit-${i}`} className="block text-sm font-medium text-slate-700 dark:text-slate-300">
                 Priced
               </label>
               <select
                 id={`svc-unit-${i}`}
                 value={r.unit}
                 onChange={(e) => set(i, { unit: e.target.value as Row["unit"] })}
-                className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm"
+                className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white px-3 text-sm"
               >
                 {(Object.keys(unitLabels) as (keyof typeof unitLabels)[]).map((u) => (
                   <option key={u} value={u}>

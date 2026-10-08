@@ -4,7 +4,7 @@ import { SectionHeading } from "@/components/ui/section-heading";
 
 export function Faq() {
   return (
-    <section id="faq" className="scroll-mt-20 bg-white py-20 sm:py-24">
+    <section id="faq" className="scroll-mt-20 bg-white py-20 sm:py-24 dark:bg-slate-950">
       <Container>
         <SectionHeading
           eyebrow="FAQ"
@@ -15,20 +15,20 @@ export function Faq() {
           {faqs.map((f) => (
             <details
               key={f.q}
-              className="group rounded-xl border border-slate-200 bg-white px-6 py-4 open:shadow-sm"
+              className="group rounded-xl border border-slate-200 bg-white px-6 py-4 open:shadow-sm dark:border-slate-800 dark:bg-slate-900"
             >
-              <summary className="cursor-pointer list-none text-base font-semibold text-slate-900 [&::-webkit-details-marker]:hidden">
+              <summary className="cursor-pointer list-none text-base font-semibold text-slate-900 dark:text-slate-100 [&::-webkit-details-marker]:hidden">
                 <span className="flex items-center justify-between gap-4">
                   {f.q}
                   <span
                     aria-hidden="true"
-                    className="text-xl font-normal text-brand-600 transition-transform group-open:rotate-45"
+                    className="text-xl font-normal text-brand-600 dark:text-brand-400 transition-transform group-open:rotate-45"
                   >
                     +
                   </span>
                 </span>
               </summary>
-              <p className="mt-3 text-sm leading-relaxed text-slate-600">
+              <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                 {f.a}
               </p>
             </details>
