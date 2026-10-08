@@ -6,7 +6,7 @@ import { PageHero } from "@/components/marketing/page-hero";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Field, TextareaField } from "@/components/ui/input";
+import { ContactForm } from "@/components/marketing/contact-form";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -88,57 +88,8 @@ export default function ContactPage() {
                     Tell us about your business and what you&apos;re looking for.
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div
-                    role="note"
-                    className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200"
-                  >
-                    Preview only — this form isn&apos;t collecting messages yet.
-                    Email{" "}
-                    <a
-                      href={`mailto:${site.email}`}
-                      className="font-semibold underline"
-                    >
-                      {site.email}
-                    </a>{" "}
-                    to reach us directly.
-                  </div>
-                  {/* No form element: the submit is disabled (preview only),
-                      and server components can't carry event handlers. */}
-                  <div className="space-y-4">
-                    <Field
-                      id="contact-name"
-                      label="Your name"
-                      type="text"
-                      autoComplete="name"
-                      placeholder="Jordan Smith"
-                      required
-                    />
-                    <Field
-                      id="contact-company"
-                      label="Company name"
-                      type="text"
-                      autoComplete="organization"
-                      placeholder="Capital Region Clean Co."
-                    />
-                    <Field
-                      id="contact-email"
-                      label="Email"
-                      type="email"
-                      autoComplete="email"
-                      placeholder="you@company.com"
-                      required
-                    />
-                    <TextareaField
-                      id="contact-message"
-                      label="Message"
-                      placeholder="We run a 4-person residential cleaning crew in Albany and…"
-                      required
-                    />
-                    <Button type="submit" className="w-full" disabled>
-                      Send message
-                    </Button>
-                  </div>
+                <CardContent>
+                  <ContactForm />
                 </CardContent>
               </Card>
             </div>
