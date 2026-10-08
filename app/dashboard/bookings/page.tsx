@@ -22,15 +22,15 @@ type BookingRow = {
 
 function BookingList({ bookings, tz }: { bookings: BookingRow[]; tz: string }) {
   return (
-    <ul className="divide-y divide-slate-100">
+    <ul className="divide-y divide-slate-100 dark:divide-slate-800">
       {bookings.map((b) => (
         <li key={b.id}>
-          <Link href={`/dashboard/bookings/${b.id}`} className="flex items-center justify-between gap-3 px-5 py-4 hover:bg-slate-50">
+          <Link href={`/dashboard/bookings/${b.id}`} className="flex items-center justify-between gap-3 px-5 py-4 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-900">
             <div className="min-w-0">
-              <p className="truncate font-medium text-slate-900">
+              <p className="truncate font-medium text-slate-900 dark:text-slate-100">
                 {b.booking_number} · {b.customers?.name}
               </p>
-              <p className="truncate text-sm text-slate-500">
+              <p className="truncate text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
                 {formatDate(b.scheduled_start)}, {formatTime(b.scheduled_start, tz)} – {formatTime(b.scheduled_end, tz)}
                 {" · "}{b.service_addresses?.address_line1}, {b.service_addresses?.city}
                 {b.recurrence !== "none" && ` · repeats ${b.recurrence}`}
@@ -90,7 +90,7 @@ export default async function BookingsPage() {
             </CardHeader>
             <CardContent className="p-0">
               {upcoming.length === 0 ? (
-                <p className="px-5 py-4 text-sm text-slate-500">Nothing upcoming.</p>
+                <p className="px-5 py-4 text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">Nothing upcoming.</p>
               ) : (
                 <BookingList bookings={upcoming} tz={tz} />
               )}

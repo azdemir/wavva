@@ -69,23 +69,23 @@ export default async function InvoicesPage({
       ) : (
         <Card>
           <CardContent className="p-0">
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-slate-100 dark:divide-slate-800">
               {(invoices ?? []).map((inv) => {
                 const due = inv.total_cents - inv.amount_paid_cents;
                 return (
                   <li key={inv.id}>
-                    <Link href={`/dashboard/invoices/${inv.id}`} className="flex items-center justify-between gap-3 px-5 py-4 hover:bg-slate-50">
+                    <Link href={`/dashboard/invoices/${inv.id}`} className="flex items-center justify-between gap-3 px-5 py-4 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-900">
                       <div className="min-w-0">
-                        <p className="truncate font-medium text-slate-900">
+                        <p className="truncate font-medium text-slate-900 dark:text-slate-100">
                           {inv.invoice_number} · {one(inv.customers)?.name}
                         </p>
-                        <p className="truncate text-sm text-slate-500">
+                        <p className="truncate text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
                           {inv.due_date ? `Due ${formatDate(inv.due_date)}` : "No due date"}
                           {due > 0 && inv.status !== "draft" && ` · ${formatCents(due)} due`}
                         </p>
                       </div>
                       <div className="flex shrink-0 items-center gap-3">
-                        <span className="font-semibold text-slate-900">{formatCents(inv.total_cents)}</span>
+                        <span className="font-semibold text-slate-900 dark:text-slate-100">{formatCents(inv.total_cents)}</span>
                         <InvoiceStatusPill status={inv.status as InvoiceStatus} />
                       </div>
                     </Link>

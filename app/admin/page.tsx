@@ -60,8 +60,8 @@ export default async function AdminPage() {
         {stats.map((s) => (
           <Card key={s.label}>
             <CardContent className="pt-6">
-              <p className="text-2xl font-bold text-slate-900">{s.value}</p>
-              <p className="text-sm text-slate-500">{s.label}</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-slate-100 dark:text-slate-100">{s.value}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-500">{s.label}</p>
             </CardContent>
           </Card>
         ))}
@@ -75,7 +75,7 @@ export default async function AdminPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-200 text-left text-xs uppercase tracking-wide text-slate-500">
+                <tr className="border-b border-slate-200 dark:border-slate-800 text-left text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-500">
                   <th className="px-5 py-3 font-medium">Company</th>
                   <th className="px-5 py-3 font-medium">Contact</th>
                   <th className="px-5 py-3 text-center font-medium">Members</th>
@@ -84,11 +84,11 @@ export default async function AdminPage() {
                   <th className="px-5 py-3 text-right font-medium">Created</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 dark:divide-slate-800">
                 {(companies ?? []).map((c) => (
                   <tr key={c.id}>
-                    <td className="px-5 py-3 font-medium text-slate-900">{c.name}</td>
-                    <td className="px-5 py-3 text-slate-600">
+                    <td className="px-5 py-3 font-medium text-slate-900 dark:text-slate-100 dark:text-slate-100">{c.name}</td>
+                    <td className="px-5 py-3 text-slate-600 dark:text-slate-400 dark:text-slate-500 dark:text-slate-500">
                       {[c.email, c.phone].filter(Boolean).join(" · ") || "—"}
                     </td>
                     <td className="px-5 py-3 text-center">{memberCount.get(c.id) ?? 0}</td>
@@ -102,7 +102,7 @@ export default async function AdminPage() {
                         {c.stripe_onboarded ? "Live" : "—"}
                       </Badge>
                     </td>
-                    <td className="px-5 py-3 text-right text-slate-500">
+                    <td className="px-5 py-3 text-right text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-500">
                       {formatDate(c.created_at)}
                     </td>
                   </tr>

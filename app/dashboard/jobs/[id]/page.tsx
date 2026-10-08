@@ -72,44 +72,44 @@ export default async function JobDetailPage({
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
           <p>
-            <span className="font-medium text-slate-700">Address: </span>
+            <span className="font-medium text-slate-700 dark:text-slate-300">Address: </span>
             {address?.label}: {address?.address_line1}
             {address?.address_line2 ? `, ${address.address_line2}` : ""}, {address?.city},{" "}
             {address?.state} {address?.zip}
           </p>
           {customer?.phone && (
             <p>
-              <span className="font-medium text-slate-700">Customer phone: </span>
-              <a href={`tel:${customer.phone}`} className="text-brand-600 hover:text-brand-700">
+              <span className="font-medium text-slate-700 dark:text-slate-300">Customer phone: </span>
+              <a href={`tel:${customer.phone}`} className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400">
                 {customer.phone}
               </a>
             </p>
           )}
           {address?.access_instructions && (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-800 dark:bg-amber-950">
               <p className="font-medium text-amber-800">Access instructions</p>
               <p className="text-amber-900">{address.access_instructions}</p>
             </div>
           )}
           {booking?.notes && (
             <p>
-              <span className="font-medium text-slate-700">Booking notes: </span>
+              <span className="font-medium text-slate-700 dark:text-slate-300">Booking notes: </span>
               {booking.notes}
             </p>
           )}
           {booking?.booking_number && (
             <p>
-              <span className="font-medium text-slate-700">Booking: </span>
-              <Link href={`/dashboard/bookings/${job.booking_id}`} className="text-brand-600 hover:text-brand-700">
+              <span className="font-medium text-slate-700 dark:text-slate-300">Booking: </span>
+              <Link href={`/dashboard/bookings/${job.booking_id}`} className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400">
                 {booking.booking_number}
               </Link>
             </p>
           )}
           {job.started_at && (
-            <p className="text-slate-500">Started {formatTime(job.started_at, tz)}</p>
+            <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500">Started {formatTime(job.started_at, tz)}</p>
           )}
           {job.completed_at && (
-            <p className="text-slate-500">Completed {formatTime(job.completed_at, tz)}</p>
+            <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500">Completed {formatTime(job.completed_at, tz)}</p>
           )}
         </CardContent>
       </Card>
@@ -140,13 +140,13 @@ export default async function JobDetailPage({
                     placeholder="Anything the customer should know…"
                   />
                 </div>
-                <Button type="submit" variant="outline" className="border-accent-300 text-accent-700 hover:bg-accent-50">
+                <Button type="submit" variant="outline" className="border-accent-300 text-accent-700 hover:bg-accent-50 dark:border-accent-800 dark:text-accent-400 dark:hover:bg-accent-950">
                   Complete job
                 </Button>
               </form>
             )}
             <form action={async () => { "use server"; await cancelJob(id); }}>
-              <Button type="submit" variant="outline" className="border-red-200 text-red-600 hover:bg-red-50">
+              <Button type="submit" variant="outline" className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950">
                 Cancel
               </Button>
             </form>
@@ -196,7 +196,7 @@ export default async function JobDetailPage({
               />
               <Button type="submit" variant="outline">Save notes</Button>
             </form>
-            <p className="mt-3 text-xs text-slate-500">
+            <p className="mt-3 text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">
               Photo documentation unlocks once object storage is configured.
             </p>
           </CardContent>
@@ -204,7 +204,7 @@ export default async function JobDetailPage({
       )}
 
       <p className="text-sm">
-        <Link href="/dashboard/schedule" className="font-medium text-brand-600 hover:text-brand-700">
+        <Link href="/dashboard/schedule" className="font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400">
           ← Schedule
         </Link>
       </p>

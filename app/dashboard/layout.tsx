@@ -19,6 +19,7 @@ import {
   BellIcon,
 } from "@/components/ui/icons";
 import { Logo, LogoMark } from "@/components/ui/logo";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 type NavItem = {
   href: string;
@@ -59,7 +60,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
           </>
         );
         const cls =
-          "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900";
+          "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 hover:text-slate-900";
         return item.soon ? (
           <span
             key={item.href}
@@ -86,9 +87,9 @@ export default async function DashboardLayout({
   const { user, membership, company } = await requireCompany();
 
   return (
-    <div className="min-h-screen bg-slate-50 md:flex">
+    <div className="min-h-screen bg-slate-50 md:flex dark:bg-slate-950">
       {/* Desktop sidebar */}
-      <aside className="hidden w-64 shrink-0 border-r border-slate-200 bg-white md:block">
+      <aside className="hidden w-64 shrink-0 border-r border-slate-200 bg-white md:block dark:border-slate-800 dark:bg-slate-900">
         <div className="flex h-full flex-col">
           <Link href="/dashboard" className="flex items-center gap-2.5 px-5 pb-5 pt-6">
 <LogoMark className="h-9 w-9" />
@@ -96,14 +97,37 @@ export default async function DashboardLayout({
           <div className="flex-1 overflow-y-auto px-3">
             <NavLinks />
           </div>
-          <div className="border-t border-slate-200 p-4">
+          <div className="border-t border-slate-200 p-4 dark:border-slate-800">
             <p className="truncate text-sm font-semibold text-slate-900">
               {company.name}
             </p>
             <p className="truncate text-xs text-slate-500">
               {user.email} · {membership.role}
             </p>
-            <form action={signOut} className="mt-3">
+            <div className="mt-3 flex items-center justify-between">
+              <form action={signOut}>
+                <button
+                  type="submit"
+                  className="text-sm font-medium text-slate-500 hover:text-slate-800"
+                >
+                  Sign out
+                </button>
+              </form>
+              <ThemeToggle className="h-8 w-8" />
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      {/* Mobile header */}
+      <div className="border-b border-slate-200 bg-white md:hidden dark:border-slate-800 dark:bg-slate-900">
+        <div className="flex items-center justify-between px-4 py-3">
+          <Link href="/dashboard" className="flex items-center gap-2">
+<Logo />
+          </Link>
+          <div className="flex items-center gap-2">
+            <ThemeToggle className="h-8 w-8" />
+            <form action={signOut}>
               <button
                 type="submit"
                 className="text-sm font-medium text-slate-500 hover:text-slate-800"
@@ -113,23 +137,6 @@ export default async function DashboardLayout({
             </form>
           </div>
         </div>
-      </aside>
-
-      {/* Mobile header */}
-      <div className="border-b border-slate-200 bg-white md:hidden">
-        <div className="flex items-center justify-between px-4 py-3">
-          <Link href="/dashboard" className="flex items-center gap-2">
-<Logo />
-          </Link>
-          <form action={signOut}>
-            <button
-              type="submit"
-              className="text-sm font-medium text-slate-500 hover:text-slate-800"
-            >
-              Sign out
-            </button>
-          </form>
-        </div>
         <div className="overflow-x-auto px-4 pb-3">
           <div className="flex gap-1">
             {nav
@@ -138,7 +145,7 @@ export default async function DashboardLayout({
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
+                  className="whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
                 >
                   {item.label}
                 </Link>

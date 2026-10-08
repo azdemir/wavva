@@ -63,32 +63,32 @@ export default async function AuditPage({
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-200 text-left text-xs uppercase tracking-wide text-slate-500">
+                <tr className="border-b border-slate-200 dark:border-slate-800 text-left text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 dark:text-slate-500">
                   <th className="px-5 py-3 font-medium">When</th>
                   <th className="px-5 py-3 font-medium">Action</th>
                   <th className="px-5 py-3 font-medium">Entity</th>
                   <th className="px-5 py-3 font-medium">Actor</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {(logs ?? []).map((l) => (
                   <tr key={l.id}>
-                    <td className="whitespace-nowrap px-5 py-3 text-slate-500">
+                    <td className="whitespace-nowrap px-5 py-3 text-slate-500 dark:text-slate-400 dark:text-slate-500">
                       {new Date(l.created_at).toLocaleString("en-US")}
                     </td>
                     <td className="px-5 py-3">
                       <Badge tone="slate">{l.action}</Badge>
                     </td>
-                    <td className="px-5 py-3 text-slate-600">
+                    <td className="px-5 py-3 text-slate-600 dark:text-slate-400 dark:text-slate-500">
                       {l.entity_type}
-                      {l.entity_id ? <span className="text-slate-400"> · {l.entity_id.slice(0, 8)}</span> : ""}
+                      {l.entity_id ? <span className="text-slate-400 dark:text-slate-500"> · {l.entity_id.slice(0, 8)}</span> : ""}
                     </td>
-                    <td className="px-5 py-3 text-slate-600">{emailOf(l.actor_user_id)}</td>
+                    <td className="px-5 py-3 text-slate-600 dark:text-slate-400 dark:text-slate-500">{emailOf(l.actor_user_id)}</td>
                   </tr>
                 ))}
                 {(logs ?? []).length === 0 && (
                   <tr>
-                    <td colSpan={4} className="px-5 py-8 text-center text-sm text-slate-500">
+                    <td colSpan={4} className="px-5 py-8 text-center text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
                       No events match.
                     </td>
                   </tr>

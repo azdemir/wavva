@@ -44,14 +44,14 @@ export default async function BillingPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center gap-2 text-sm">
-            <span className="text-slate-600">Status:</span>
+            <span className="text-slate-600 dark:text-slate-400 dark:text-slate-500">Status:</span>
             {!connected && <Badge tone="slate">Not connected</Badge>}
             {connected && !onboarded && <Badge tone="amber">Onboarding incomplete</Badge>}
             {connected && onboarded && <Badge tone="accent">Ready to accept payments</Badge>}
           </div>
 
           {!isStripeConfigured() && (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
               The platform hasn&apos;t configured Stripe yet (no STRIPE_SECRET_KEY).
               Offline payments (cash, check) work regardless — see any invoice.
             </div>
@@ -62,7 +62,7 @@ export default async function BillingPage() {
           )}
 
           {connected && onboarded && (
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-slate-600 dark:text-slate-400 dark:text-slate-500">
               Customers with portal links can now pay invoices online. Payouts
               land in the bank account on your Stripe Express dashboard.
             </p>

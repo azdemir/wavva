@@ -59,9 +59,9 @@ export default async function NewBookingPage({
         <Heading title="New booking" description="Schedule a cleaning visit." />
         <Card>
           <CardContent className="pt-6">
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-slate-600 dark:text-slate-400 dark:text-slate-500">
               You need a customer with a service address first.{" "}
-              <Link href="/dashboard/customers/new" className="font-semibold text-brand-600 hover:text-brand-700">
+              <Link href="/dashboard/customers/new" className="font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400">
                 Add a customer →
               </Link>
             </p>

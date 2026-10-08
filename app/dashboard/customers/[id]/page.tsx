@@ -94,13 +94,13 @@ export default async function CustomerDetailPage({
         </CardHeader>
         <CardContent className="space-y-4">
           {(addresses ?? []).map((a) => (
-            <div key={a.id} className="flex items-start justify-between gap-3 rounded-xl border border-slate-200 p-4">
+            <div key={a.id} className="flex items-start justify-between gap-3 rounded-xl border border-slate-200 dark:border-slate-800 p-4">
               <div className="min-w-0">
-                <p className="font-medium text-slate-900">
+                <p className="font-medium text-slate-900 dark:text-slate-100">
                   {a.label}{" "}
                   {a.is_default && <Badge tone="brand">Default</Badge>}
                 </p>
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-slate-600 dark:text-slate-400 dark:text-slate-500">
                   {a.address_line1}
                   {a.address_line2 ? `, ${a.address_line2}` : ""}, {a.city},{" "}
                   {a.state} {a.zip}
@@ -127,7 +127,7 @@ export default async function CustomerDetailPage({
           <CardTitle>Customer portal</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="mb-3 text-sm text-slate-600">
+          <p className="mb-3 text-sm text-slate-600 dark:text-slate-400 dark:text-slate-500">
             Share a private link so this customer can approve quotes, see
             upcoming visits, and pay invoices — no login needed.
           </p>
@@ -142,15 +142,15 @@ export default async function CustomerDetailPage({
           </CardHeader>
           <CardContent>
             {(bookings ?? []).length === 0 ? (
-              <p className="text-sm text-slate-500">No bookings yet.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">No bookings yet.</p>
             ) : (
-              <ul className="divide-y divide-slate-100">
+              <ul className="divide-y divide-slate-100 dark:divide-slate-800">
                 {(bookings ?? []).map((b) => (
                   <li key={b.id} className="py-2 text-sm">
-                    <Link href={`/dashboard/bookings/${b.id}`} className="font-medium text-brand-600 hover:text-brand-700">
+                    <Link href={`/dashboard/bookings/${b.id}`} className="font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400">
                       {b.booking_number}
                     </Link>{" "}
-                    <span className="text-slate-500">· {formatDate(b.scheduled_start)}</span>{" "}
+                    <span className="text-slate-500 dark:text-slate-400 dark:text-slate-500">· {formatDate(b.scheduled_start)}</span>{" "}
                     <JobStatusPill status={b.status as JobStatus} />
                   </li>
                 ))}
@@ -164,15 +164,15 @@ export default async function CustomerDetailPage({
           </CardHeader>
           <CardContent>
             {(quotes ?? []).length === 0 ? (
-              <p className="text-sm text-slate-500">No quotes yet.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">No quotes yet.</p>
             ) : (
-              <ul className="divide-y divide-slate-100">
+              <ul className="divide-y divide-slate-100 dark:divide-slate-800">
                 {(quotes ?? []).map((q) => (
                   <li key={q.id} className="py-2 text-sm">
-                    <Link href={`/dashboard/quotes/${q.id}`} className="font-medium text-brand-600 hover:text-brand-700">
+                    <Link href={`/dashboard/quotes/${q.id}`} className="font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400">
                       {q.quote_number}
                     </Link>{" "}
-                    <span className="text-slate-500">· {formatCents(q.total_cents)}</span>{" "}
+                    <span className="text-slate-500 dark:text-slate-400 dark:text-slate-500">· {formatCents(q.total_cents)}</span>{" "}
                     <QuoteStatusPill status={q.status as QuoteStatus} />
                   </li>
                 ))}
@@ -190,10 +190,10 @@ export default async function CustomerDetailPage({
               await deleteCustomer(id);
             }}
           >
-            <Button type="submit" variant="outline" className="border-red-200 text-red-600 hover:bg-red-50">
+            <Button type="submit" variant="outline" className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950">
               Delete customer
             </Button>
-            <p className="mt-2 text-xs text-slate-500">
+            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">
               Only possible when the customer has no active bookings. Addresses
               are removed with the customer.
             </p>

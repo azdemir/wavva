@@ -30,15 +30,15 @@ export default function ContactPage() {
               <div className="space-y-6">
                 <Card>
                   <CardContent>
-                    <h2 className="text-lg font-semibold text-slate-900">
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                       Email us
                     </h2>
-                    <p className="mt-2 text-sm text-slate-600">
+                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
                       The fastest way to reach a human.
                     </p>
                     <a
                       href={`mailto:${site.email}`}
-                      className="mt-3 inline-block text-base font-semibold text-brand-600 hover:text-brand-700"
+                      className="mt-3 inline-block text-base font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400"
                     >
                       {site.email}
                     </a>
@@ -46,10 +46,10 @@ export default function ContactPage() {
                 </Card>
                 <Card>
                   <CardContent>
-                    <h2 className="text-lg font-semibold text-slate-900">
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                       Join the pilot program
                     </h2>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                       We&apos;re onboarding a small group of cleaning businesses
                       now and building the roadmap around their feedback. Pilot
                       members get extra onboarding help and a voice in what we
@@ -62,10 +62,10 @@ export default function ContactPage() {
                 </Card>
                 <Card>
                   <CardContent>
-                    <h2 className="text-lg font-semibold text-slate-900">
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                       Prefer to explore first?
                     </h2>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                       Browse the feature tour and pricing — most questions are
                       answered there.
                     </p>
@@ -91,7 +91,7 @@ export default function ContactPage() {
                 <CardContent className="space-y-4">
                   <div
                     role="note"
-                    className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"
+                    className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200"
                   >
                     Preview only — this form isn&apos;t collecting messages yet.
                     Email{" "}

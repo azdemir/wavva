@@ -61,14 +61,14 @@ export default async function InvoiceDetailPage({
           <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-200 text-left text-xs uppercase tracking-wide text-slate-500">
+              <tr className="border-b border-slate-200 dark:border-slate-800 text-left text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 dark:text-slate-500">
                 <th className="px-5 py-3 font-medium">Description</th>
                 <th className="px-5 py-3 text-right font-medium">Qty</th>
                 <th className="px-5 py-3 text-right font-medium">Unit price</th>
                 <th className="px-5 py-3 text-right font-medium">Total</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {(items ?? []).map((it) => (
                 <tr key={it.id}>
                   <td className="px-5 py-3">{it.label}</td>
@@ -80,10 +80,10 @@ export default async function InvoiceDetailPage({
             </tbody>
           </table>
           </div>
-          <div className="space-y-1 border-t border-slate-200 px-5 py-4 text-sm">
-            <div className="flex justify-between"><span className="text-slate-500">Subtotal</span><span>{formatCents(invoice.subtotal_cents)}</span></div>
-            <div className="flex justify-between"><span className="text-slate-500">Tax ({(Number(invoice.tax_rate) * 100).toFixed(2)}%)</span><span>{formatCents(invoice.tax_cents)}</span></div>
-            <div className="flex justify-between pt-1 text-base font-bold text-slate-900"><span>Total</span><span>{formatCents(invoice.total_cents)}</span></div>
+          <div className="space-y-1 border-t border-slate-200 dark:border-slate-800 px-5 py-4 text-sm">
+            <div className="flex justify-between"><span className="text-slate-500 dark:text-slate-400 dark:text-slate-500">Subtotal</span><span>{formatCents(invoice.subtotal_cents)}</span></div>
+            <div className="flex justify-between"><span className="text-slate-500 dark:text-slate-400 dark:text-slate-500">Tax ({(Number(invoice.tax_rate) * 100).toFixed(2)}%)</span><span>{formatCents(invoice.tax_cents)}</span></div>
+            <div className="flex justify-between pt-1 text-base font-bold text-slate-900 dark:text-slate-100"><span>Total</span><span>{formatCents(invoice.total_cents)}</span></div>
             <div className="flex justify-between text-accent-700"><span>Paid</span><span>{formatCents(invoice.amount_paid_cents)}</span></div>
             {due > 0 && <div className="flex justify-between font-semibold"><span>Balance due</span><span>{formatCents(due)}</span></div>}
           </div>
@@ -96,13 +96,13 @@ export default async function InvoiceDetailPage({
             <CardTitle>Payments</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-slate-100 dark:divide-slate-800">
               {(payments ?? []).map((p) => (
                 <li key={p.id} className="flex items-center justify-between px-5 py-3 text-sm">
                   <span>
                     {formatCents(p.amount_cents)} · {p.provider}
                     {p.provider_ref ? ` · ${p.provider_ref}` : ""}
-                    <span className="text-slate-500"> · {formatDate(p.created_at)}</span>
+                    <span className="text-slate-500 dark:text-slate-400 dark:text-slate-500"> · {formatDate(p.created_at)}</span>
                   </span>
                   <Badge tone={p.status === "succeeded" ? "accent" : "slate"}>{statusLabel(p.status)}</Badge>
                 </li>
@@ -125,7 +125,7 @@ export default async function InvoiceDetailPage({
             ))}
             {invoice.status === "draft" && (
               <form action={async () => { "use server"; await deleteInvoice(id); }}>
-                <Button type="submit" variant="outline" className="border-red-200 text-red-600 hover:bg-red-50">
+                <Button type="submit" variant="outline" className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950">
                   Delete draft
                 </Button>
               </form>
@@ -155,7 +155,7 @@ export default async function InvoiceDetailPage({
                 </div>
                 <Button type="submit">Record</Button>
               </form>
-              <p className="mt-2 text-xs text-slate-500">
+              <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">
                 Online card payments unlock after connecting Stripe (Billing page).
               </p>
             </CardContent>
@@ -164,7 +164,7 @@ export default async function InvoiceDetailPage({
       </div>
 
       <p className="text-sm">
-        <Link href="/dashboard/invoices" className="font-medium text-brand-600 hover:text-brand-700">
+        <Link href="/dashboard/invoices" className="font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400">
           ← All invoices
         </Link>
       </p>

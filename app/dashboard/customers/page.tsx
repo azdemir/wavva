@@ -67,20 +67,20 @@ export default async function CustomersPage({
       ) : (
         <Card>
           <CardContent className="p-0">
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-slate-100 dark:divide-slate-800">
               {(customers ?? []).map((c) => (
                 <li key={c.id}>
                   <Link
                     href={`/dashboard/customers/${c.id}`}
-                    className="flex items-center justify-between gap-3 px-5 py-4 hover:bg-slate-50"
+                    className="flex items-center justify-between gap-3 px-5 py-4 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-900"
                   >
                     <div className="min-w-0">
-                      <p className="truncate font-medium text-slate-900">{c.name}</p>
-                      <p className="truncate text-sm text-slate-500">
+                      <p className="truncate font-medium text-slate-900 dark:text-slate-100">{c.name}</p>
+                      <p className="truncate text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
                         {[c.email, c.phone].filter(Boolean).join(" · ") || "No contact info"}
                       </p>
                     </div>
-                    <span className="shrink-0 text-sm text-slate-400" aria-hidden="true">→</span>
+                    <span className="shrink-0 text-sm text-slate-400 dark:text-slate-500" aria-hidden="true">→</span>
                   </Link>
                 </li>
               ))}
