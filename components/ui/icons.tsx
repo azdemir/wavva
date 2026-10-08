@@ -99,6 +99,22 @@ export function ArrowRightIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function PlayIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Base {...props}>
+      <path d="M8 5.5v13l11-6.5z" fill="currentColor" stroke="none" />
+    </Base>
+  );
+}
+
+export function PauseIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Base {...props}>
+      <path d="M8.5 5.5v13M15.5 5.5v13" strokeWidth={2.5} />
+    </Base>
+  );
+}
+
 export function MapPinIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <Base {...props}>

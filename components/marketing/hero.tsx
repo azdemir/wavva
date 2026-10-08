@@ -1,35 +1,8 @@
 import { site } from "@/lib/site";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
-import { Badge, JobStatusPill } from "@/components/ui/badge";
 import { ArrowRightIcon } from "@/components/ui/icons";
-
-/**
- * Fictional sample data — used only to illustrate the product in the hero visual.
- */
-const sampleJobs = [
-  {
-    time: "9:00 AM",
-    customer: "Maple Street Residence",
-    address: "Albany, NY",
-    crew: "Crew A · Maria & Jen",
-    status: "in_progress" as const,
-  },
-  {
-    time: "11:30 AM",
-    customer: "Lakeside Dental Office",
-    address: "Saratoga Springs, NY",
-    crew: "Crew B · Devon",
-    status: "scheduled" as const,
-  },
-  {
-    time: "2:00 PM",
-    customer: "Elm Avenue Residence",
-    address: "Schenectady, NY",
-    crew: "Crew A · Maria & Jen",
-    status: "scheduled" as const,
-  },
-];
+import { DashboardTour } from "@/components/marketing/dashboard-tour";
 
 export function Hero() {
   return (
@@ -61,52 +34,9 @@ export function Hero() {
             </p>
           </div>
 
-          {/* Illustrative product preview — sample data, not a screenshot */}
-          {/* min-w-0: lets the grid track shrink so long row content truncates instead of blowing out the card */}
+          {/* Auto-playing dashboard tour — sample data, not a screenshot */}
           <div className="animate-fade-in min-w-0">
-            <div
-              aria-hidden="true"
-              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xl shadow-brand-600/5"
-            >
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4">
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-slate-900">
-                    Today&apos;s schedule
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    Thursday · {sampleJobs.length} jobs scheduled
-                  </p>
-                </div>
-                <Badge tone="accent" className="shrink-0">2 new quote requests</Badge>
-              </div>
-              <ul className="divide-y divide-slate-100">
-                {sampleJobs.map((job) => (
-                  <li key={job.customer} className="flex items-center gap-3 py-4 sm:gap-4">
-                    <div className="w-14 shrink-0 text-sm font-semibold text-slate-700 sm:w-16">
-                      {job.time}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-slate-900">
-                        {job.customer}
-                      </p>
-                      <p className="truncate text-xs text-slate-500">
-                        {job.address} · {job.crew}
-                      </p>
-                    </div>
-                    <span className="shrink-0">
-                      <JobStatusPill status={job.status} />
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-2 flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3">
-                <p className="text-sm text-slate-600">Outstanding invoices</p>
-                <p className="text-sm font-bold text-slate-900">$1,240.00</p>
-              </div>
-            </div>
-            <p className="mt-3 text-center text-xs text-slate-400">
-              Illustrative preview — sample data shown
-            </p>
+            <DashboardTour />
           </div>
         </div>
 
