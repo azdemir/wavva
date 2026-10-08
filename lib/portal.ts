@@ -1,4 +1,6 @@
 import { createServiceClient } from "@/lib/supabase/server";
+import { rateLimit } from "@/lib/rate-limit";
+import { notFound } from "next/navigation";
 
 export type PortalContext = {
   token: string;
@@ -26,6 +28,9 @@ export type PortalContext = {
  * like passwords — long, random, and revocable.
  */
 export async function getPortalContext(token: string): Promise<PortalContext | null> {
+  // Blunt token brute-forcing: 30 portal hits per minute per IP.
+  const rl = await rateLimit("portal", 30, 60_000);
+  if (!rl.allowed) notFound();
   const svc = await createServiceClient();
   const { data } = await svc
     .from("portal_tokens")

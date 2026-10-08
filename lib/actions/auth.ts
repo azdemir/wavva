@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { rateLimit, limits, rateLimitError } from "@/lib/rate-limit";
 
 const credentialsSchema = z.object({
   email: z.string().email("Enter a valid email address"),
@@ -16,6 +17,8 @@ const NOT_CONFIGURED_ERROR =
 
 export async function signUp(formData: FormData): Promise<AuthResult> {
   if (!isSupabaseConfigured()) return { error: NOT_CONFIGURED_ERROR };
+  const rl = await rateLimit("auth:signup", limits.auth.max, limits.auth.windowMs);
+  if (!rl.allowed) return rateLimitError(rl.resetIn);
   const parsed = credentialsSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
@@ -46,6 +49,8 @@ export async function signUp(formData: FormData): Promise<AuthResult> {
 
 export async function signIn(formData: FormData): Promise<AuthResult> {
   if (!isSupabaseConfigured()) return { error: NOT_CONFIGURED_ERROR };
+  const rl = await rateLimit("auth:signin", limits.auth.max, limits.auth.windowMs);
+  if (!rl.allowed) return rateLimitError(rl.resetIn);
   const parsed = credentialsSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
