@@ -8,6 +8,9 @@ import { logAudit } from "@/lib/audit";
 import { bookingSchema } from "@/lib/validation";
 import { localInputToUtc } from "@/lib/dates";
 import { nextNumber } from "@/lib/pricing";
+import { one } from "@/lib/relations";
+import { formatDate, formatTime } from "@/lib/format";
+import { enqueueNotification } from "@/lib/notifications/queue";
 
 export type ActionResult = { error?: string; ok?: boolean };
 
@@ -111,6 +114,33 @@ export async function createBooking(input: unknown): Promise<ActionResult> {
     entity_id: booking.id,
     metadata: { recurrence: parsed.data.recurrence, jobs: jobs.length },
   });
+
+  const { data: full } = await supabase
+    .from("bookings")
+    .select("scheduled_start, scheduled_end, customer_id, customers(name, email), service_addresses(address_line1, city)")
+    .eq("id", booking.id)
+    .single();
+  const notifCustomer = one(full?.customers);
+  const addr = one(full?.service_addresses);
+  if (full && notifCustomer?.email) {
+    const settings2 = ctx.company.settings as { cancellation_policy?: string | null };
+    await enqueueNotification(supabase, {
+      company_id: ctx.company.id,
+      recipient_type: "customer",
+      recipient_id: full.customer_id,
+      channel: "email",
+      template: "booking_confirmed",
+      payload: {
+        email: notifCustomer.email,
+        recipient_name: notifCustomer.name,
+        company_name: ctx.company.name,
+        date: formatDate(full.scheduled_start),
+        time: `${formatTime(full.scheduled_start, tz)} – ${formatTime(full.scheduled_end, tz)}`,
+        address: `${addr?.address_line1 ?? ""}, ${addr?.city ?? ""}`,
+        cancellation_policy: settings2.cancellation_policy ?? undefined,
+      },
+    });
+  }
 
   redirect(`/dashboard/bookings/${booking.id}`);
 }

@@ -7,6 +7,11 @@ import { requireCompany } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
 import { quoteSchema } from "@/lib/validation";
 import { computeTotals, nextNumber } from "@/lib/pricing";
+import { one } from "@/lib/relations";
+import { baseUrl } from "@/lib/base-url";
+import { formatDate } from "@/lib/format";
+import { enqueueNotification } from "@/lib/notifications/queue";
+import { getOrCreatePortalLink } from "@/lib/actions/portal";
 
 export type ActionResult = { error?: string; ok?: boolean };
 
@@ -127,6 +132,35 @@ export async function setQuoteStatus(id: string, status: string): Promise<Action
     entity_type: "quote",
     entity_id: id,
   });
+
+  if (status === "sent") {
+    const { data: full } = await supabase
+      .from("quotes")
+      .select("quote_number, total_cents, valid_until, customer_id, customers(name, email)")
+      .eq("id", id)
+      .single();
+    const customer = one(full?.customers);
+    if (full && customer?.email) {
+      const bUrl = await baseUrl();
+      const portal = await getOrCreatePortalLink(full.customer_id, bUrl);
+      await enqueueNotification(supabase, {
+        company_id: ctx.company.id,
+        recipient_type: "customer",
+        recipient_id: full.customer_id,
+        channel: "email",
+        template: "quote_sent",
+        payload: {
+          email: customer.email,
+          recipient_name: customer.name,
+          company_name: ctx.company.name,
+          quote_number: full.quote_number,
+          total_cents: full.total_cents,
+          valid_until: full.valid_until ? formatDate(full.valid_until) : undefined,
+          portal_link: portal.link,
+        },
+      });
+    }
+  }
 
   revalidatePath(`/dashboard/quotes/${id}`);
   revalidatePath("/dashboard/quotes");
