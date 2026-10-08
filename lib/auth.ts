@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 
 export type Membership = {
@@ -69,10 +70,17 @@ export async function getActiveMembership(): Promise<{
   return { membership: membership as Membership, company: company as Company };
 }
 
-/** Require a signed-in user; otherwise send to /signin. */
+/** Require a signed-in user; otherwise send to /signin (preserving destination). */
 export async function requireUser() {
   const user = await getSessionUser();
-  if (!user) redirect("/signin");
+  if (!user) {
+    const pathname = (await headers()).get("x-pathname");
+    redirect(
+      pathname && pathname !== "/"
+        ? `/signin?next=${encodeURIComponent(pathname)}`
+        : "/signin",
+    );
+  }
   return user;
 }
 

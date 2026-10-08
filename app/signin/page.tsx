@@ -33,7 +33,7 @@ export default async function SignInPage({
         <>
           New to TidyPro?{" "}
           <Link
-            href="/signup"
+            href={next ? `/signup?next=${encodeURIComponent(next)}` : "/signup"}
             className="font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400"
           >
             Create an account
