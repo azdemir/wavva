@@ -53,8 +53,7 @@ export default async function NewBookingPage({
     }
   }
 
-  if ((customers ?? []).length === 0) {
-    return (
+  if ((customers ?? []).length === 0) {    return (
       <div className="max-w-2xl space-y-6">
         <Heading title="New booking" description="Schedule a cleaning visit." />
         <Card>
@@ -71,6 +70,27 @@ export default async function NewBookingPage({
     );
   }
 
+  // BookingForm expects `addresses`; the query nests them as `service_addresses`.
+  const formCustomers = (customers ?? []).map((c) => ({
+    id: c.id,
+    name: c.name,
+    addresses: ((c.service_addresses ?? []) as {
+      id: string;
+      label: string;
+      address_line1: string;
+      city: string;
+      state: string;
+      is_default: boolean;
+    }[]).map((a) => ({
+      id: a.id,
+      label: a.label,
+      address_line1: a.address_line1,
+      city: a.city,
+      state: a.state,
+      is_default: a.is_default,
+    })),
+  }));
+
   return (
     <div className="max-w-3xl space-y-6">
       <Heading
@@ -84,7 +104,7 @@ export default async function NewBookingPage({
       <Card>
         <CardContent className="pt-6">
           <BookingForm
-            customers={(customers ?? []) as never}
+            customers={formCustomers}
             services={services ?? []}
             prefill={prefill}
           />
