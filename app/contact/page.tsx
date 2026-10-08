@@ -24,7 +24,7 @@ export default function ContactPage() {
           description="Questions about plans, the pilot program, or whether TidyPro fits your business — we reply within one business day."
         />
 
-        <section className="bg-white py-16 sm:py-20">
+        <section className="bg-white py-16 sm:py-20 dark:bg-slate-950">
           <Container>
             <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-2">
               <div className="space-y-6">

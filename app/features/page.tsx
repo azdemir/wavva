@@ -120,7 +120,7 @@ export default function FeaturesPage() {
           description="One workspace for quotes, scheduling, crews, invoices, and customers — designed for owners who'd rather be cleaning than clicking."
         />
 
-        <section className="bg-white py-16 sm:py-20">
+        <section className="bg-white py-16 sm:py-20 dark:bg-slate-950">
           <Container>
             <div className="grid gap-6 md:grid-cols-2">
               {deepDives.map((f) => (

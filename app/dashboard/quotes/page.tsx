@@ -46,7 +46,7 @@ export default async function QuotesPage({
             key={s}
             href={s === "all" ? "/dashboard/quotes" : `/dashboard/quotes?status=${s}`}
             className={`inline-flex min-h-9 items-center rounded-full px-3.5 py-1.5 text-sm font-medium capitalize ${
-              valid === s ? "bg-brand-600 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
+              valid === s ? "bg-brand-600 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-300 dark:ring-slate-700 dark:hover:bg-slate-800"
             }`}
           >
             {statusLabel(s)}

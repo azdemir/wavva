@@ -67,7 +67,7 @@ export function TeamStep({ baseUrl }: { baseUrl: string }) {
           {invites.map((inv) => (
             <div key={inv.link} className="flex items-center gap-2 text-sm">
               <Badge tone="accent">{inv.role}</Badge>
-              <code className="min-w-0 flex-1 truncate rounded bg-white px-2 py-1 text-xs text-slate-700 dark:text-slate-300">
+              <code className="min-w-0 flex-1 truncate rounded bg-white px-2 py-1 text-xs text-slate-700 dark:bg-slate-800 dark:text-slate-300">
                 {inv.link}
               </code>
             </div>
@@ -95,7 +95,7 @@ export function TeamStep({ baseUrl }: { baseUrl: string }) {
               id={`inv-role-${i}`}
               value={r.role}
               onChange={(e) => set(i, { role: e.target.value as Row["role"] })}
-              className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white px-3 text-sm"
+              className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
             >
               <option value="cleaner">Cleaner</option>
               <option value="manager">Manager</option>

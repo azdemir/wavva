@@ -94,7 +94,7 @@ export function ServicesStep({ initial }: { initial?: Row[] }) {
                 id={`svc-cat-${i}`}
                 value={r.category}
                 onChange={(e) => set(i, { category: e.target.value as Row["category"] })}
-                className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white px-3 text-sm"
+                className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
               >
                 <option value="residential">Residential</option>
                 <option value="commercial">Commercial</option>
@@ -118,7 +118,7 @@ export function ServicesStep({ initial }: { initial?: Row[] }) {
                 id={`svc-unit-${i}`}
                 value={r.unit}
                 onChange={(e) => set(i, { unit: e.target.value as Row["unit"] })}
-                className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white px-3 text-sm"
+                className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
               >
                 {(Object.keys(unitLabels) as (keyof typeof unitLabels)[]).map((u) => (
                   <option key={u} value={u}>

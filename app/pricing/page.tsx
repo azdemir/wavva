@@ -61,7 +61,7 @@ export default function PricingPage() {
           description="One extra booking a month covers TidyPro for most companies. Start free for 14 days — no credit card required."
         />
 
-        <section className="bg-white pt-4 pb-16 sm:pb-20">
+        <section className="bg-white pt-4 pb-16 sm:pb-20 dark:bg-slate-950">
           <Container>
             <PlanCards />
             <PricingDisclaimer className="mt-8" />
@@ -135,7 +135,7 @@ export default function PricingPage() {
           </Container>
         </section>
 
-        <section className="bg-white py-16 sm:py-20">
+        <section className="bg-white py-16 sm:py-20 dark:bg-slate-950">
           <Container>
             <SectionHeading
               eyebrow="Billing questions"

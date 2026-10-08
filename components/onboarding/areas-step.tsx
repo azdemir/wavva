@@ -53,7 +53,7 @@ export function AreasStep() {
               id={`area-type-${i}`}
               value={r.area_type}
               onChange={(e) => set(i, { area_type: e.target.value as Row["area_type"] })}
-              className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white px-3 text-sm"
+              className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
             >
               <option value="city">City</option>
               <option value="county">County</option>

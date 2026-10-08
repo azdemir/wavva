@@ -90,7 +90,7 @@ export default function FaqPage() {
           description="Straight answers — including the ones about tax, payments, and privacy."
         />
 
-        <section className="bg-white py-16 sm:py-20">
+        <section className="bg-white py-16 sm:py-20 dark:bg-slate-950">
           <Container>
             <div className="mx-auto max-w-3xl space-y-12">
               {groups.map((g) => (
@@ -102,7 +102,7 @@ export default function FaqPage() {
                     {g.items.map((f) => (
                       <details
                         key={f.q}
-                        className="group rounded-xl border border-slate-200 dark:border-slate-800 bg-white px-6 py-4 open:shadow-sm"
+                        className="group rounded-xl border border-slate-200 bg-white px-6 py-4 open:shadow-sm dark:border-slate-800 dark:bg-slate-900"
                       >
                         <summary className="cursor-pointer list-none text-base font-semibold text-slate-900 dark:text-slate-100 [&::-webkit-details-marker]:hidden">
                           <span className="flex items-center justify-between gap-4">
