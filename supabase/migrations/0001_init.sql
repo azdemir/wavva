@@ -6,43 +6,6 @@
 -- Requires: PostgreSQL 15+ (Supabase default). Uses auth.uid() from Supabase Auth.
 
 -- ============================================================
--- Helper functions (SECURITY DEFINER so RLS policies avoid recursion)
--- ============================================================
-
-create or replace function public.user_company_ids()
-returns setof uuid
-language sql
-security definer
-set search_path = public
-stable
-as $$
-  select company_id from public.memberships where user_id = auth.uid();
-$$;
-
-create or replace function public.is_company_owner(cid uuid)
-returns boolean
-language sql
-security definer
-set search_path = public
-stable
-as $$
-  select exists (
-    select 1 from public.memberships
-    where company_id = cid and user_id = auth.uid() and role = 'owner'
-  );
-$$;
-
-create or replace function public.company_member_count(cid uuid)
-returns integer
-language sql
-security definer
-set search_path = public
-stable
-as $$
-  select count(*)::integer from public.memberships where company_id = cid;
-$$;
-
--- ============================================================
 -- Tables
 -- ============================================================
 
@@ -283,6 +246,44 @@ create table public.audit_logs (
   metadata jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
 );
+
+-- ============================================================
+-- Helper functions (SECURITY DEFINER so RLS policies avoid recursion)
+-- ============================================================
+
+create or replace function public.user_company_ids()
+returns setof uuid
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select company_id from public.memberships where user_id = auth.uid();
+$$;
+
+create or replace function public.is_company_owner(cid uuid)
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists (
+    select 1 from public.memberships
+    where company_id = cid and user_id = auth.uid() and role = 'owner'
+  );
+$$;
+
+create or replace function public.company_member_count(cid uuid)
+returns integer
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select count(*)::integer from public.memberships where company_id = cid;
+$$;
+
 
 -- ============================================================
 -- Indexes
