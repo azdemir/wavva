@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import { cookies } from "next/headers";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Logo } from "@/components/ui/logo";
@@ -12,16 +14,20 @@ const links = [
   { label: "FAQ", href: "/faq" },
 ];
 
-export async function Navbar() {
+/** Session-aware auth buttons. Streams in after the static shell. */
+async function AuthNavActions() {
+  // Force dynamic: read cookies unconditionally so this boundary streams
+  // even when Supabase isn't configured at build time.
+  await cookies();
   const user = await getSessionUser();
-
-  const actions = user ? (
-    <>
+  if (user) {
+    return (
       <Button href="/dashboard" size="sm">
         Go to dashboard
       </Button>
-    </>
-  ) : (
+    );
+  }
+  return (
     <>
       <Button href="/signin" variant="ghost" size="sm">
         Sign in
@@ -31,12 +37,19 @@ export async function Navbar() {
       </Button>
     </>
   );
+}
 
-  const mobileActions = user ? (
-    <Button href="/dashboard" size="sm" className="w-full">
-      Go to dashboard
-    </Button>
-  ) : (
+async function MobileAuthNavActions() {
+  await cookies();
+  const user = await getSessionUser();
+  if (user) {
+    return (
+      <Button href="/dashboard" size="sm" className="w-full">
+        Go to dashboard
+      </Button>
+    );
+  }
+  return (
     <>
       <Button href="/signin" variant="outline" size="sm" className="w-full">
         Sign in
@@ -46,6 +59,15 @@ export async function Navbar() {
       </Button>
     </>
   );
+}
+
+function ActionsFallback() {
+  return (
+    <span className="inline-flex h-9 w-24 animate-pulse rounded-lg bg-slate-100 dark:bg-slate-800" aria-hidden="true" />
+  );
+}
+
+export function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/85 backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
       <Container>
@@ -71,7 +93,9 @@ export async function Navbar() {
 
           <div className="hidden items-center gap-2 md:flex">
             <ThemeToggle />
-            {actions}
+            <Suspense fallback={<ActionsFallback />}>
+              <AuthNavActions />
+            </Suspense>
           </div>
 
           {/* Mobile: theme toggle + no-JS menu */}
@@ -92,7 +116,9 @@ export async function Navbar() {
                 </Link>
               ))}
               <div className="mt-2 space-y-2 border-t border-slate-200 dark:border-slate-800 pt-2">
-                {mobileActions}
+                <Suspense fallback={null}>
+                  <MobileAuthNavActions />
+                </Suspense>
               </div>
             </div>
           </details>

@@ -1,11 +1,27 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import { cookies } from "next/headers";
 import { site } from "@/lib/site";
 import { Container } from "@/components/ui/container";
 import { ArrowRightIcon } from "@/components/ui/icons";
 import { getSessionUser } from "@/lib/auth";
 
-export async function Cta() {
+/** Session-aware CTA button. Streams in after the static shell. */
+async function CtaButton() {
+  await cookies();
   const user = await getSessionUser();
+  return (
+    <Link
+      href={user ? "/dashboard" : "/demo"}
+      className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-white px-7 text-base font-semibold whitespace-nowrap text-brand-700 shadow-sm transition-colors hover:bg-brand-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+    >
+      {user ? "Go to dashboard" : "Start free trial"}
+      <ArrowRightIcon className="h-5 w-5 shrink-0" />
+    </Link>
+  );
+}
+
+export function Cta() {
   return (
     <section id="contact" className="scroll-mt-20 bg-brand-700 py-20 sm:py-24 dark:bg-brand-900">
       <Container>
@@ -22,13 +38,13 @@ export async function Cta() {
                 shared Button variants can't reliably override via className
                 because conflicting Tailwind utilities resolve by stylesheet
                 order, not class order. */}
-            <Link
-              href={user ? "/dashboard" : "/demo"}
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-white px-7 text-base font-semibold whitespace-nowrap text-brand-700 shadow-sm transition-colors hover:bg-brand-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            <Suspense
+              fallback={
+                <span className="inline-flex h-12 w-44 animate-pulse rounded-lg bg-white/20" aria-hidden="true" />
+              }
             >
-              {user ? "Go to dashboard" : "Start free trial"}
-              <ArrowRightIcon className="h-5 w-5 shrink-0" />
-            </Link>
+              <CtaButton />
+            </Suspense>
             <Link
               href={`mailto:${site.email}`}
               className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-white/40 px-7 text-base font-semibold whitespace-nowrap text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"

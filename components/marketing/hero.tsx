@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import { cookies } from "next/headers";
 import { site } from "@/lib/site";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
@@ -5,8 +7,24 @@ import { ArrowRightIcon } from "@/components/ui/icons";
 import { DashboardTour } from "@/components/marketing/dashboard-tour";
 import { getSessionUser } from "@/lib/auth";
 
-export async function Hero() {
+/** Session-aware hero CTA. Streams in after the static shell. */
+async function HeroCta() {
+  await cookies();
   const user = await getSessionUser();
+  return user ? (
+    <Button href="/dashboard" size="lg">
+      Go to dashboard
+      <ArrowRightIcon className="h-5 w-5" />
+    </Button>
+  ) : (
+    <Button href="/demo" size="lg">
+      Start free trial
+      <ArrowRightIcon className="h-5 w-5" />
+    </Button>
+  );
+}
+
+export function Hero() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-brand-50/60 to-white dark:from-brand-950/50 dark:to-slate-950">
       <Container>
@@ -23,17 +41,13 @@ export async function Hero() {
               solo operators to growing teams.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              {user ? (
-                <Button href="/dashboard" size="lg">
-                  Go to dashboard
-                  <ArrowRightIcon className="h-5 w-5" />
-                </Button>
-              ) : (
-                <Button href="/demo" size="lg">
-                  Start free trial
-                  <ArrowRightIcon className="h-5 w-5" />
-                </Button>
-              )}
+              <Suspense
+                fallback={
+                  <span className="inline-flex h-12 w-40 animate-pulse rounded-lg bg-slate-100 dark:bg-slate-800" aria-hidden="true" />
+                }
+              >
+                <HeroCta />
+              </Suspense>
               <Button href="#how-it-works" variant="outline" size="lg">
                 See how it works
               </Button>
