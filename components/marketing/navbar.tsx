@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { getSessionUser } from "@/lib/auth";
 
 const links = [
   { label: "Features", href: "/features" },
@@ -11,7 +12,40 @@ const links = [
   { label: "FAQ", href: "/faq" },
 ];
 
-export function Navbar() {
+export async function Navbar() {
+  const user = await getSessionUser();
+
+  const actions = user ? (
+    <>
+      <Button href="/dashboard" size="sm">
+        Go to dashboard
+      </Button>
+    </>
+  ) : (
+    <>
+      <Button href="/signin" variant="ghost" size="sm">
+        Sign in
+      </Button>
+      <Button href="/demo" size="sm">
+        Start free trial
+      </Button>
+    </>
+  );
+
+  const mobileActions = user ? (
+    <Button href="/dashboard" size="sm" className="w-full">
+      Go to dashboard
+    </Button>
+  ) : (
+    <>
+      <Button href="/signin" variant="outline" size="sm" className="w-full">
+        Sign in
+      </Button>
+      <Button href="/demo" size="sm" className="w-full">
+        Start free trial
+      </Button>
+    </>
+  );
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/85 backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
       <Container>
@@ -37,12 +71,7 @@ export function Navbar() {
 
           <div className="hidden items-center gap-2 md:flex">
             <ThemeToggle />
-            <Button href="/signin" variant="ghost" size="sm">
-              Sign in
-            </Button>
-            <Button href="/demo" size="sm">
-              Start free trial
-            </Button>
+            {actions}
           </div>
 
           {/* Mobile: theme toggle + no-JS menu */}
@@ -63,12 +92,7 @@ export function Navbar() {
                 </Link>
               ))}
               <div className="mt-2 space-y-2 border-t border-slate-200 dark:border-slate-800 pt-2">
-                <Button href="/signin" variant="outline" size="sm" className="w-full">
-                  Sign in
-                </Button>
-                <Button href="/demo" size="sm" className="w-full">
-                  Start free trial
-                </Button>
+                {mobileActions}
               </div>
             </div>
           </details>

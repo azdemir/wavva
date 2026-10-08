@@ -3,8 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { ArrowRightIcon } from "@/components/ui/icons";
 import { DashboardTour } from "@/components/marketing/dashboard-tour";
+import { getSessionUser } from "@/lib/auth";
 
-export function Hero() {
+export async function Hero() {
+  const user = await getSessionUser();
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-brand-50/60 to-white dark:from-brand-950/50 dark:to-slate-950">
       <Container>
@@ -21,10 +23,17 @@ export function Hero() {
               solo operators to growing teams.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button href="/demo" size="lg">
-                Start free trial
-                <ArrowRightIcon className="h-5 w-5" />
-              </Button>
+              {user ? (
+                <Button href="/dashboard" size="lg">
+                  Go to dashboard
+                  <ArrowRightIcon className="h-5 w-5" />
+                </Button>
+              ) : (
+                <Button href="/demo" size="lg">
+                  Start free trial
+                  <ArrowRightIcon className="h-5 w-5" />
+                </Button>
+              )}
               <Button href="#how-it-works" variant="outline" size="lg">
                 See how it works
               </Button>

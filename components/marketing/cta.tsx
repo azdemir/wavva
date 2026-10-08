@@ -2,8 +2,10 @@ import Link from "next/link";
 import { site } from "@/lib/site";
 import { Container } from "@/components/ui/container";
 import { ArrowRightIcon } from "@/components/ui/icons";
+import { getSessionUser } from "@/lib/auth";
 
-export function Cta() {
+export async function Cta() {
+  const user = await getSessionUser();
   return (
     <section id="contact" className="scroll-mt-20 bg-brand-700 py-20 sm:py-24 dark:bg-brand-900">
       <Container>
@@ -21,10 +23,10 @@ export function Cta() {
                 because conflicting Tailwind utilities resolve by stylesheet
                 order, not class order. */}
             <Link
-              href="/demo"
+              href={user ? "/dashboard" : "/demo"}
               className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-white px-7 text-base font-semibold whitespace-nowrap text-brand-700 shadow-sm transition-colors hover:bg-brand-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
-              Start free trial
+              {user ? "Go to dashboard" : "Start free trial"}
               <ArrowRightIcon className="h-5 w-5 shrink-0" />
             </Link>
             <Link
