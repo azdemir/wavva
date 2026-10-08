@@ -34,7 +34,7 @@ export default async function SignInPage({
           New to TidyPro?{" "}
           <Link
             href="/signup"
-            className="font-semibold text-brand-600 hover:text-brand-700"
+            className="font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400"
           >
             Create an account
           </Link>

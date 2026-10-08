@@ -75,12 +75,12 @@ export function CustomerForm({
         defaultValue={initial?.notes ?? ""}
         placeholder="Gate code, pets, preferences…"
       />
-      <label className="flex items-start gap-2.5 text-sm text-slate-700">
+      <label className="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-300">
         <input
           type="checkbox"
           name="sms_consent"
           defaultChecked={initial?.sms_consent ?? false}
-          className="mt-1 h-4 w-4 rounded border-slate-300 text-brand-600"
+          className="mt-1 h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-brand-600 dark:text-brand-400"
         />
         <span>
           This customer consented to SMS reminders and notifications.

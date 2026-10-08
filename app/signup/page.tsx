@@ -28,7 +28,7 @@ export default async function SignUpPage() {
           Already have an account?{" "}
           <Link
             href="/signin"
-            className="font-semibold text-brand-600 hover:text-brand-700"
+            className="font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400"
           >
             Sign in
           </Link>
@@ -42,7 +42,7 @@ export default async function SignUpPage() {
             submitLabel="Create account"
             pendingLabel="Creating account…"
           />
-          <p className="mt-4 text-xs text-slate-500">
+          <p className="mt-4 text-xs text-slate-500 dark:text-slate-400">
             By creating an account you agree to set up one workspace per
             cleaning business. Each company&apos;s data stays private to that
             company.

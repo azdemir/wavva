@@ -79,9 +79,9 @@ export function InvoiceBuilder({
       </div>
 
       <div className="space-y-4">
-        <h3 className="text-base font-semibold text-slate-900">Line items</h3>
+        <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">Line items</h3>
         {items.map((it, i) => (
-          <div key={i} className="grid gap-3 rounded-xl border border-slate-200 p-4 sm:grid-cols-[1fr_90px_130px_auto]">
+          <div key={i} className="grid gap-3 rounded-xl border border-slate-200 dark:border-slate-800 p-4 sm:grid-cols-[1fr_90px_130px_auto]">
             <Field id={`inv-label-${i}`} label="Description" value={it.label} onChange={(e) => set(i, { label: e.target.value })} placeholder="Standard home cleaning — Oct 12" />
             <Field id={`inv-qty-${i}`} label="Qty" type="number" min="0" step="0.01" value={it.qty} onChange={(e) => set(i, { qty: e.target.value })} />
             <Field id={`inv-price-${i}`} label="Unit price ($)" type="number" min="0" step="0.01" value={it.unit_price} onChange={(e) => set(i, { unit_price: e.target.value })} />
@@ -104,10 +104,10 @@ export function InvoiceBuilder({
 
       <TextareaField id="inv-notes" label="Notes" rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Payment terms…" />
 
-      <div className="rounded-xl bg-slate-100 p-4 text-sm">
-        <div className="flex justify-between py-1"><span className="text-slate-600">Subtotal</span><span className="font-medium">{formatCents(totals.subtotal)}</span></div>
-        <div className="flex justify-between py-1"><span className="text-slate-600">Tax</span><span className="font-medium">{formatCents(totals.tax)}</span></div>
-        <div className="flex justify-between border-t border-slate-200 pt-2 text-base font-bold text-slate-900"><span>Total</span><span>{formatCents(totals.total)}</span></div>
+      <div className="rounded-xl bg-slate-100 dark:bg-slate-800 p-4 text-sm">
+        <div className="flex justify-between py-1"><span className="text-slate-600 dark:text-slate-400 dark:text-slate-500">Subtotal</span><span className="font-medium">{formatCents(totals.subtotal)}</span></div>
+        <div className="flex justify-between py-1"><span className="text-slate-600 dark:text-slate-400 dark:text-slate-500">Tax</span><span className="font-medium">{formatCents(totals.tax)}</span></div>
+        <div className="flex justify-between border-t border-slate-200 dark:border-slate-800 pt-2 text-base font-bold text-slate-900 dark:text-slate-100"><span>Total</span><span>{formatCents(totals.total)}</span></div>
       </div>
 
       <Button onClick={submit} disabled={pending || !customerId} className="w-full sm:w-auto">

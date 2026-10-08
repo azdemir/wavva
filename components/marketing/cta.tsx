@@ -5,7 +5,7 @@ import { ArrowRightIcon } from "@/components/ui/icons";
 
 export function Cta() {
   return (
-    <section id="contact" className="scroll-mt-20 bg-brand-700 py-20 sm:py-24">
+    <section id="contact" className="scroll-mt-20 bg-brand-700 py-20 sm:py-24 dark:bg-brand-900">
       <Container>
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">

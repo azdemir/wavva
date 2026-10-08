@@ -28,7 +28,7 @@ export function AddressForm({ customerId }: { customerId: string }) {
         if (result?.error) setError(result.error);
         else setOpen(false);
       }}
-      className="space-y-4 rounded-xl border border-slate-200 p-4"
+      className="space-y-4 rounded-xl border border-slate-200 dark:border-slate-800 p-4"
     >
       {error && (
         <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -55,8 +55,8 @@ export function AddressForm({ customerId }: { customerId: string }) {
         rows={2}
         placeholder="Lockbox code, parking, alarm…"
       />
-      <label className="flex items-center gap-2.5 text-sm text-slate-700">
-        <input type="checkbox" name="is_default" className="h-4 w-4 rounded border-slate-300 text-brand-600" />
+      <label className="flex items-center gap-2.5 text-sm text-slate-700 dark:text-slate-300">
+        <input type="checkbox" name="is_default" className="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-brand-600 dark:text-brand-400" />
         Default address for this customer
       </label>
       <div className="flex gap-2">

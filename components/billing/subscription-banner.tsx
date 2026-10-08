@@ -24,7 +24,7 @@ export function SubscriptionBanner({
   }
   if (status === "canceled") {
     return (
-      <div className="mb-6 rounded-xl border border-slate-300 bg-slate-100 px-4 py-3 text-sm text-slate-700">
+      <div className="mb-6 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 px-4 py-3 text-sm text-slate-700 dark:text-slate-300">
         <span className="font-semibold">Your subscription was canceled.</span>{" "}
         You&apos;re on the Starter plan limits now.{" "}
         <Link href="/dashboard/settings/billing" className="font-semibold underline underline-offset-2">

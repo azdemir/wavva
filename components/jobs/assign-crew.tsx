@@ -39,7 +39,7 @@ export function AssignCrew({
 
   if (crew.length === 0) {
     return (
-      <p className="text-sm text-slate-500">
+      <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
         No team members yet. Invite your crew from the Team page first.
       </p>
     );
@@ -60,15 +60,15 @@ export function AssignCrew({
       <ul className="space-y-2">
         {crew.map((m) => (
           <li key={m.user_id}>
-            <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-slate-200 px-3 py-2.5 hover:bg-slate-50">
+            <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-slate-200 dark:border-slate-800 px-3 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-900">
               <input
                 type="checkbox"
                 checked={selected.includes(m.user_id)}
                 onChange={() => toggle(m.user_id)}
-                className="h-5 w-5 rounded border-slate-300 text-brand-600"
+                className="h-5 w-5 rounded border-slate-300 dark:border-slate-700 text-brand-600 dark:text-brand-400"
               />
-              <span className="flex-1 text-sm text-slate-900">{m.email}</span>
-              <span className="text-xs text-slate-500">{m.role}</span>
+              <span className="flex-1 text-sm text-slate-900 dark:text-slate-100">{m.email}</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">{m.role}</span>
             </label>
           </li>
         ))}

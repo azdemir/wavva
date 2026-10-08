@@ -57,10 +57,10 @@ export default async function PortalHomePage({
     <PortalShell companyName={ctx.company.name} customerName={ctx.customer.name}>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
             Welcome, {ctx.customer.name.split(" ")[0]}
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
             Your upcoming cleanings, quotes awaiting approval, and invoices.
           </p>
         </div>
@@ -71,18 +71,18 @@ export default async function PortalHomePage({
           </CardHeader>
           <CardContent>
             {(bookings ?? []).length === 0 ? (
-              <p className="text-sm text-slate-500">No upcoming visits scheduled.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">No upcoming visits scheduled.</p>
             ) : (
-              <ul className="divide-y divide-slate-100">
+              <ul className="divide-y divide-slate-100 dark:divide-slate-800">
                 {(bookings ?? []).map((b) => {
                   const addr = Array.isArray(b.service_addresses) ? b.service_addresses[0] : b.service_addresses;
                   return (
                     <li key={b.id} className="py-3">
-                      <p className="font-medium text-slate-900">
+                      <p className="font-medium text-slate-900 dark:text-slate-100">
                         {formatDate(b.scheduled_start)}, {formatTime(b.scheduled_start, tz)} –{" "}
                         {formatTime(b.scheduled_end, tz)}
                       </p>
-                      <p className="text-sm text-slate-500">
+                      <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
                         {addr?.address_line1}, {addr?.city}
                         {b.recurrence !== "none" && ` · repeats ${b.recurrence}`}
                       </p>
@@ -100,15 +100,15 @@ export default async function PortalHomePage({
           </CardHeader>
           <CardContent>
             {(quotes ?? []).length === 0 ? (
-              <p className="text-sm text-slate-500">No quotes waiting right now.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">No quotes waiting right now.</p>
             ) : (
-              <ul className="divide-y divide-slate-100">
+              <ul className="divide-y divide-slate-100 dark:divide-slate-800">
                 {(quotes ?? []).map((q) => (
                   <li key={q.id}>
-                    <Link href={`/p/${token}/quotes/${q.id}`} className="flex items-center justify-between gap-3 py-3 hover:bg-slate-50">
+                    <Link href={`/p/${token}/quotes/${q.id}`} className="flex items-center justify-between gap-3 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-900">
                       <div className="min-w-0">
-                        <p className="truncate font-medium text-slate-900">{q.quote_number}</p>
-                        <p className="truncate text-sm text-slate-500">
+                        <p className="truncate font-medium text-slate-900 dark:text-slate-100">{q.quote_number}</p>
+                        <p className="truncate text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
                           {q.valid_until ? `Valid until ${formatDate(q.valid_until)}` : "No expiry"}
                         </p>
                       </div>
@@ -136,13 +136,13 @@ export default async function PortalHomePage({
                 icon={<CardIcon className="h-10 w-10" />}
               />
             ) : (
-              <ul className="divide-y divide-slate-100">
+              <ul className="divide-y divide-slate-100 dark:divide-slate-800">
                 {(invoices ?? []).map((inv) => (
                   <li key={inv.id}>
-                    <Link href={`/p/${token}/invoices/${inv.id}`} className="flex items-center justify-between gap-3 py-3 hover:bg-slate-50">
+                    <Link href={`/p/${token}/invoices/${inv.id}`} className="flex items-center justify-between gap-3 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-900">
                       <div className="min-w-0">
-                        <p className="truncate font-medium text-slate-900">{inv.invoice_number}</p>
-                        <p className="truncate text-sm text-slate-500">
+                        <p className="truncate font-medium text-slate-900 dark:text-slate-100">{inv.invoice_number}</p>
+                        <p className="truncate text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
                           {inv.due_date ? `Due ${formatDate(inv.due_date)}` : "No due date"} ·{" "}
                           {formatCents(inv.total_cents - inv.amount_paid_cents)} due
                         </p>
@@ -158,7 +158,7 @@ export default async function PortalHomePage({
           </CardContent>
         </Card>
 
-        <p className="text-center text-xs text-slate-400">
+        <p className="text-center text-xs text-slate-400 dark:text-slate-500">
           Questions? Call {ctx.company.name}
           {ctx.company.phone ? ` at ${ctx.company.phone}` : ""}.
         </p>

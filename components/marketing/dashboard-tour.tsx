@@ -100,9 +100,9 @@ function useReducedMotion() {
 function SceneOverview({ active }: { active: boolean }) {
   return (
     <div className={`absolute inset-0 p-4 pb-12 transition-all duration-700 ${active ? "opacity-100" : "pointer-events-none opacity-0"}`}>
-      <p className="text-sm font-semibold text-slate-900">Good morning, Sarah</p>
-      <p className="text-xs text-slate-500">Thursday · 6 jobs today</p>
-      <div className="mt-2.5 grid grid-cols-4 gap-2">
+      <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Good morning, Sarah</p>
+      <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">Thursday · 6 jobs today</p>
+      <div className="mt-2.5 grid grid-cols-2 gap-2 sm:grid-cols-4">
         {stats.map((s) => (
           <StatCard key={s.label} {...s} run={active} />
         ))}
@@ -111,13 +111,13 @@ function SceneOverview({ active }: { active: boolean }) {
         {todayJobs.map((j, i) => (
           <div
             key={j.customer}
-            className={`flex items-center gap-3 rounded-lg border border-slate-100 bg-white px-3 py-1.5 shadow-sm transition-all duration-500 ${active ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"}`}
+            className={`flex items-center gap-3 rounded-lg border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-1.5 shadow-sm transition-all duration-500 ${active ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"}`}
             style={{ transitionDelay: `${200 + i * 150}ms` }}
           >
-            <span className="w-14 shrink-0 text-[11px] font-semibold text-slate-600">{j.time}</span>
+            <span className="w-14 shrink-0 text-[11px] font-semibold text-slate-600 dark:text-slate-400 dark:text-slate-500">{j.time}</span>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-xs font-semibold text-slate-900">{j.customer}</p>
-              <p className="truncate text-[10px] text-slate-500">{j.meta}</p>
+              <p className="truncate text-xs font-semibold text-slate-900 dark:text-slate-100">{j.customer}</p>
+              <p className="truncate text-[10px] text-slate-500 dark:text-slate-400 dark:text-slate-500">{j.meta}</p>
             </div>
             <span className={`h-2 w-2 shrink-0 rounded-full ${j.tone === "amber" ? "bg-amber-400" : "bg-brand-500"}`} />
           </div>
@@ -130,13 +130,13 @@ function SceneOverview({ active }: { active: boolean }) {
 function StatCard({ label, value, prefix, suffix, run }: { label: string; value: number; prefix: string; suffix: string; run: boolean }) {
   const n = useCountUp(value, run);
   return (
-    <div className="rounded-lg border border-slate-100 bg-white px-2.5 py-2 shadow-sm">
-      <p className="text-sm font-bold text-slate-900">
+    <div className="rounded-lg border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 px-2.5 py-2 shadow-sm">
+      <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
         {prefix}
         {n.toLocaleString()}
         {suffix}
       </p>
-      <p className="truncate text-[10px] text-slate-500">{label}</p>
+      <p className="truncate text-[10px] text-slate-500 dark:text-slate-400 dark:text-slate-500">{label}</p>
     </div>
   );
 }
@@ -144,18 +144,18 @@ function StatCard({ label, value, prefix, suffix, run }: { label: string; value:
 function SceneQuotes({ active }: { active: boolean }) {
   return (
     <div className={`absolute inset-0 p-5 pb-12 transition-all duration-700 ${active ? "opacity-100" : "pointer-events-none opacity-0"}`}>
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-bold text-slate-900">Quote Q-1042</p>
-            <p className="text-[11px] text-slate-500">Maple Street Residence · Deep clean</p>
+            <p className="text-sm font-bold text-slate-900 dark:text-slate-100">Quote Q-1042</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 dark:text-slate-500">Maple Street Residence · Deep clean</p>
           </div>
-          <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-semibold text-amber-800">Sent</span>
+          <span className="rounded-full bg-amber-100 dark:bg-amber-950 px-2.5 py-1 text-[10px] font-semibold text-amber-800 dark:text-amber-300">Sent</span>
         </div>
-        <div className="mt-3 space-y-1.5 border-t border-slate-100 pt-3 text-xs">
-          <div className="flex justify-between text-slate-600"><span>Deep clean · 3bd/2ba</span><span className="font-medium text-slate-900">$240</span></div>
-          <div className="flex justify-between text-slate-600"><span>Inside fridge + oven</span><span className="font-medium text-slate-900">$45</span></div>
-          <div className="flex justify-between border-t border-slate-100 pt-1.5 font-bold text-slate-900"><span>Total</span><span>$285</span></div>
+        <div className="mt-3 space-y-1.5 border-t border-slate-100 dark:border-slate-800 pt-3 text-xs">
+          <div className="flex justify-between text-slate-600 dark:text-slate-400 dark:text-slate-500"><span>Deep clean · 3bd/2ba</span><span className="font-medium text-slate-900 dark:text-slate-100">$240</span></div>
+          <div className="flex justify-between text-slate-600 dark:text-slate-400 dark:text-slate-500"><span>Inside fridge + oven</span><span className="font-medium text-slate-900 dark:text-slate-100">$45</span></div>
+          <div className="flex justify-between border-t border-slate-100 dark:border-slate-800 pt-1.5 font-bold text-slate-900 dark:text-slate-100"><span>Total</span><span>$285</span></div>
         </div>
         <div className="mt-3 space-y-1.5">
           {[
@@ -164,16 +164,16 @@ function SceneQuotes({ active }: { active: boolean }) {
           ].map((f, i) => (
             <div
               key={f.n}
-              className={`flex items-center justify-between rounded-lg bg-brand-50 px-3 py-1.5 transition-all duration-500 ${active ? "translate-x-0 opacity-100" : "translate-x-4 opacity-0"}`}
+              className={`flex items-center justify-between rounded-lg bg-brand-50 dark:bg-brand-950 px-3 py-1.5 transition-all duration-500 ${active ? "translate-x-0 opacity-100" : "translate-x-4 opacity-0"}`}
               style={{ transitionDelay: `${600 + i * 400}ms` }}
             >
-              <span className="text-[11px] font-medium text-brand-900">{f.label} · {f.when}</span>
+              <span className="text-[11px] font-medium text-brand-900 dark:text-brand-200">{f.label} · {f.when}</span>
               <span className="rounded-full bg-brand-600 px-2 py-0.5 text-[10px] font-semibold text-white">Scheduled</span>
             </div>
           ))}
         </div>
       </div>
-      <p className={`mt-3 text-center text-[11px] text-slate-500 transition-opacity delay-1000 duration-500 ${active ? "opacity-100" : "opacity-0"}`}>
+      <p className={`mt-3 text-center text-[11px] text-slate-500 dark:text-slate-400 dark:text-slate-500 transition-opacity delay-1000 duration-500 ${active ? "opacity-100" : "opacity-0"}`}>
         Sending stops the moment they approve, decline, or it expires.
       </p>
     </div>
@@ -186,7 +186,7 @@ function SceneSchedule({ active }: { active: boolean }) {
       <div className="grid h-full grid-cols-5 gap-1.5">
         {weekDays.map((d, di) => (
           <div key={d} className="flex flex-col rounded-lg bg-slate-50 p-1.5">
-            <p className={`text-center text-[10px] font-semibold ${di === 3 ? "text-brand-700" : "text-slate-500"}`}>{d}</p>
+            <p className={`text-center text-[10px] font-semibold ${di === 3 ? "text-brand-700" : "text-slate-500 dark:text-slate-400 dark:text-slate-500"}`}>{d}</p>
             <div className="mt-1.5 flex-1 space-y-1.5">
               {weekJobs
                 .filter((j) => j.day === di)
@@ -217,12 +217,12 @@ function SceneJob({ active }: { active: boolean }) {
 
   return (
     <div className={`absolute inset-0 p-5 pb-12 transition-all duration-700 ${active ? "opacity-100" : "pointer-events-none opacity-0"}`}>
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 shadow-sm">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-bold text-slate-900">Maple Street Residence</p>
-          <span className="rounded-full bg-brand-100 px-2.5 py-1 text-[10px] font-semibold text-brand-800">In progress</span>
+          <p className="text-sm font-bold text-slate-900 dark:text-slate-100">Maple Street Residence</p>
+          <span className="rounded-full bg-brand-100 dark:bg-brand-900 px-2.5 py-1 text-[10px] font-semibold text-brand-800 dark:text-brand-300">In progress</span>
         </div>
-        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-100">
+        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
           <div
             className="h-full rounded-full bg-accent-500 transition-all duration-500"
             style={{ width: `${(done / checklist.length) * 100}%` }}
@@ -234,11 +234,11 @@ function SceneJob({ active }: { active: boolean }) {
             return (
               <li key={item} className="flex items-center gap-2.5">
                 <span
-                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all duration-300 ${checked ? "border-accent-600 bg-accent-600" : "border-slate-300 bg-white"}`}
+                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all duration-300 ${checked ? "border-accent-600 bg-accent-600" : "border-slate-300 bg-white dark:bg-slate-900"}`}
                 >
                   {checked && <CheckIcon className="h-3.5 w-3.5 text-white" />}
                 </span>
-                <span className={`text-xs transition-colors ${checked ? "text-slate-400 line-through" : "text-slate-700"}`}>{item}</span>
+                <span className={`text-xs transition-colors ${checked ? "text-slate-400 dark:text-slate-500 line-through" : "text-slate-700 dark:text-slate-300"}`}>{item}</span>
               </li>
             );
           })}
@@ -258,19 +258,19 @@ function SceneInvoices({ active }: { active: boolean }) {
 
   return (
     <div className={`absolute inset-0 flex items-center justify-center p-5 transition-all duration-700 ${active ? "opacity-100" : "pointer-events-none opacity-0"}`}>
-      <div className="w-full max-w-xs rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="w-full max-w-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-bold text-slate-900">INV-2081</p>
-            <p className="text-[11px] text-slate-500">Maple Street Residence</p>
+            <p className="text-sm font-bold text-slate-900 dark:text-slate-100">INV-2081</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 dark:text-slate-500">Maple Street Residence</p>
           </div>
-          <p className="text-lg font-bold text-slate-900">$285</p>
+          <p className="text-lg font-bold text-slate-900 dark:text-slate-100">$285</p>
         </div>
-        <div className={`mt-3 rounded-lg px-3 py-2 text-center text-xs font-semibold transition-all duration-500 ${paid ? "bg-accent-100 text-accent-800" : "bg-amber-100 text-amber-800"}`}>
+        <div className={`mt-3 rounded-lg px-3 py-2 text-center text-xs font-semibold transition-all duration-500 ${paid ? "bg-accent-100 dark:bg-accent-950 text-accent-800 dark:text-accent-300" : "bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300"}`}>
           {paid ? "✓ Paid online — thank you!" : "Sent · awaiting payment"}
         </div>
         {!paid && (
-          <div className="mt-2 h-1 overflow-hidden rounded-full bg-slate-100">
+          <div className="mt-2 h-1 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
             <div className="h-full w-1/3 animate-shimmer rounded-full bg-brand-400" />
           </div>
         )}
@@ -287,7 +287,7 @@ function SceneEnd() {
       <p className="mt-2 max-w-xs text-sm text-brand-100">
         Run your cleaning business from one tidy place.
       </p>
-      <span className="mt-5 rounded-full bg-white px-5 py-2 text-sm font-semibold text-brand-800">
+      <span className="mt-5 rounded-full bg-white dark:bg-slate-900 px-5 py-2 text-sm font-semibold text-brand-800 dark:text-brand-300">
         Start free trial
       </span>
     </div>
@@ -340,21 +340,21 @@ export function DashboardTour() {
   return (
     <div ref={wrapRef} aria-label="TidyPro dashboard tour" role="img">
       {/* Browser chrome */}
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-brand-600/10">
-        <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50 px-4 py-2.5">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl shadow-brand-600/10">
+        <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 px-4 py-2.5">
           <span className="flex gap-1.5" aria-hidden="true">
             <i className="h-2.5 w-2.5 rounded-full bg-red-400" />
             <i className="h-2.5 w-2.5 rounded-full bg-amber-400" />
             <i className="h-2.5 w-2.5 rounded-full bg-green-400" />
           </span>
-          <span className="mx-auto hidden rounded-md bg-white px-3 py-0.5 text-[10px] text-slate-400 ring-1 ring-slate-200 sm:block">
+          <span className="mx-auto hidden rounded-md bg-white dark:bg-slate-900 px-3 py-0.5 text-[10px] text-slate-400 dark:text-slate-500 ring-1 ring-slate-200 dark:ring-slate-700 sm:block">
             app.tidypro.com/dashboard
           </span>
           <button
             type="button"
             onClick={() => setPlaying((p) => !p)}
             aria-label={playing ? "Pause tour" : "Play tour"}
-            className="flex h-7 w-7 items-center justify-center rounded-full text-slate-500 ring-1 ring-slate-200 transition hover:bg-white hover:text-slate-800"
+            className="flex h-7 w-7 items-center justify-center rounded-full text-slate-500 ring-1 ring-slate-200 transition hover:bg-slate-100 hover:text-slate-800 [margin:-8px] [padding:8px] dark:text-slate-400 dark:ring-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
           >
             {playing ? <PauseIcon className="h-3.5 w-3.5" /> : <PlayIcon className="h-3.5 w-3.5" />}
           </button>
@@ -362,11 +362,11 @@ export function DashboardTour() {
 
         <div className="flex">
           {/* Mini sidebar */}
-          <div className="hidden w-32 shrink-0 flex-col gap-0.5 border-r border-slate-100 bg-white p-2 sm:flex" aria-hidden="true">
+          <div className="hidden w-32 shrink-0 flex-col gap-0.5 border-r border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 sm:flex" aria-hidden="true">
             {nav.map((n) => (
               <span
                 key={n.label}
-                className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-[10px] font-medium ${n.on ? "bg-brand-50 text-brand-800" : "text-slate-500"}`}
+                className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-[10px] font-medium ${n.on ? "bg-brand-50 dark:bg-brand-950 text-brand-800 dark:text-brand-300" : "text-slate-500 dark:text-slate-400 dark:text-slate-500"}`}
               >
                 <n.icon className="h-3.5 w-3.5" />
                 {n.label}
@@ -375,7 +375,7 @@ export function DashboardTour() {
           </div>
 
           {/* Stage */}
-          <div className="relative min-w-0 flex-1 bg-slate-50" style={{ aspectRatio: "16 / 10" }}>
+          <div className="relative min-w-0 flex-1 bg-slate-50 dark:bg-slate-950" style={{ aspectRatio: "16 / 10" }}>
             <SceneOverview key={`overview-${cycle}`} active={scene === 0} />
             <SceneQuotes key={`quotes-${cycle}`} active={scene === 1} />
             <SceneSchedule key={`schedule-${cycle}`} active={scene === 2} />
@@ -383,9 +383,9 @@ export function DashboardTour() {
             <SceneInvoices key={`invoices-${cycle}`} active={scene === 4} />
             {scene === 5 && <SceneEnd />}
 
-            {/* Caption — cinematic subtitle scrim */}
+            {/* Caption — cinematic subtitle scrim (desktop overlay) */}
             {s.caption && (
-              <div key={scene} className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-900/55 via-slate-900/20 to-transparent px-4 pb-2.5 pt-8">
+              <div key={scene} className="pointer-events-none absolute inset-x-0 bottom-0 hidden bg-gradient-to-t from-slate-900/55 via-slate-900/20 to-transparent px-4 pb-2.5 pt-8 sm:block">
                 <p className="animate-fade-up text-xs font-semibold text-white drop-shadow">
                   {s.caption}
                 </p>
@@ -394,8 +394,15 @@ export function DashboardTour() {
           </div>
         </div>
 
+        {/* Caption below the frame on mobile (no overlay) */}
+        {s.caption && (
+          <p key={`m-${scene}`} className="animate-fade-up px-1 pt-2 text-center text-xs font-semibold text-slate-600 dark:text-slate-400 sm:hidden">
+            {s.caption}
+          </p>
+        )}
+
         {/* Timeline */}
-        <div className="flex items-center gap-2 border-t border-slate-100 bg-white px-4 py-2.5">
+        <div className="flex items-center gap-2 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5">
           <div className="flex flex-1 gap-1" aria-hidden="true">
             {SCENES.map((sc, i) => (
               <button
@@ -406,7 +413,7 @@ export function DashboardTour() {
                 className="group h-6 flex-1 cursor-pointer"
                 aria-label={`Go to ${sc.id}`}
               >
-                <span className="block h-1 overflow-hidden rounded-full bg-slate-100">
+                <span className="block h-1 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                   {i < scene && <span className="block h-full w-full bg-brand-500" />}
                   {i === scene && !reduced && playing && (
                     <span
@@ -425,7 +432,7 @@ export function DashboardTour() {
         </div>
       </div>
       <style>{`@keyframes tourProgress { from { transform: scaleX(0); } to { transform: scaleX(1); } }`}</style>
-      <p className="mt-3 text-center text-xs text-slate-400">Live product tour — sample data shown</p>
+      <p className="mt-3 text-center text-xs text-slate-400 dark:text-slate-500">Live product tour — sample data shown</p>
     </div>
   );
 }

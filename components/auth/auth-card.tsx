@@ -23,7 +23,7 @@ export function AuthCard({
   footer: ReactNode;
 }) {
   return (
-    <div className="bg-slate-50">
+    <div className="bg-slate-50 dark:bg-slate-900">
       <Container>
         <div className="flex min-h-screen flex-col items-center justify-center py-16">
           <Link href="/" className="mb-8 flex items-center gap-2.5">
@@ -36,7 +36,7 @@ export function AuthCard({
             </CardHeader>
             <CardContent>
               {children}
-              <div className="mt-5 text-center text-sm text-slate-500">
+              <div className="mt-5 text-center text-sm text-slate-500 dark:text-slate-400">
                 {footer}
               </div>
             </CardContent>

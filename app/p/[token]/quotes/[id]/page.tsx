@@ -42,10 +42,10 @@ export default async function PortalQuotePage({
       <div className="space-y-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
               Quote {quote.quote_number}
             </h1>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
               {quote.valid_until ? `Valid until ${formatDate(quote.valid_until)}` : "No expiry set"}
             </p>
           </div>
@@ -56,12 +56,12 @@ export default async function PortalQuotePage({
           <CardContent className="p-0">
             <div className="overflow-x-auto">
             <table className="w-full min-w-[420px] text-sm">
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {(items ?? []).map((it) => (
                   <tr key={it.id}>
                     <td className="px-5 py-3">
                       {it.label}
-                      <span className="block text-xs text-slate-400">
+                      <span className="block text-xs text-slate-400 dark:text-slate-500">
                         Qty {Number(it.qty)} × {formatCents(it.unit_price_cents)}
                       </span>
                     </td>
@@ -73,20 +73,20 @@ export default async function PortalQuotePage({
               </tbody>
             </table>
             </div>
-            <div className="space-y-1 border-t border-slate-200 px-5 py-4 text-sm">
-              <div className="flex justify-between"><span className="text-slate-500">Subtotal</span><span>{formatCents(quote.subtotal_cents)}</span></div>
+            <div className="space-y-1 border-t border-slate-200 dark:border-slate-800 px-5 py-4 text-sm">
+              <div className="flex justify-between"><span className="text-slate-500 dark:text-slate-400 dark:text-slate-500">Subtotal</span><span>{formatCents(quote.subtotal_cents)}</span></div>
               {quote.discount_cents > 0 && (
-                <div className="flex justify-between"><span className="text-slate-500">Discount</span><span>−{formatCents(quote.discount_cents)}</span></div>
+                <div className="flex justify-between"><span className="text-slate-500 dark:text-slate-400 dark:text-slate-500">Discount</span><span>−{formatCents(quote.discount_cents)}</span></div>
               )}
-              <div className="flex justify-between"><span className="text-slate-500">Tax</span><span>{formatCents(quote.tax_cents)}</span></div>
-              <div className="flex justify-between pt-1 text-base font-bold text-slate-900"><span>Total</span><span>{formatCents(quote.total_cents)}</span></div>
+              <div className="flex justify-between"><span className="text-slate-500 dark:text-slate-400 dark:text-slate-500">Tax</span><span>{formatCents(quote.tax_cents)}</span></div>
+              <div className="flex justify-between pt-1 text-base font-bold text-slate-900 dark:text-slate-100"><span>Total</span><span>{formatCents(quote.total_cents)}</span></div>
             </div>
           </CardContent>
         </Card>
 
         {quote.notes && (
           <Card>
-            <CardContent className="pt-6 text-sm text-slate-600">{quote.notes}</CardContent>
+            <CardContent className="pt-6 text-sm text-slate-600 dark:text-slate-400 dark:text-slate-500">{quote.notes}</CardContent>
           </Card>
         )}
 
@@ -107,14 +107,14 @@ export default async function PortalQuotePage({
         )}
 
         {quote.status !== "sent" && (
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
             You {quote.status === "approved" ? "approved" : quote.status} this quote.{" "}
             {ctx.company.phone && <>Questions? Call {ctx.company.phone}.</>}
           </p>
         )}
 
         <p className="text-sm">
-          <Link href={`/p/${token}`} className="font-medium text-brand-600 hover:text-brand-700">
+          <Link href={`/p/${token}`} className="font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400">
             ← Back to overview
           </Link>
         </p>

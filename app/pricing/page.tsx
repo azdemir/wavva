@@ -68,7 +68,7 @@ export default function PricingPage() {
           </Container>
         </section>
 
-        <section className="bg-slate-50 py-16 sm:py-20">
+        <section className="bg-slate-50 dark:bg-slate-900 py-16 sm:py-20">
           <Container>
             <SectionHeading
               eyebrow="Compare plans"
@@ -76,40 +76,44 @@ export default function PricingPage() {
               description="Every plan includes quotes, bookings, basic invoicing, and email support."
             />
             <Card className="mx-auto mt-10 max-w-4xl overflow-hidden">
-              <div className="overflow-x-auto">
+              <p className="border-b border-slate-200 px-4 py-2 text-center text-xs font-medium text-slate-400 dark:border-slate-800 dark:text-slate-500 sm:hidden">
+                Swipe sideways to compare all plans →
+              </p>
+              <div className="relative overflow-x-auto">
+                <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-white to-transparent dark:from-slate-900 sm:hidden" />
                 <table className="w-full min-w-[560px] text-left text-sm">
                   <caption className="sr-only">
                     Feature comparison across Starter, Growth, and Pro plans
                   </caption>
                   <thead>
-                    <tr className="border-b border-slate-200 bg-slate-50">
-                      <th scope="col" className="px-6 py-4 font-semibold text-slate-900">
+                    <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
+                      <th scope="col" className="px-6 py-4 font-semibold text-slate-900 dark:text-slate-100">
                         Feature
                       </th>
                       {plans.map((p) => (
                         <th
                           key={p.name}
                           scope="col"
-                          className="px-6 py-4 text-center font-semibold text-slate-900"
+                          className="px-6 py-4 text-center font-semibold text-slate-900 dark:text-slate-100"
                         >
                           {p.name}
                         </th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                     {comparisonRows.map((row) => (
                       <tr key={row.label}>
                         <th
                           scope="row"
-                          className="px-6 py-3.5 font-medium text-slate-700"
+                          className="px-6 py-3.5 font-medium text-slate-700 dark:text-slate-300"
                         >
                           {row.label}
                         </th>
                         {row.values.map((v, i) => (
                           <td
                             key={i}
-                            className="px-6 py-3.5 text-center text-slate-600"
+                            className="px-6 py-3.5 text-center text-slate-600 dark:text-slate-400"
                           >
                             {v === true ? (
                               <CheckIcon className="mx-auto h-5 w-5 text-accent-600" />
@@ -141,10 +145,10 @@ export default function PricingPage() {
               {billingFaqs.map((f) => (
                 <Card key={f.q}>
                   <CardContent>
-                    <h3 className="text-base font-semibold text-slate-900">
+                    <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
                       {f.q}
                     </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                       {f.a}
                     </p>
                   </CardContent>
