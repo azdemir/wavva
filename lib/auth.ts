@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 
 export type Membership = {
   id: string;
@@ -22,8 +22,9 @@ export type Company = {
   onboarding_completed: boolean;
 };
 
-/** The signed-in user, or null. */
+/** The signed-in user, or null (also null when Supabase isn't configured). */
 export async function getSessionUser() {
+  if (!isSupabaseConfigured()) return null;
   const supabase = await createClient();
   const {
     data: { user },

@@ -2,6 +2,18 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 /**
+ * True when the public Supabase credentials are present. Auth and data
+ * pages check this first so a missing .env.local shows a setup notice
+ * instead of crashing with a 500.
+ */
+export function isSupabaseConfigured() {
+  return Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  );
+}
+
+/**
  * Supabase client for Server Components, Server Actions, and Route Handlers.
  * Carries the user's JWT, so Postgres RLS policies enforce tenant isolation.
  */

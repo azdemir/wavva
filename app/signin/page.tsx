@@ -5,8 +5,10 @@ import { redirect } from "next/navigation";
 export const instant = false;
 import { AuthCard } from "@/components/auth/auth-card";
 import { AuthForm } from "@/components/auth/auth-form";
+import { AuthSetupNotice } from "@/components/auth/setup-notice";
 import { signIn } from "@/lib/actions/auth";
 import { getSessionUser } from "@/lib/auth";
+import { isSupabaseConfigured } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Sign in",
@@ -39,12 +41,16 @@ export default async function SignInPage({
         </>
       }
     >
-      <AuthForm
-        action={signIn}
-        submitLabel="Sign in"
-        pendingLabel="Signing in…"
-        nextPath={next}
-      />
+      {isSupabaseConfigured() ? (
+        <AuthForm
+          action={signIn}
+          submitLabel="Sign in"
+          pendingLabel="Signing in…"
+          nextPath={next}
+        />
+      ) : (
+        <AuthSetupNotice />
+      )}
     </AuthCard>
   );
 }

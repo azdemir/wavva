@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 
 const credentialsSchema = z.object({
   email: z.string().email("Enter a valid email address"),
@@ -11,7 +11,11 @@ const credentialsSchema = z.object({
 
 export type AuthResult = { error?: string };
 
+const NOT_CONFIGURED_ERROR =
+  "Sign-in isn't set up on this server yet — add your Supabase keys to .env.local and restart.";
+
 export async function signUp(formData: FormData): Promise<AuthResult> {
+  if (!isSupabaseConfigured()) return { error: NOT_CONFIGURED_ERROR };
   const parsed = credentialsSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
@@ -41,6 +45,7 @@ export async function signUp(formData: FormData): Promise<AuthResult> {
 }
 
 export async function signIn(formData: FormData): Promise<AuthResult> {
+  if (!isSupabaseConfigured()) return { error: NOT_CONFIGURED_ERROR };
   const parsed = credentialsSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
