@@ -67,8 +67,8 @@ export function Hero() {
               aria-hidden="true"
               className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xl shadow-brand-600/5"
             >
-              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                <div>
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4">
+                <div className="min-w-0">
                   <p className="text-sm font-semibold text-slate-900">
                     Today&apos;s schedule
                   </p>
@@ -76,12 +76,12 @@ export function Hero() {
                     Thursday · {sampleJobs.length} jobs scheduled
                   </p>
                 </div>
-                <Badge tone="accent">2 new quote requests</Badge>
+                <Badge tone="accent" className="shrink-0">2 new quote requests</Badge>
               </div>
               <ul className="divide-y divide-slate-100">
                 {sampleJobs.map((job) => (
-                  <li key={job.customer} className="flex items-center gap-4 py-4">
-                    <div className="w-16 shrink-0 text-sm font-semibold text-slate-700">
+                  <li key={job.customer} className="flex items-center gap-3 py-4 sm:gap-4">
+                    <div className="w-14 shrink-0 text-sm font-semibold text-slate-700 sm:w-16">
                       {job.time}
                     </div>
                     <div className="min-w-0 flex-1">
@@ -92,7 +92,9 @@ export function Hero() {
                         {job.address} · {job.crew}
                       </p>
                     </div>
-                    <JobStatusPill status={job.status} />
+                    <span className="shrink-0">
+                      <JobStatusPill status={job.status} />
+                    </span>
                   </li>
                 ))}
               </ul>

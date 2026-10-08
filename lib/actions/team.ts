@@ -6,6 +6,7 @@ import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { requireUser, requireOwner, getActiveMembership } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
 import { inviteSchema } from "@/lib/validation";
+import { PLANS, isPlanId, seatsAvailable, seatLimitLabel } from "@/lib/plans";
 
 /** Owner creates a single invite from the Team page. */
 export async function createInvite(formData: FormData) {
@@ -17,6 +18,24 @@ export async function createInvite(formData: FormData) {
   if (!parsed.success) return { error: "Enter a valid email and role." };
 
   const supabase = await createClient();
+
+  // Plan seat limit: members (including the owner) count against the plan.
+  const { data: company } = await supabase
+    .from("companies")
+    .select("plan")
+    .eq("id", ctx.company.id)
+    .single();
+  const planId = isPlanId(company?.plan) ? company.plan : "starter";
+  const { count: memberCount } = await supabase
+    .from("memberships")
+    .select("id", { count: "exact", head: true })
+    .eq("company_id", ctx.company.id);
+  if (!seatsAvailable(planId, memberCount ?? 0)) {
+    return {
+      error: `Your ${PLANS[planId].name} plan includes ${seatLimitLabel(planId)}. Upgrade in Settings → Billing to invite more people.`,
+    };
+  }
+
   const { error } = await supabase.from("invites").upsert(
     {
       company_id: ctx.company.id,
