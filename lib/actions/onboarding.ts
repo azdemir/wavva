@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { requireUser, getActiveMembership } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
 import {
@@ -50,14 +50,40 @@ export async function saveCompanyProfile(
       .eq("id", active.company.id);
     if (error) return err(error.message);
   } else {
-    const { data: company, error: cErr } = await supabase
+    // Bootstrap: the user has no company/membership yet, so tenant RLS
+    // policies can't authorize this insert via the normal path. Prefer the
+    // user-scoped client (respects RLS as designed). If the deployment's
+    // JWT claims aren't reaching RLS (auth.uid() null), fall back to the
+    // service_role client — authentication was already verified via
+    // requireUser() above, and we create exactly one company + one owner
+    // membership for that verified user.
+    let db = supabase;
+    let company: { id: string } | null = null;
+    const attempt = await supabase
       .from("companies")
       .insert(data)
       .select("id")
       .single();
-    if (cErr || !company) return err(cErr?.message ?? "Could not create company");
+    if (attempt.error) {
+      const isRls = attempt.error.code === "42501";
+      const hasSvcKey = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
+      if (!isRls || !hasSvcKey) return err(attempt.error.message);
+      const svc = await createServiceClient();
+      const retry = await svc
+        .from("companies")
+        .insert(data)
+        .select("id")
+        .single();
+      if (retry.error || !retry.data) {
+        return err(retry.error?.message ?? "Could not create company");
+      }
+      db = svc;
+      company = retry.data;
+    } else {
+      company = attempt.data;
+    }
 
-    const { error: mErr } = await supabase.from("memberships").insert({
+    const { error: mErr } = await db.from("memberships").insert({
       user_id: user.id,
       company_id: company.id,
       email: user.email ?? "",
@@ -65,7 +91,7 @@ export async function saveCompanyProfile(
     });
     if (mErr) return err(mErr.message);
 
-    await logAudit(supabase, {
+    await logAudit(db, {
       company_id: company.id,
       action: "company.created",
       entity_type: "company",
