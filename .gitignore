@@ -43,3 +43,7 @@ next-env.d.ts
 # generated previews (not source)
 /screenshots/
 /tidypro-preview-widget.html
+
+# playwright artifacts
+/tests/playwright-report/
+/tests/screenshots/

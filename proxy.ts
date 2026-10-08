@@ -7,6 +7,15 @@ import { NextResponse, type NextRequest } from "next/server";
  * always see a valid session. Routing guards live in layouts, not here.
  */
 export async function proxy(request: NextRequest) {
+  // Without Supabase configured, skip the session refresh entirely so the
+  // marketing site still serves (previously this hard-crashed every route).
+  if (
+    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  ) {
+    return NextResponse.next({ request });
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
