@@ -104,7 +104,28 @@ lib/
 - **Stage 2:** ✅ done — full marketing pages: `/features`, `/pricing` (plan comparison + billing FAQ), `/faq` (grouped Q&A), `/contact`
 - **Stage 3:** ✅ done — Supabase Auth, PostgreSQL schema with RLS tenant isolation, onboarding wizard, dashboard shell, team invites, settings
 - **Stage 4:** ✅ done — customers, services/pricing config, quotes → bookings with job generation
-- **Stage 5:** scheduling, assignments, job lifecycle, cleaner mobile views
-- **Stage 6:** invoicing, Stripe Connect, customer portal
-- **Stage 7:** email notifications, platform admin, audit logs, security review
-- **Stage 8:** pilot with 2–3 Upstate NY cleaning companies
+- **Stage 5:** ✅ done — week schedule view, job detail with lifecycle (start/complete/cancel), interactive checklists, crew assignment, cleaner mobile "My jobs" view
+- **Stage 6:** ✅ done — invoices (builder, statuses, offline payments), Stripe Connect onboarding + webhook + Checkout, customer portal (`/p/[token]`: quotes approval, invoice payment)
+- **Stage 7:** ✅ done — email notification queue (Resend) + cron endpoint with booking reminders, platform admin (`/admin`), audit log viewer, `SECURITY.md` review
+- **Stage 8:** pilot prep kit ready in `pilot/` (checklist, outreach script, agreement template, feedback form, success metrics) — recruiting the 2–3 companies is a human task
+
+## Running the app (stages 3+)
+
+1. Create a Supabase project and run `supabase/migrations/0001_init.sql`,
+   `0002_job_lifecycle.sql`, `0003_billing_portal.sql` in order.
+2. Copy `.env.example` to `.env.local` and fill in the Supabase keys.
+   For local dev, disable "Confirm email" in Supabase Auth settings.
+3. `npm install && npm run dev` → sign up, complete onboarding, explore.
+4. Optional: `RESEND_API_KEY` + daily cron on `/api/cron/notifications`;
+   `STRIPE_SECRET_KEY` + webhook for online payments; `PLATFORM_ADMIN_EMAILS`
+   for `/admin`.
+
+## Honest limitations (pre-pilot)
+
+- **Roles are coarse:** every member currently has full access to company
+  data. Tighten RLS per `SECURITY.md` P0 before charging anyone.
+- **Stripe/Resend are key-gated:** without keys, payments and emails queue
+  but don't send — the UI says so explicitly.
+- **No platform subscription billing yet:** charging cleaning companies for
+  TidyPro itself is post-pilot work.
+- **Job photos** need object storage (schema-ready, UI notes it).
