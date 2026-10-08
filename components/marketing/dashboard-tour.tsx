@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
-  SparkleIcon,
   HomeIcon,
   UsersIcon,
   QuoteIcon,
@@ -13,6 +12,7 @@ import {
   PauseIcon,
   PlayIcon,
 } from "@/components/ui/icons";
+import { LogoMark } from "@/components/ui/logo";
 
 /* ------------------------------------------------------------------ */
 /* Sample data (fictional — same flavor as the rest of the marketing   */
@@ -282,9 +282,7 @@ function SceneInvoices({ active }: { active: boolean }) {
 function SceneEnd() {
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-brand-700 to-brand-900 p-6 text-center">
-      <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/15">
-        <SparkleIcon className="h-6 w-6 text-white" />
-      </span>
+<LogoMark className="h-14 w-14" />
       <p className="mt-4 text-xl font-bold tracking-tight text-white">TidyPro</p>
       <p className="mt-2 max-w-xs text-sm text-brand-100">
         Run your cleaning business from one tidy place.

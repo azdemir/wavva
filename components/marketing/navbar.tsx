@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { site } from "@/lib/site";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
-import { SparkleIcon } from "@/components/ui/icons";
+import { Logo } from "@/components/ui/logo";
 
 const links = [
   { label: "Features", href: "/features" },
@@ -20,12 +19,7 @@ export function Navbar() {
           className="flex h-16 items-center justify-between"
         >
           <Link href="/" className="flex items-center gap-2.5">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-white">
-              <SparkleIcon className="h-5 w-5" />
-            </span>
-            <span className="text-lg font-bold tracking-tight text-slate-900">
-              {site.name}
-            </span>
+            <Logo />
           </Link>
 
           <div className="hidden items-center gap-1 md:flex">

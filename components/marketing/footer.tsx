@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { site } from "@/lib/site";
 import { Container } from "@/components/ui/container";
-import { SparkleIcon } from "@/components/ui/icons";
+import { Logo } from "@/components/ui/logo";
 
 const columns = [
   {
@@ -30,12 +30,7 @@ export function Footer() {
         <div className="grid gap-10 py-12 md:grid-cols-[1.5fr_1fr_1fr]">
           <div>
             <div className="flex items-center gap-2.5">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-white">
-                <SparkleIcon className="h-5 w-5" />
-              </span>
-              <span className="text-lg font-bold tracking-tight text-slate-900">
-                {site.name}
-              </span>
+<Logo />
             </div>
             <p className="mt-4 max-w-sm text-sm text-slate-500">
               {site.tagline}. Quotes, scheduling, teams, invoices, and

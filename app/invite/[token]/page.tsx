@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { SparkleIcon } from "@/components/ui/icons";
+import { Logo } from "@/components/ui/logo";
 
 export const metadata: Metadata = { title: "Accept invite" };
 
@@ -19,12 +19,7 @@ function Shell({ children }: { children: React.ReactNode }) {
       <Container>
         <div className="flex min-h-screen flex-col items-center justify-center py-16">
           <div className="mb-8 flex items-center gap-2.5">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-white">
-              <SparkleIcon className="h-5 w-5" />
-            </span>
-            <span className="text-lg font-bold tracking-tight text-slate-900">
-              {site.name}
-            </span>
+<Logo />
           </div>
           <Card className="w-full max-w-md">
             <CardContent className="pt-6">{children}</CardContent>

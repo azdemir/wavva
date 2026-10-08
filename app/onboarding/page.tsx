@@ -3,11 +3,10 @@ import { redirect } from "next/navigation";
 
 export const instant = false;
 import { headers } from "next/headers";
-import { site } from "@/lib/site";
 import { requireUser, getActiveMembership } from "@/lib/auth";
 import { Container } from "@/components/ui/container";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { SparkleIcon } from "@/components/ui/icons";
+import { Logo } from "@/components/ui/logo";
 import { OnboardingProgress } from "@/components/onboarding/progress";
 import { CompanyStep } from "@/components/onboarding/company-step";
 import { ServicesStep } from "@/components/onboarding/services-step";
@@ -50,12 +49,7 @@ export default async function OnboardingPage({
       <Container>
         <div className="mx-auto max-w-2xl py-10">
           <div className="mb-8 flex items-center gap-2.5">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-white">
-              <SparkleIcon className="h-5 w-5" />
-            </span>
-            <span className="text-lg font-bold tracking-tight text-slate-900">
-              {site.name}
-            </span>
+<Logo />
           </div>
 
           <OnboardingProgress current={step} />

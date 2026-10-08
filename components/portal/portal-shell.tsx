@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { site } from "@/lib/site";
 import { Container } from "@/components/ui/container";
-import { SparkleIcon } from "@/components/ui/icons";
+import { LogoMark } from "@/components/ui/logo";
 
 /** Minimal branded shell for the customer portal (no login required). */
 export function PortalShell({
@@ -19,9 +19,7 @@ export function PortalShell({
         <Container>
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center gap-2.5">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white">
-                <SparkleIcon className="h-4 w-4" />
-              </span>
+              <LogoMark className="h-8 w-8" />
               <div>
                 <p className="text-sm font-bold text-slate-900">{companyName}</p>
                 <p className="text-xs text-slate-500">powered by {site.name}</p>

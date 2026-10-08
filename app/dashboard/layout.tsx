@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { site } from "@/lib/site";
 import { requireCompany } from "@/lib/auth";
 import { signOut } from "@/lib/actions/auth";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +8,6 @@ import { PLANS, isPlanId } from "@/lib/plans";
 // Workspace routes render per request (auth session) — never prerendered.
 export const instant = false;
 import {
-  SparkleIcon,
   HomeIcon,
   UsersIcon,
   TagIcon,
@@ -20,6 +18,7 @@ import {
   GearIcon,
   BellIcon,
 } from "@/components/ui/icons";
+import { Logo, LogoMark } from "@/components/ui/logo";
 
 type NavItem = {
   href: string;
@@ -92,12 +91,7 @@ export default async function DashboardLayout({
       <aside className="hidden w-64 shrink-0 border-r border-slate-200 bg-white md:block">
         <div className="flex h-full flex-col">
           <Link href="/dashboard" className="flex items-center gap-2.5 px-5 pb-5 pt-6">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-white">
-              <SparkleIcon className="h-5 w-5" />
-            </span>
-            <span className="text-lg font-bold tracking-tight text-slate-900">
-              {site.name}
-            </span>
+<LogoMark className="h-9 w-9" />
           </Link>
           <div className="flex-1 overflow-y-auto px-3">
             <NavLinks />
@@ -125,12 +119,7 @@ export default async function DashboardLayout({
       <div className="border-b border-slate-200 bg-white md:hidden">
         <div className="flex items-center justify-between px-4 py-3">
           <Link href="/dashboard" className="flex items-center gap-2">
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white">
-              <SparkleIcon className="h-4 w-4" />
-            </span>
-            <span className="font-bold tracking-tight text-slate-900">
-              {site.name}
-            </span>
+<Logo />
           </Link>
           <form action={signOut}>
             <button
