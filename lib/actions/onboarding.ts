@@ -27,7 +27,9 @@ export async function saveCompanyProfile(
     phone: formData.get("phone") || "",
     email: formData.get("email") || "",
     website: formData.get("website") || "",
-    timezone: formData.get("timezone"),
+    // Time zone is no longer asked during onboarding; default it here.
+    // Users can change it later in Settings.
+    timezone: formData.get("timezone") || "America/New_York",
   });
   if (!parsed.success) return err(parsed.error.issues[0]?.message ?? "Invalid input");
 

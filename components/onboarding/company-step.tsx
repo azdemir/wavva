@@ -6,15 +6,6 @@ import { Field } from "@/components/ui/input";
 import { saveCompanyProfile } from "@/lib/actions/onboarding";
 import type { Company } from "@/lib/auth";
 
-const timezones = [
-  "America/New_York",
-  "America/Chicago",
-  "America/Denver",
-  "America/Los_Angeles",
-  "America/Anchorage",
-  "Pacific/Honolulu",
-];
-
 export function CompanyStep({ company }: { company?: Company | null }) {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -61,32 +52,13 @@ export function CompanyStep({ company }: { company?: Company | null }) {
           defaultValue={company?.email ?? ""}
         />
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field
-          id="ob-website"
-          name="website"
-          label="Website (optional)"
-          placeholder="www.company.com"
-          defaultValue={company?.website ?? ""}
-        />
-        <div>
-          <label htmlFor="ob-timezone" className="block text-sm font-medium text-slate-700">
-            Time zone
-          </label>
-          <select
-            id="ob-timezone"
-            name="timezone"
-            defaultValue={company?.timezone ?? "America/New_York"}
-            className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3.5 text-sm text-slate-900 focus:outline-2 focus:outline-offset-1 focus:outline-brand-600"
-          >
-            {timezones.map((tz) => (
-              <option key={tz} value={tz}>
-                {tz.replace("_", " ")}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+      <Field
+        id="ob-website"
+        name="website"
+        label="Website (optional)"
+        placeholder="www.company.com"
+        defaultValue={company?.website ?? ""}
+      />
       <Button type="submit" className="w-full" disabled={pending}>
         {pending ? "Saving…" : "Continue"}
       </Button>
