@@ -138,16 +138,19 @@ export async function assignJob(id: string, userIds: string[]): Promise<ActionRe
   });
 
   if (userIds.length > 0) {
-    const { data: jobFull } = await supabase
-      .from("jobs")
-      .select("scheduled_start, scheduled_end, customers(name), service_addresses(address_line1, city)")
-      .eq("id", id)
-      .single();
-    const { data: assignees } = await supabase
-      .from("memberships")
-      .select("user_id, email")
-      .eq("company_id", ctx.company.id)
-      .in("user_id", userIds);
+    // Job details and assignee emails are independent — fetch together.
+    const [{ data: jobFull }, { data: assignees }] = await Promise.all([
+      supabase
+        .from("jobs")
+        .select("scheduled_start, scheduled_end, customers(name), service_addresses(address_line1, city)")
+        .eq("id", id)
+        .single(),
+      supabase
+        .from("memberships")
+        .select("user_id, email")
+        .eq("company_id", ctx.company.id)
+        .in("user_id", userIds),
+    ]);
     const bUrl = await baseUrl();
     const tz2 = ctx.company.timezone || "America/New_York";
     for (const a of assignees ?? []) {

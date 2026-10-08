@@ -26,23 +26,25 @@ export default async function JobDetailPage({
   const tz = company.timezone || "America/New_York";
   const isStaff = membership.role === "owner" || membership.role === "manager";
 
-  const { data: job } = await supabase
-    .from("jobs")
-    .select(
-      "*, customers(name, phone), service_addresses(label, address_line1, address_line2, city, state, zip, access_instructions), bookings(booking_number, notes)",
-    )
-    .eq("id", id)
-    .eq("company_id", company.id)
-    .single();
+  // Job and roster load in parallel; isStaff is known from requireCompany.
+  const [{ data: job }, { data: members }] = await Promise.all([
+    supabase
+      .from("jobs")
+      .select(
+        "*, customers(name, phone), service_addresses(label, address_line1, address_line2, city, state, zip, access_instructions), bookings(booking_number, notes)",
+      )
+      .eq("id", id)
+      .eq("company_id", company.id)
+      .single(),
+    isStaff
+      ? supabase
+          .from("memberships")
+          .select("user_id, email, role")
+          .eq("company_id", company.id)
+          .order("email")
+      : Promise.resolve({ data: [] as { user_id: string; email: string; role: string }[] }),
+  ]);
   if (!job) notFound();
-
-  const { data: members } = isStaff
-    ? await supabase
-        .from("memberships")
-        .select("user_id, email, role")
-        .eq("company_id", company.id)
-        .order("email")
-    : { data: [] };
 
   const assigned: string[] = job.assigned_user_ids ?? [];
   // Cleaners only see jobs assigned to them.

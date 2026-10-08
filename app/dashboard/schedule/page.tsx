@@ -31,23 +31,26 @@ export default async function SchedulePage({
   const end = new Date(start);
   end.setDate(end.getDate() + 7);
 
-  const { data: jobs } = await supabase
-    .from("jobs")
-    .select(
-      "id, scheduled_start, scheduled_end, status, assigned_user_ids, customers(name), service_addresses(address_line1, city)",
-    )
-    .eq("company_id", company.id)
-    .gte("scheduled_start", start.toISOString())
-    .lt("scheduled_start", end.toISOString())
-    .neq("status", "canceled")
-    .order("scheduled_start", { ascending: true });
-
-  const { data: members } = await supabase
-    .from("memberships")
-    .select("user_id, email")
-    .eq("company_id", company.id);
-  const emailOf = (uid: string) =>
-    members?.find((m) => m.user_id === uid)?.email ?? "Unknown";
+  // Jobs and the team roster load in parallel; email lookup uses a Map
+  // instead of a linear .find() per job per assignee.
+  const [{ data: jobs }, { data: members }] = await Promise.all([
+    supabase
+      .from("jobs")
+      .select(
+        "id, scheduled_start, scheduled_end, status, assigned_user_ids, customers(name), service_addresses(address_line1, city)",
+      )
+      .eq("company_id", company.id)
+      .gte("scheduled_start", start.toISOString())
+      .lt("scheduled_start", end.toISOString())
+      .neq("status", "canceled")
+      .order("scheduled_start", { ascending: true }),
+    supabase
+      .from("memberships")
+      .select("user_id, email")
+      .eq("company_id", company.id),
+  ]);
+  const emailByUserId = new Map((members ?? []).map((m) => [m.user_id, m.email]));
+  const emailOf = (uid: string) => emailByUserId.get(uid) ?? "Unknown";
 
   // Group by local day.
   const days: { date: Date; jobs: NonNullable<typeof jobs> }[] = [];

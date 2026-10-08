@@ -25,17 +25,20 @@ export async function createInvite(
 
   const supabase = await createClient();
 
-  // Plan seat limit: members (including the owner) count against the plan.
-  const { data: company } = await supabase
-    .from("companies")
-    .select("plan")
-    .eq("id", ctx.company.id)
-    .single();
-  const planId = isPlanId(company?.plan) ? company.plan : "starter";
-  const { count: memberCount } = await supabase
-    .from("memberships")
-    .select("id", { count: "exact", head: true })
-    .eq("company_id", ctx.company.id);
+  // Plan seat limit: the plan lookup and the member count are
+  // independent — run them together.
+  const [{ data: companyRow }, { count: memberCount }] = await Promise.all([
+    supabase
+      .from("companies")
+      .select("plan")
+      .eq("id", ctx.company.id)
+      .single(),
+    supabase
+      .from("memberships")
+      .select("id", { count: "exact", head: true })
+      .eq("company_id", ctx.company.id),
+  ]);
+  const planId = isPlanId(companyRow?.plan) ? companyRow.plan : "starter";
   if (!seatsAvailable(planId, memberCount ?? 0)) {
     return {
       error: `Your ${PLANS[planId].name} plan includes ${seatLimitLabel(planId)}. Upgrade in Settings → Billing to invite more people.`,
