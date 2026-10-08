@@ -6,6 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { QuoteStatusPill, statusLabel, type QuoteStatus } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Pagination } from "@/components/ui/pagination";
+import { parsePageParam, PAGE_SIZE } from "@/lib/pagination";
 import { PlusIcon, QuoteIcon } from "@/components/ui/icons";
 import { formatCents, formatDate } from "@/lib/format";
 import { one } from "@/lib/relations";
@@ -15,21 +17,24 @@ const statuses = ["all", "draft", "sent", "approved", "declined", "expired"] as 
 export default async function QuotesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string }>;
+  searchParams: Promise<{ status?: string; page?: string }>;
 }) {
   const { company } = await requireCompany();
   const supabase = await createClient();
-  const status = (await searchParams).status ?? "all";
+  const params = await searchParams;
+  const status = params.status ?? "all";
   const valid = statuses.includes(status as (typeof statuses)[number]) ? status : "all";
+  const page = parsePageParam(params.page);
 
   let query = supabase
     .from("quotes")
-    .select("id, quote_number, status, total_cents, valid_until, created_at, customers(name)")
+    .select("id, quote_number, status, total_cents, valid_until, created_at, customers(name)", { count: "exact" })
     .eq("company_id", company.id)
     .order("created_at", { ascending: false });
   if (valid !== "all") query = query.eq("status", valid);
 
-  const { data: quotes } = await query;
+  const { data: quotes, count } = await query.range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
+  const total = count ?? 0;
 
   return (
     <div className="space-y-6">
@@ -89,6 +94,18 @@ export default async function QuotesPage({
               ))}
             </ul>
           </CardContent>
+          {total > PAGE_SIZE && (
+            <div className="px-5 pb-4">
+              <Pagination
+                page={page}
+                totalPages={Math.max(1, Math.ceil(total / PAGE_SIZE))}
+                total={total}
+                pageSize={PAGE_SIZE}
+                basePath="/dashboard/quotes"
+                searchParams={{ status: valid !== "all" ? valid : undefined }}
+              />
+            </div>
+          )}
         </Card>
       )}
     </div>

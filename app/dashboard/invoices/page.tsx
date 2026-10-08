@@ -7,6 +7,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { InvoiceStatusPill, statusLabel, type InvoiceStatus } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Pagination } from "@/components/ui/pagination";
+import { parsePageParam, PAGE_SIZE } from "@/lib/pagination";
 import { PlusIcon, CardIcon } from "@/components/ui/icons";
 import { formatCents, formatDate } from "@/lib/format";
 
@@ -17,20 +19,23 @@ const statuses = ["all", "draft", "sent", "overdue", "paid", "void"] as const;
 export default async function InvoicesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string }>;
+  searchParams: Promise<{ status?: string; page?: string }>;
 }) {
   const { company } = await requireCompany();
   const supabase = await createClient();
-  const status = (await searchParams).status ?? "all";
+  const params = await searchParams;
+  const status = params.status ?? "all";
   const valid = (statuses as readonly string[]).includes(status) ? status : "all";
+  const page = parsePageParam(params.page);
 
   let query = supabase
     .from("invoices")
-    .select("id, invoice_number, status, total_cents, amount_paid_cents, due_date, customers(name)")
+    .select("id, invoice_number, status, total_cents, amount_paid_cents, due_date, customers(name)", { count: "exact" })
     .eq("company_id", company.id)
     .order("created_at", { ascending: false });
   if (valid !== "all") query = query.eq("status", valid);
-  const { data: invoices } = await query;
+  const { data: invoices, count } = await query.range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
+  const total = count ?? 0;
 
   return (
     <div className="space-y-6">
@@ -94,6 +99,18 @@ export default async function InvoicesPage({
               })}
             </ul>
           </CardContent>
+          {total > PAGE_SIZE && (
+            <div className="px-5 pb-4">
+              <Pagination
+                page={page}
+                totalPages={Math.max(1, Math.ceil(total / PAGE_SIZE))}
+                total={total}
+                pageSize={PAGE_SIZE}
+                basePath="/dashboard/invoices"
+                searchParams={{ status: valid !== "all" ? valid : undefined }}
+              />
+            </div>
+          )}
         </Card>
       )}
     </div>

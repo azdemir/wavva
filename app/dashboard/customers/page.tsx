@@ -6,25 +6,34 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/input";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Pagination } from "@/components/ui/pagination";
+import { parsePageParam, PAGE_SIZE } from "@/lib/pagination";
 import { PlusIcon, UsersIcon } from "@/components/ui/icons";
 
 export default async function CustomersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; page?: string }>;
 }) {
   const { company } = await requireCompany();
   const supabase = await createClient();
-  const q = ((await searchParams).q ?? "").trim();
+  const params = await searchParams;
+  const q = (params.q ?? "").trim();
+  const page = parsePageParam(params.page);
 
   let query = supabase
     .from("customers")
-    .select("id, name, email, phone, created_at")
+    .select("id, name, email, phone, created_at", { count: "exact" })
     .eq("company_id", company.id)
     .order("name", { ascending: true });
   if (q) query = query.ilike("name", `%${q}%`);
 
-  const { data: customers } = await query;
+  const { data: customers, count } = await query.range(
+    (page - 1) * PAGE_SIZE,
+    page * PAGE_SIZE - 1,
+  );
+  const total = count ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <div className="space-y-6">
@@ -86,6 +95,16 @@ export default async function CustomersPage({
               ))}
             </ul>
           </CardContent>
+          <div className="px-5 pb-4">
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              total={total}
+              pageSize={PAGE_SIZE}
+              basePath="/dashboard/customers"
+              searchParams={{ q: q || undefined }}
+            />
+          </div>
         </Card>
       )}
     </div>

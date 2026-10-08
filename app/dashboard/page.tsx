@@ -22,7 +22,7 @@ export default async function DashboardPage() {
   const tz = company.timezone || "America/New_York";
   const { start, end } = dayBoundsUtc(tz);
 
-  const [{ data: jobs }, { data: quotes }, { data: invoices }, { count: customerCount }] =
+  const [{ data: jobs }, { data: quotes }, { data: stats }] =
     await Promise.all([
       supabase
         .from("jobs")
@@ -39,25 +39,28 @@ export default async function DashboardPage() {
         .in("status", ["draft", "sent"])
         .order("created_at", { ascending: false })
         .limit(5),
-      supabase
-        .from("invoices")
-        .select("total_cents, amount_paid_cents")
-        .in("status", ["sent", "overdue"]),
-      supabase.from("customers").select("id", { count: "exact", head: true }),
+      // Single DB round trip for the stat cards (aggregates server-side).
+      supabase.rpc("dashboard_stats", {
+        p_company_id: company.id,
+        p_day_start: start.toISOString(),
+        p_day_end: end.toISOString(),
+      }),
     ]);
 
   const todaysJobs = jobs ?? [];
   const openQuotes = quotes ?? [];
-  const outstanding = (invoices ?? []).reduce(
-    (sum, inv) => sum + (inv.total_cents - inv.amount_paid_cents),
-    0,
-  );
+  const stat = (stats as unknown as {
+    jobs_today: number;
+    open_quotes: number;
+    outstanding_cents: number;
+    customer_count: number;
+  }[] | null)?.[0];
 
-  const stats = [
-    { label: "Jobs today", value: String(todaysJobs.length), icon: CalendarIcon },
-    { label: "Open quotes", value: String(openQuotes.length), icon: QuoteIcon },
-    { label: "Outstanding", value: formatCents(outstanding), icon: CardIcon },
-    { label: "Customers", value: String(customerCount ?? 0), icon: UsersIcon },
+  const statsCards = [
+    { label: "Jobs today", value: String(stat?.jobs_today ?? todaysJobs.length), icon: CalendarIcon },
+    { label: "Open quotes", value: String(stat?.open_quotes ?? openQuotes.length), icon: QuoteIcon },
+    { label: "Outstanding", value: formatCents(stat?.outstanding_cents ?? 0), icon: CardIcon },
+    { label: "Customers", value: String(stat?.customer_count ?? 0), icon: UsersIcon },
   ];
 
   return (
@@ -78,7 +81,7 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {stats.map((s) => {
+        {statsCards.map((s) => {
           const Icon = s.icon;
           return (
             <Card key={s.label}>
