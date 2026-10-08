@@ -4,13 +4,11 @@ import { createClient } from "@/lib/supabase/server";
 import { one } from "@/lib/relations";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { JobStatusPill, type JobStatus } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { formatTime, formatDate } from "@/lib/format";
 
 export const instant = false;
-
-const tones = { scheduled: "brand", in_progress: "accent", completed: "slate", canceled: "red" } as const;
 
 /**
  * Cleaner-facing view: only jobs assigned to the signed-in user,
@@ -66,9 +64,7 @@ export default async function MyJobsPage() {
                       {one(job.service_addresses)?.address_line1}, {one(job.service_addresses)?.city}
                     </p>
                   </div>
-                  <Badge tone={tones[job.status as keyof typeof tones] ?? "slate"}>
-                    {job.status.replace("_", " ")}
-                  </Badge>
+                  <JobStatusPill status={job.status as JobStatus} />
                 </div>
                 <span className="mt-3 inline-block rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white">
                   {job.status === "in_progress" ? "Continue job →" : "Open job →"}

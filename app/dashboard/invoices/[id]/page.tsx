@@ -7,13 +7,11 @@ import { setInvoiceStatus, recordPayment, deleteInvoice } from "@/lib/actions/in
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Badge, InvoiceStatusPill, statusLabel, type InvoiceStatus } from "@/components/ui/badge";
 import { Field } from "@/components/ui/input";
 import { formatCents, formatDate } from "@/lib/format";
 
 export const instant = false;
-
-const tones = { draft: "slate", sent: "brand", overdue: "red", paid: "accent", void: "slate" } as const;
 
 const nextActions: Record<string, { status: string; label: string }[]> = {
   draft: [{ status: "sent", label: "Mark as sent" }, { status: "void", label: "Void" }],
@@ -55,13 +53,12 @@ export default async function InvoiceDetailPage({
           title={`Invoice ${invoice.invoice_number}`}
           description={`${customer?.name ?? "Customer"} · created ${formatDate(invoice.created_at)}`}
         />
-        <Badge tone={tones[invoice.status as keyof typeof tones] ?? "slate"} className="text-sm">
-          {invoice.status}
-        </Badge>
+        <InvoiceStatusPill status={invoice.status as InvoiceStatus} className="text-sm" />
       </div>
 
       <Card>
         <CardContent className="p-0">
+          <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-200 text-left text-xs uppercase tracking-wide text-slate-500">
@@ -82,6 +79,7 @@ export default async function InvoiceDetailPage({
               ))}
             </tbody>
           </table>
+          </div>
           <div className="space-y-1 border-t border-slate-200 px-5 py-4 text-sm">
             <div className="flex justify-between"><span className="text-slate-500">Subtotal</span><span>{formatCents(invoice.subtotal_cents)}</span></div>
             <div className="flex justify-between"><span className="text-slate-500">Tax ({(Number(invoice.tax_rate) * 100).toFixed(2)}%)</span><span>{formatCents(invoice.tax_cents)}</span></div>
@@ -106,7 +104,7 @@ export default async function InvoiceDetailPage({
                     {p.provider_ref ? ` · ${p.provider_ref}` : ""}
                     <span className="text-slate-500"> · {formatDate(p.created_at)}</span>
                   </span>
-                  <Badge tone={p.status === "succeeded" ? "accent" : "slate"}>{p.status}</Badge>
+                  <Badge tone={p.status === "succeeded" ? "accent" : "slate"}>{statusLabel(p.status)}</Badge>
                 </li>
               ))}
             </ul>

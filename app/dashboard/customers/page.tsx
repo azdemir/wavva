@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/input";
 import { EmptyState } from "@/components/ui/empty-state";
-import { PlusIcon } from "@/components/ui/icons";
+import { PlusIcon, UsersIcon } from "@/components/ui/icons";
 
 export default async function CustomersPage({
   searchParams,
@@ -60,6 +60,7 @@ export default async function CustomersPage({
                   <Button href="/dashboard/customers/new">New customer</Button>
                 )
               }
+              icon={<UsersIcon className="h-10 w-10" />}
             />
           </CardContent>
         </Card>

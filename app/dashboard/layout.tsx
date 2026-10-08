@@ -127,7 +127,7 @@ export default async function DashboardLayout({
               <SparkleIcon className="h-4 w-4" />
             </span>
             <span className="font-bold tracking-tight text-slate-900">
-              {company.name}
+              {site.name}
             </span>
           </Link>
           <form action={signOut}>

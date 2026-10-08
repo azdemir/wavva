@@ -7,7 +7,13 @@ import { updateCustomer, deleteCustomer, deleteAddress } from "@/lib/actions/cus
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import {
+  Badge,
+  JobStatusPill,
+  QuoteStatusPill,
+  type JobStatus,
+  type QuoteStatus,
+} from "@/components/ui/badge";
 import { CustomerForm } from "@/components/customers/customer-form";
 import { AddressForm } from "@/components/customers/address-form";
 import { PortalLinkButton } from "@/components/portal/portal-link-button";
@@ -145,7 +151,7 @@ export default async function CustomerDetailPage({
                       {b.booking_number}
                     </Link>{" "}
                     <span className="text-slate-500">· {formatDate(b.scheduled_start)}</span>{" "}
-                    <Badge tone="slate">{b.status}</Badge>
+                    <JobStatusPill status={b.status as JobStatus} />
                   </li>
                 ))}
               </ul>
@@ -167,7 +173,7 @@ export default async function CustomerDetailPage({
                       {q.quote_number}
                     </Link>{" "}
                     <span className="text-slate-500">· {formatCents(q.total_cents)}</span>{" "}
-                    <Badge tone="slate">{q.status}</Badge>
+                    <QuoteStatusPill status={q.status as QuoteStatus} />
                   </li>
                 ))}
               </ul>

@@ -4,14 +4,13 @@ import { createClient } from "@/lib/supabase/server";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { QuoteStatusPill, statusLabel, type QuoteStatus } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
-import { PlusIcon } from "@/components/ui/icons";
+import { PlusIcon, QuoteIcon } from "@/components/ui/icons";
 import { formatCents, formatDate } from "@/lib/format";
 import { one } from "@/lib/relations";
 
 const statuses = ["all", "draft", "sent", "approved", "declined", "expired"] as const;
-const tones = { draft: "slate", sent: "brand", approved: "accent", declined: "red", expired: "slate" } as const;
 
 export default async function QuotesPage({
   searchParams,
@@ -46,11 +45,11 @@ export default async function QuotesPage({
           <Link
             key={s}
             href={s === "all" ? "/dashboard/quotes" : `/dashboard/quotes?status=${s}`}
-            className={`rounded-full px-3.5 py-1.5 text-sm font-medium capitalize ${
+            className={`inline-flex min-h-9 items-center rounded-full px-3.5 py-1.5 text-sm font-medium capitalize ${
               valid === s ? "bg-brand-600 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
             }`}
           >
-            {s}
+            {statusLabel(s)}
           </Link>
         ))}
       </div>
@@ -62,6 +61,7 @@ export default async function QuotesPage({
               title="No quotes here"
               description="Create your first quote — it takes about a minute."
               action={<Button href="/dashboard/quotes/new">New quote</Button>}
+              icon={<QuoteIcon className="h-10 w-10" />}
             />
           </CardContent>
         </Card>
@@ -82,7 +82,7 @@ export default async function QuotesPage({
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="font-semibold text-slate-900">{formatCents(q.total_cents)}</span>
-                      <Badge tone={tones[q.status as keyof typeof tones] ?? "slate"}>{q.status}</Badge>
+                      <QuoteStatusPill status={q.status as QuoteStatus} />
                     </div>
                   </Link>
                 </li>

@@ -6,12 +6,10 @@ import { rescheduleBooking, cancelBooking } from "@/lib/actions/bookings";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { JobStatusPill, type JobStatus } from "@/components/ui/badge";
 import { Field } from "@/components/ui/input";
 import { formatTime, formatDate } from "@/lib/format";
 import { one } from "@/lib/relations";
-
-const tones = { scheduled: "brand", in_progress: "accent", completed: "slate", canceled: "red" } as const;
 
 function toInputValue(iso: string): string {
   const d = new Date(iso);
@@ -58,9 +56,7 @@ export default async function BookingDetailPage({
           title={`Booking ${booking.booking_number}`}
           description={`${customer?.name ?? "Customer"} · ${booking.recurrence === "none" ? "One time" : `Repeats ${booking.recurrence}`}`}
         />
-        <Badge tone={tones[booking.status as keyof typeof tones] ?? "slate"} className="text-sm">
-          {booking.status.replace("_", " ")}
-        </Badge>
+        <JobStatusPill status={booking.status as JobStatus} className="text-sm" />
       </div>
 
       <Card>
@@ -124,9 +120,7 @@ export default async function BookingDetailPage({
                   Visit {i + 1} — {formatDate(j.scheduled_start)},{" "}
                   {formatTime(j.scheduled_start, tz)} – {formatTime(j.scheduled_end, tz)}
                 </span>
-                <Badge tone={tones[j.status as keyof typeof tones] ?? "slate"}>
-                  {j.status.replace("_", " ")}
-                </Badge>
+                <JobStatusPill status={j.status as JobStatus} />
               </li>
             ))}
           </ul>

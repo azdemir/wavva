@@ -4,12 +4,10 @@ import { createClient } from "@/lib/supabase/server";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { JobStatusPill, type JobStatus } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
-import { PlusIcon } from "@/components/ui/icons";
+import { PlusIcon, CalendarIcon } from "@/components/ui/icons";
 import { formatTime, formatDate } from "@/lib/format";
-
-const tones = { scheduled: "brand", in_progress: "accent", completed: "slate", canceled: "red" } as const;
 
 type BookingRow = {
   id: string;
@@ -38,9 +36,7 @@ function BookingList({ bookings, tz }: { bookings: BookingRow[]; tz: string }) {
                 {b.recurrence !== "none" && ` · repeats ${b.recurrence}`}
               </p>
             </div>
-            <Badge tone={tones[b.status as keyof typeof tones] ?? "slate"}>
-              {b.status.replace("_", " ")}
-            </Badge>
+            <JobStatusPill status={b.status as JobStatus} />
           </Link>
         </li>
       ))}
@@ -82,6 +78,7 @@ export default async function BookingsPage() {
               title="No bookings yet"
               description="Book a cleaning and its job visits will be generated automatically."
               action={<Button href="/dashboard/bookings/new">New booking</Button>}
+              icon={<CalendarIcon className="h-10 w-10" />}
             />
           </CardContent>
         </Card>

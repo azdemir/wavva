@@ -7,7 +7,12 @@ import { one } from "@/lib/relations";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import {
+  JobStatusPill,
+  QuoteStatusPill,
+  type JobStatus,
+  type QuoteStatus,
+} from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PlusIcon, CalendarIcon, QuoteIcon, UsersIcon, CardIcon } from "@/components/ui/icons";
 
@@ -102,6 +107,7 @@ export default async function DashboardPage() {
                 title="Nothing scheduled today"
                 description="Create a booking and its jobs will appear here."
                 action={<Button href="/dashboard/bookings/new">New booking</Button>}
+                icon={<CalendarIcon className="h-10 w-10" />}
               />
             ) : (
               <ul className="divide-y divide-slate-100">
@@ -117,9 +123,7 @@ export default async function DashboardPage() {
                         {one(job.service_addresses)?.address_line1}
                       </p>
                     </div>
-                    <Badge tone={job.status === "completed" ? "accent" : "brand"}>
-                      {job.status.replace("_", " ")}
-                    </Badge>
+                    <JobStatusPill status={job.status as JobStatus} />
                   </li>
                 ))}
               </ul>
@@ -142,6 +146,7 @@ export default async function DashboardPage() {
                 title="No open quotes"
                 description="Build a quote in under a minute and send it to a customer."
                 action={<Button href="/dashboard/quotes/new">New quote</Button>}
+                icon={<QuoteIcon className="h-10 w-10" />}
               />
             ) : (
               <ul className="divide-y divide-slate-100">
@@ -158,7 +163,7 @@ export default async function DashboardPage() {
                       </div>
                       <div className="text-right">
                         <p className="font-semibold text-slate-900">{formatCents(q.total_cents)}</p>
-                        <Badge tone={q.status === "sent" ? "brand" : "slate"}>{q.status}</Badge>
+                        <QuoteStatusPill status={q.status as QuoteStatus} />
                       </div>
                     </Link>
                   </li>

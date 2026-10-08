@@ -6,11 +6,9 @@ import { setQuoteStatus, deleteQuote } from "@/lib/actions/quotes";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { QuoteStatusPill, statusLabel, type QuoteStatus } from "@/components/ui/badge";
 import { formatCents, formatDate } from "@/lib/format";
 import { one } from "@/lib/relations";
-
-const tones = { draft: "slate", sent: "brand", approved: "accent", declined: "red", expired: "slate" } as const;
 
 const nextActions: Record<string, { status: string; label: string; variant?: "primary" | "outline" }[]> = {
   draft: [{ status: "sent", label: "Mark as sent" }, { status: "expired", label: "Expire", variant: "outline" }],
@@ -56,9 +54,7 @@ export default async function QuoteDetailPage({
           title={`Quote ${quote.quote_number}`}
           description={`${customer?.name ?? "Customer"} · created ${formatDate(quote.created_at)}`}
         />
-        <Badge tone={tones[quote.status as keyof typeof tones] ?? "slate"} className="text-sm">
-          {quote.status}
-        </Badge>
+        <QuoteStatusPill status={quote.status as QuoteStatus} className="text-sm" />
       </div>
 
       <Card>
@@ -66,6 +62,7 @@ export default async function QuoteDetailPage({
           <CardTitle>Line items</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
+          <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-200 text-left text-xs uppercase tracking-wide text-slate-500">
@@ -80,7 +77,7 @@ export default async function QuoteDetailPage({
                 <tr key={it.id}>
                   <td className="px-5 py-3">
                     {it.label}
-                    <span className="ml-2 text-xs text-slate-400">{it.kind}</span>
+                    <span className="ml-2 text-xs text-slate-400">{statusLabel(it.kind)}</span>
                   </td>
                   <td className="px-5 py-3 text-right">{Number(it.qty)}</td>
                   <td className="px-5 py-3 text-right">{formatCents(it.unit_price_cents)}</td>
@@ -89,6 +86,7 @@ export default async function QuoteDetailPage({
               ))}
             </tbody>
           </table>
+          </div>
           <div className="space-y-1 border-t border-slate-200 px-5 py-4 text-sm">
             <div className="flex justify-between"><span className="text-slate-500">Subtotal</span><span>{formatCents(quote.subtotal_cents)}</span></div>
             {quote.discount_cents > 0 && (

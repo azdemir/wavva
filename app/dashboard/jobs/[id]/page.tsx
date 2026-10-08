@@ -7,15 +7,13 @@ import { startJob, completeJob, cancelJob, saveJobNotes } from "@/lib/actions/jo
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { JobStatusPill, type JobStatus } from "@/components/ui/badge";
 import { TextareaField } from "@/components/ui/input";
 import { JobChecklist, type ChecklistItem } from "@/components/jobs/job-checklist";
 import { AssignCrew } from "@/components/jobs/assign-crew";
 import { formatTime, formatDate } from "@/lib/format";
 
 export const instant = false;
-
-const tones = { scheduled: "brand", in_progress: "accent", completed: "slate", canceled: "red" } as const;
 
 export default async function JobDetailPage({
   params,
@@ -65,9 +63,7 @@ export default async function JobDetailPage({
           title={customer?.name ?? "Job"}
           description={`${formatDate(job.scheduled_start)}, ${formatTime(job.scheduled_start, tz)} – ${formatTime(job.scheduled_end, tz)}`}
         />
-        <Badge tone={tones[job.status as keyof typeof tones] ?? "slate"} className="text-sm">
-          {job.status.replace("_", " ")}
-        </Badge>
+        <JobStatusPill status={job.status as JobStatus} className="text-sm" />
       </div>
 
       <Card>
