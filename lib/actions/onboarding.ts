@@ -1,5 +1,7 @@
 "use server";
 
+import { rateLimit, limits, rateLimitError } from "@/lib/rate-limit";
+
 import { redirect } from "next/navigation";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { requireUser, getActiveMembership } from "@/lib/auth";
@@ -176,6 +178,8 @@ export async function createInvites(
   items: unknown,
   baseUrl: string,
 ): Promise<{ error?: string; invites?: CreatedInvite[] }> {
+  const rl = await rateLimit("invite", limits.spammy.max, limits.spammy.windowMs);
+  if (!rl.allowed) return rateLimitError(rl.resetIn);
   const active = await getActiveMembership();
   if (!active) redirect("/onboarding");
   if (active.membership.role !== "owner") return { error: "Only owners can invite the team." };

@@ -1,5 +1,7 @@
 "use server";
 
+import { rateLimit, limits, rateLimitError } from "@/lib/rate-limit";
+
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
@@ -9,7 +11,11 @@ import { inviteSchema } from "@/lib/validation";
 import { PLANS, isPlanId, seatsAvailable, seatLimitLabel } from "@/lib/plans";
 
 /** Owner creates a single invite from the Team page. */
-export async function createInvite(formData: FormData) {
+export async function createInvite(
+  formData: FormData,
+): Promise<{ error?: string; ok?: boolean }> {
+  const rl = await rateLimit("invite", limits.spammy.max, limits.spammy.windowMs);
+  if (!rl.allowed) return rateLimitError(rl.resetIn);
   const ctx = await requireOwner();
   const parsed = inviteSchema.safeParse({
     email: formData.get("email"),

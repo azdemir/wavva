@@ -26,6 +26,26 @@ and isn't protected. Fix P0 items before onboarding paying pilot companies.
 - **Secrets.** All keys live in env vars (`.env.example` documents them);
   the service-role key and Stripe secret never touch client components.
 
+
+## 2026-10-08 hardening pass
+
+- **Security headers** (`next.config.ts`): `X-Frame-Options: DENY`
+  (clickjacking), `X-Content-Type-Options: nosniff`, `Referrer-Policy`,
+  `Strict-Transport-Security` (1yr), a Content-Security-Policy (self +
+  Google Maps/Stripe/Supabase allowlists), and `Permissions-Policy`
+  disabling camera/mic/geolocation.
+- **Rate limiting** (`lib/rate-limit.ts`, in-memory per-IP):
+  sign-in/sign-up capped at 10 attempts per 10 minutes (brute-force
+  protection); team invites at 5/hour (spam); customer portal pages at
+  30/minute (token brute-forcing). Not distributed — use Redis/Upstash
+  for multi-region.
+- **Input validation**: all server actions validate with Zod
+  (`safeParse`); no raw `formData` reaches the database.
+- **No XSS vectors**: no `dangerouslySetInnerHTML` outside the theme
+  init script; React escapes all user content by default.
+- **No hardcoded secrets**: all keys via env vars; cron and webhook
+  endpoints verify bearer/signature against env secrets.
+
 ## P0 — fix before paid pilot
 
 1. **Coarse roles.** Today every company member (including cleaners) gets
