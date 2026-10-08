@@ -6,6 +6,7 @@
 
 export type TemplateName =
   | "quote_sent"
+  | "quote_followup"
   | "quote_approved"
   | "booking_confirmed"
   | "booking_reminder"
@@ -49,6 +50,12 @@ export function renderTemplate(
         subject: `Your cleaning quote ${p.quote_number} from ${company}`,
         html: shell(company, `<p>${greeting}</p><p>Your quote <strong>${p.quote_number}</strong> for <strong>${money(p.total_cents)}</strong> is ready.${p.valid_until ? ` It's valid until ${p.valid_until}.` : ""}</p>${p.portal_link ? `<p><a href="${p.portal_link}">Review and approve your quote →</a></p>` : ""}`),
         text: `${greeting}\n\nYour quote ${p.quote_number} for ${money(p.total_cents)} is ready.${p.valid_until ? ` Valid until ${p.valid_until}.` : ""}${p.portal_link ? `\nReview it here: ${p.portal_link}` : ""}`,
+      };
+    case "quote_followup":
+      return {
+        subject: `Still interested? Your quote ${p.quote_number} from ${company}`,
+        html: shell(company, `<p>${greeting}</p><p>Just checking in — your quote <strong>${p.quote_number}</strong> for <strong>${money(p.total_cents)}</strong> is still available.${p.valid_until ? ` It's valid until ${p.valid_until}.` : ""}</p>${p.portal_link ? `<p><a href="${p.portal_link}">Review and approve it here →</a></p>` : ""}<p style="font-size:13px;color:#64748b;">Questions? Just reply to this email.</p>`),
+        text: `${greeting}\n\nJust checking in — your quote ${p.quote_number} for ${money(p.total_cents)} is still available.${p.valid_until ? ` Valid until ${p.valid_until}.` : ""}${p.portal_link ? `\nReview and approve: ${p.portal_link}` : ""}\n\nQuestions? Just reply to this email.`,
       };
     case "quote_approved":
       return {

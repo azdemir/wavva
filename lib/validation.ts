@@ -97,4 +97,6 @@ export const settingsSchema = z.object({
   freq_weekly: z.coerce.number().min(0).max(2).default(1),
   freq_biweekly: z.coerce.number().min(0).max(2).default(1),
   freq_monthly: z.coerce.number().min(0).max(2).default(1),
+  followup_enabled: z.coerce.boolean().default(true),
+  followup_days: z.string().max(30).default("2, 5"),
 });
