@@ -4,12 +4,15 @@
 --
 -- Apply: supabase db push  (or paste into the Supabase SQL editor)
 -- Requires: PostgreSQL 15+ (Supabase default). Uses auth.uid() from Supabase Auth.
+-- Idempotent: safe to re-run. Tables, indexes, and policies are skipped
+-- if they already exist, so a partial earlier run can be repaired by
+-- simply running this file again.
 
 -- ============================================================
 -- Tables
 -- ============================================================
 
-create table public.companies (
+create table if not exists public.companies (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   logo_url text,
@@ -26,7 +29,7 @@ create table public.companies (
   updated_at timestamptz not null default now()
 );
 
-create table public.memberships (
+create table if not exists public.memberships (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
   company_id uuid not null references public.companies(id) on delete cascade,
@@ -36,7 +39,7 @@ create table public.memberships (
   unique (user_id, company_id)
 );
 
-create table public.invites (
+create table if not exists public.invites (
   id uuid primary key default gen_random_uuid(),
   company_id uuid not null references public.companies(id) on delete cascade,
   email text not null,
@@ -47,7 +50,7 @@ create table public.invites (
   unique (company_id, email)
 );
 
-create table public.customers (
+create table if not exists public.customers (
   id uuid primary key default gen_random_uuid(),
   company_id uuid not null references public.companies(id) on delete cascade,
   name text not null,
@@ -60,7 +63,7 @@ create table public.customers (
   updated_at timestamptz not null default now()
 );
 
-create table public.service_addresses (
+create table if not exists public.service_addresses (
   id uuid primary key default gen_random_uuid(),
   company_id uuid not null references public.companies(id) on delete cascade,
   customer_id uuid not null references public.customers(id) on delete cascade,
@@ -77,7 +80,7 @@ create table public.service_addresses (
   created_at timestamptz not null default now()
 );
 
-create table public.services (
+create table if not exists public.services (
   id uuid primary key default gen_random_uuid(),
   company_id uuid not null references public.companies(id) on delete cascade,
   name text not null,
@@ -90,7 +93,7 @@ create table public.services (
   created_at timestamptz not null default now()
 );
 
-create table public.addons (
+create table if not exists public.addons (
   id uuid primary key default gen_random_uuid(),
   company_id uuid not null references public.companies(id) on delete cascade,
   name text not null,
@@ -99,7 +102,7 @@ create table public.addons (
   created_at timestamptz not null default now()
 );
 
-create table public.service_areas (
+create table if not exists public.service_areas (
   id uuid primary key default gen_random_uuid(),
   company_id uuid not null references public.companies(id) on delete cascade,
   area_type text not null check (area_type in ('city', 'county', 'zip', 'radius')),
@@ -107,7 +110,7 @@ create table public.service_areas (
   created_at timestamptz not null default now()
 );
 
-create table public.quotes (
+create table if not exists public.quotes (
   id uuid primary key default gen_random_uuid(),
   company_id uuid not null references public.companies(id) on delete cascade,
   customer_id uuid not null references public.customers(id) on delete restrict,
@@ -126,7 +129,7 @@ create table public.quotes (
   unique (company_id, quote_number)
 );
 
-create table public.quote_line_items (
+create table if not exists public.quote_line_items (
   id uuid primary key default gen_random_uuid(),
   company_id uuid not null references public.companies(id) on delete cascade,
   quote_id uuid not null references public.quotes(id) on delete cascade,
@@ -139,7 +142,7 @@ create table public.quote_line_items (
   sort integer not null default 0
 );
 
-create table public.bookings (
+create table if not exists public.bookings (
   id uuid primary key default gen_random_uuid(),
   company_id uuid not null references public.companies(id) on delete cascade,
   customer_id uuid not null references public.customers(id) on delete restrict,
@@ -161,7 +164,7 @@ create table public.bookings (
   unique (company_id, booking_number)
 );
 
-create table public.jobs (
+create table if not exists public.jobs (
   id uuid primary key default gen_random_uuid(),
   company_id uuid not null references public.companies(id) on delete cascade,
   booking_id uuid not null references public.bookings(id) on delete cascade,
@@ -178,7 +181,7 @@ create table public.jobs (
   created_at timestamptz not null default now()
 );
 
-create table public.invoices (
+create table if not exists public.invoices (
   id uuid primary key default gen_random_uuid(),
   company_id uuid not null references public.companies(id) on delete cascade,
   customer_id uuid not null references public.customers(id) on delete restrict,
@@ -199,7 +202,7 @@ create table public.invoices (
   unique (company_id, invoice_number)
 );
 
-create table public.invoice_line_items (
+create table if not exists public.invoice_line_items (
   id uuid primary key default gen_random_uuid(),
   company_id uuid not null references public.companies(id) on delete cascade,
   invoice_id uuid not null references public.invoices(id) on delete cascade,
@@ -210,7 +213,7 @@ create table public.invoice_line_items (
   sort integer not null default 0
 );
 
-create table public.payments (
+create table if not exists public.payments (
   id uuid primary key default gen_random_uuid(),
   company_id uuid not null references public.companies(id) on delete cascade,
   invoice_id uuid not null references public.invoices(id) on delete restrict,
@@ -222,7 +225,7 @@ create table public.payments (
   created_at timestamptz not null default now()
 );
 
-create table public.notifications (
+create table if not exists public.notifications (
   id uuid primary key default gen_random_uuid(),
   company_id uuid not null references public.companies(id) on delete cascade,
   recipient_type text not null check (recipient_type in ('customer', 'user')),
@@ -236,7 +239,7 @@ create table public.notifications (
   created_at timestamptz not null default now()
 );
 
-create table public.audit_logs (
+create table if not exists public.audit_logs (
   id uuid primary key default gen_random_uuid(),
   company_id uuid not null references public.companies(id) on delete cascade,
   actor_user_id uuid references auth.users(id) on delete set null,
@@ -289,28 +292,28 @@ $$;
 -- Indexes
 -- ============================================================
 
-create index idx_memberships_user on public.memberships(user_id);
-create index idx_memberships_company on public.memberships(company_id);
-create index idx_invites_company on public.invites(company_id);
-create index idx_customers_company on public.customers(company_id);
-create index idx_service_addresses_company on public.service_addresses(company_id);
-create index idx_service_addresses_customer on public.service_addresses(customer_id);
-create index idx_services_company on public.services(company_id);
-create index idx_addons_company on public.addons(company_id);
-create index idx_service_areas_company on public.service_areas(company_id);
-create index idx_quotes_company on public.quotes(company_id);
-create index idx_quotes_customer on public.quotes(customer_id);
-create index idx_quote_line_items_quote on public.quote_line_items(quote_id);
-create index idx_bookings_company on public.bookings(company_id);
-create index idx_bookings_customer on public.bookings(customer_id);
-create index idx_jobs_company on public.jobs(company_id);
-create index idx_jobs_booking on public.jobs(booking_id);
-create index idx_jobs_start on public.jobs(scheduled_start);
-create index idx_invoices_company on public.invoices(company_id);
-create index idx_invoice_line_items_invoice on public.invoice_line_items(invoice_id);
-create index idx_payments_invoice on public.payments(invoice_id);
-create index idx_notifications_company on public.notifications(company_id);
-create index idx_audit_logs_company on public.audit_logs(company_id);
+create index if not exists idx_memberships_user on public.memberships(user_id);
+create index if not exists idx_memberships_company on public.memberships(company_id);
+create index if not exists idx_invites_company on public.invites(company_id);
+create index if not exists idx_customers_company on public.customers(company_id);
+create index if not exists idx_service_addresses_company on public.service_addresses(company_id);
+create index if not exists idx_service_addresses_customer on public.service_addresses(customer_id);
+create index if not exists idx_services_company on public.services(company_id);
+create index if not exists idx_addons_company on public.addons(company_id);
+create index if not exists idx_service_areas_company on public.service_areas(company_id);
+create index if not exists idx_quotes_company on public.quotes(company_id);
+create index if not exists idx_quotes_customer on public.quotes(customer_id);
+create index if not exists idx_quote_line_items_quote on public.quote_line_items(quote_id);
+create index if not exists idx_bookings_company on public.bookings(company_id);
+create index if not exists idx_bookings_customer on public.bookings(customer_id);
+create index if not exists idx_jobs_company on public.jobs(company_id);
+create index if not exists idx_jobs_booking on public.jobs(booking_id);
+create index if not exists idx_jobs_start on public.jobs(scheduled_start);
+create index if not exists idx_invoices_company on public.invoices(company_id);
+create index if not exists idx_invoice_line_items_invoice on public.invoice_line_items(invoice_id);
+create index if not exists idx_payments_invoice on public.payments(invoice_id);
+create index if not exists idx_notifications_company on public.notifications(company_id);
+create index if not exists idx_audit_logs_company on public.audit_logs(company_id);
 
 -- ============================================================
 -- Row-Level Security
@@ -336,20 +339,26 @@ alter table public.audit_logs enable row level security;
 
 -- Companies: members read; any signed-in user can create (onboarding);
 -- members update; owners delete.
+drop policy if exists companies_select on public.companies;
 create policy companies_select on public.companies
   for select using (id in (select public.user_company_ids()));
+drop policy if exists companies_insert on public.companies;
 create policy companies_insert on public.companies
   for insert with check (auth.uid() is not null);
+drop policy if exists companies_update on public.companies;
 create policy companies_update on public.companies
   for update using (id in (select public.user_company_ids()));
+drop policy if exists companies_delete on public.companies;
 create policy companies_delete on public.companies
   for delete using (public.is_company_owner(id));
 
 -- Memberships: members read their companies' rosters.
 -- Insert: self-join only, and only as the very first member (onboarding)
 -- or by an owner (team management goes through invites in the app).
+drop policy if exists memberships_select on public.memberships;
 create policy memberships_select on public.memberships
   for select using (company_id in (select public.user_company_ids()));
+drop policy if exists memberships_insert on public.memberships;
 create policy memberships_insert on public.memberships
   for insert with check (
     user_id = auth.uid() and (
@@ -357,67 +366,88 @@ create policy memberships_insert on public.memberships
       or public.is_company_owner(company_id)
     )
   );
+drop policy if exists memberships_update on public.memberships;
 create policy memberships_update on public.memberships
   for update using (public.is_company_owner(company_id));
+drop policy if exists memberships_delete on public.memberships;
 create policy memberships_delete on public.memberships
   for delete using (
     user_id = auth.uid() or public.is_company_owner(company_id)
   );
 
 -- Invites: owners manage; acceptance happens via service role (token lookup).
+drop policy if exists invites_select on public.invites;
 create policy invites_select on public.invites
   for select using (company_id in (select public.user_company_ids()));
+drop policy if exists invites_insert on public.invites;
 create policy invites_insert on public.invites
   for insert with check (public.is_company_owner(company_id));
+drop policy if exists invites_update on public.invites;
 create policy invites_update on public.invites
   for update using (public.is_company_owner(company_id));
+drop policy if exists invites_delete on public.invites;
 create policy invites_delete on public.invites
   for delete using (public.is_company_owner(company_id));
 
 -- Standard tenant tables: full access within your own companies.
 -- (Finer role restrictions, e.g. cleaners read-only, land in a later stage.)
+drop policy if exists customers_all on public.customers;
 create policy customers_all on public.customers
   for all using (company_id in (select public.user_company_ids()))
   with check (company_id in (select public.user_company_ids()));
+drop policy if exists service_addresses_all on public.service_addresses;
 create policy service_addresses_all on public.service_addresses
   for all using (company_id in (select public.user_company_ids()))
   with check (company_id in (select public.user_company_ids()));
+drop policy if exists services_all on public.services;
 create policy services_all on public.services
   for all using (company_id in (select public.user_company_ids()))
   with check (company_id in (select public.user_company_ids()));
+drop policy if exists addons_all on public.addons;
 create policy addons_all on public.addons
   for all using (company_id in (select public.user_company_ids()))
   with check (company_id in (select public.user_company_ids()));
+drop policy if exists service_areas_all on public.service_areas;
 create policy service_areas_all on public.service_areas
   for all using (company_id in (select public.user_company_ids()))
   with check (company_id in (select public.user_company_ids()));
+drop policy if exists quotes_all on public.quotes;
 create policy quotes_all on public.quotes
   for all using (company_id in (select public.user_company_ids()))
   with check (company_id in (select public.user_company_ids()));
+drop policy if exists quote_line_items_all on public.quote_line_items;
 create policy quote_line_items_all on public.quote_line_items
   for all using (company_id in (select public.user_company_ids()))
   with check (company_id in (select public.user_company_ids()));
+drop policy if exists bookings_all on public.bookings;
 create policy bookings_all on public.bookings
   for all using (company_id in (select public.user_company_ids()))
   with check (company_id in (select public.user_company_ids()));
+drop policy if exists jobs_all on public.jobs;
 create policy jobs_all on public.jobs
   for all using (company_id in (select public.user_company_ids()))
   with check (company_id in (select public.user_company_ids()));
+drop policy if exists invoices_all on public.invoices;
 create policy invoices_all on public.invoices
   for all using (company_id in (select public.user_company_ids()))
   with check (company_id in (select public.user_company_ids()));
+drop policy if exists invoice_line_items_all on public.invoice_line_items;
 create policy invoice_line_items_all on public.invoice_line_items
   for all using (company_id in (select public.user_company_ids()))
   with check (company_id in (select public.user_company_ids()));
+drop policy if exists payments_all on public.payments;
 create policy payments_all on public.payments
   for all using (company_id in (select public.user_company_ids()))
   with check (company_id in (select public.user_company_ids()));
+drop policy if exists notifications_all on public.notifications;
 create policy notifications_all on public.notifications
   for all using (company_id in (select public.user_company_ids()))
   with check (company_id in (select public.user_company_ids()));
 
 -- Audit logs: append-only for members.
+drop policy if exists audit_logs_select on public.audit_logs;
 create policy audit_logs_select on public.audit_logs
   for select using (company_id in (select public.user_company_ids()));
+drop policy if exists audit_logs_insert on public.audit_logs;
 create policy audit_logs_insert on public.audit_logs
   for insert with check (company_id in (select public.user_company_ids()));

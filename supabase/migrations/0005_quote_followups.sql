@@ -6,7 +6,7 @@
 -- Run after 0004.
 -- ============================================================
 
-create table public.quote_followups (
+create table if not exists public.quote_followups (
   id uuid primary key default gen_random_uuid(),
   company_id uuid not null references public.companies(id) on delete cascade,
   quote_id uuid not null references public.quotes(id) on delete cascade,
@@ -16,12 +16,13 @@ create table public.quote_followups (
   created_at timestamptz not null default now()
 );
 
-create index quote_followups_due_idx
+create index if not exists quote_followups_due_idx
   on public.quote_followups (scheduled_for)
   where sent_at is null;
 
 alter table public.quote_followups enable row level security;
 
+drop policy if exists quote_followups_all on public.quote_followups;
 create policy quote_followups_all on public.quote_followups
   for all using (company_id in (select public.user_company_ids()))
   with check (company_id in (select public.user_company_ids()));
