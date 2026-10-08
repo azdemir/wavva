@@ -4,10 +4,9 @@ import { createClient } from "@/lib/supabase/server";
 import { one } from "@/lib/relations";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { JobStatusPill, type JobStatus } from "@/components/ui/badge";
 import { formatTime } from "@/lib/format";
-
-const tones = { scheduled: "brand", in_progress: "accent", completed: "slate", canceled: "red" } as const;
 
 function weekStart(date: Date): Date {
   const d = new Date(date);
@@ -75,24 +74,19 @@ export default async function SchedulePage({
       <div className="flex flex-wrap items-center justify-between gap-4">
         <Heading title="Schedule" description={monthLabel} />
         <div className="flex gap-2">
-          <Link
+          <Button
             href={offset <= 0 ? "/dashboard/schedule" : `/dashboard/schedule?week=${offset - 1}`}
-            className="rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            variant="outline"
+            size="sm"
           >
             ← Prev
-          </Link>
-          <Link
-            href="/dashboard/schedule"
-            className="rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-          >
+          </Button>
+          <Button href="/dashboard/schedule" variant="outline" size="sm">
             Today
-          </Link>
-          <Link
-            href={`/dashboard/schedule?week=${offset + 1}`}
-            className="rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-          >
+          </Button>
+          <Button href={`/dashboard/schedule?week=${offset + 1}`} variant="outline" size="sm">
             Next →
-          </Link>
+          </Button>
         </div>
       </div>
 
@@ -120,9 +114,7 @@ export default async function SchedulePage({
                           {one(job.service_addresses)?.address_line1}, {one(job.service_addresses)?.city}
                         </p>
                         <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                          <Badge tone={tones[job.status as keyof typeof tones] ?? "slate"}>
-                            {job.status.replace("_", " ")}
-                          </Badge>
+                          <JobStatusPill status={job.status as JobStatus} />
                           {assigned.slice(0, 2).map((uid) => (
                             <span key={uid} className="text-[11px] text-slate-500">
                               {emailOf(uid).split("@")[0]}

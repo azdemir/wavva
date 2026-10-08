@@ -5,8 +5,8 @@ import { createInvite, deleteInvite } from "@/lib/actions/team";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Field } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import { Field, SelectField } from "@/components/ui/input";
+import { Badge, statusLabel } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 
 const roleTones = { owner: "brand", manager: "accent", cleaner: "slate" } as const;
@@ -55,7 +55,7 @@ export default async function TeamPage() {
                   </p>
                 </div>
                 <Badge tone={roleTones[m.role as keyof typeof roleTones] ?? "slate"}>
-                  {m.role}
+                  {statusLabel(m.role)}
                 </Badge>
               </li>
             ))}
@@ -88,18 +88,11 @@ export default async function TeamPage() {
                 />
               </div>
               <div className="w-36">
-                <label htmlFor="team-role" className="block text-sm font-medium text-slate-700">
-                  Role
-                </label>
-                <select
-                  id="team-role"
-                  name="role"
-                  className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm"
-                >
+                <SelectField id="team-role" name="role" label="Role">
                   <option value="cleaner">Cleaner</option>
                   <option value="manager">Manager</option>
                   <option value="owner">Owner</option>
-                </select>
+                </SelectField>
               </div>
               <Button type="submit">Send invite</Button>
             </form>
@@ -124,7 +117,7 @@ export default async function TeamPage() {
                     <p className="font-medium text-slate-900">
                       {inv.email}{" "}
                       <Badge tone={roleTones[inv.role as keyof typeof roleTones] ?? "slate"}>
-                        {inv.role}
+                        {statusLabel(inv.role)}
                       </Badge>
                     </p>
                     <code className="mt-1 block truncate rounded bg-slate-100 px-2 py-1 text-xs text-slate-600">

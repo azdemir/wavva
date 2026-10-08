@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Field } from "@/components/ui/input";
+import { Field, SelectField } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { formatCents } from "@/lib/format";
 import {
@@ -81,24 +81,18 @@ export function ServiceManager({ initial }: { initial: ServiceRow[] }) {
               >
                 <div className="grid gap-3 sm:grid-cols-2">
                   <Field id={`se-name-${s.id}`} name="name" label="Name" required defaultValue={s.name} />
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700" htmlFor={`se-cat-${s.id}`}>Type</label>
-                    <select id={`se-cat-${s.id}`} name="category" defaultValue={s.category} className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm">
-                      <option value="residential">Residential</option>
-                      <option value="commercial">Commercial</option>
-                    </select>
-                  </div>
+                  <SelectField id={`se-cat-${s.id}`} name="category" label="Type" defaultValue={s.category}>
+                    <option value="residential">Residential</option>
+                    <option value="commercial">Commercial</option>
+                  </SelectField>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <Field id={`se-price-${s.id}`} name="price" label="Base price ($)" type="number" min="0" step="0.01" required defaultValue={(s.base_price_cents / 100).toFixed(2)} />
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700" htmlFor={`se-unit-${s.id}`}>Priced</label>
-                    <select id={`se-unit-${s.id}`} name="unit" defaultValue={s.unit} className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm">
-                      {(Object.keys(unitLabels) as (keyof typeof unitLabels)[]).map((u) => (
-                        <option key={u} value={u}>{unitLabels[u]}</option>
-                      ))}
-                    </select>
-                  </div>
+                  <SelectField id={`se-unit-${s.id}`} name="unit" label="Priced" defaultValue={s.unit}>
+                    {(Object.keys(unitLabels) as (keyof typeof unitLabels)[]).map((u) => (
+                      <option key={u} value={u}>{unitLabels[u]}</option>
+                    ))}
+                  </SelectField>
                 </div>
                 <Field id={`se-desc-${s.id}`} name="description" label="Description" defaultValue={s.description ?? ""} />
                 <div className="flex gap-2">
@@ -138,24 +132,18 @@ export function ServiceManager({ initial }: { initial: ServiceRow[] }) {
         <p className="text-sm font-semibold text-slate-700">Add a service</p>
         <div className="grid gap-3 sm:grid-cols-2">
           <Field id="ns-name" name="name" label="Name" required placeholder="Standard home cleaning" />
-          <div>
-            <label className="block text-sm font-medium text-slate-700" htmlFor="ns-cat">Type</label>
-            <select id="ns-cat" name="category" className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm">
-              <option value="residential">Residential</option>
-              <option value="commercial">Commercial</option>
-            </select>
-          </div>
+          <SelectField id="ns-cat" name="category" label="Type">
+            <option value="residential">Residential</option>
+            <option value="commercial">Commercial</option>
+          </SelectField>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           <Field id="ns-price" name="price" label="Base price ($)" type="number" min="0" step="0.01" required placeholder="129.00" />
-          <div>
-            <label className="block text-sm font-medium text-slate-700" htmlFor="ns-unit">Priced</label>
-            <select id="ns-unit" name="unit" className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm">
-              <option value="per_visit">per visit</option>
-              <option value="per_hour">per hour</option>
-              <option value="per_sqft">per sq ft</option>
-            </select>
-          </div>
+          <SelectField id="ns-unit" name="unit" label="Priced">
+            <option value="per_visit">per visit</option>
+            <option value="per_hour">per hour</option>
+            <option value="per_sqft">per sq ft</option>
+          </SelectField>
         </div>
         <Button type="submit" disabled={pending}>Add service</Button>
       </form>

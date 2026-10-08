@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Field, TextareaField } from "@/components/ui/input";
+import { Field, SelectField, TextareaField } from "@/components/ui/input";
 import { createBooking } from "@/lib/actions/bookings";
 
 export type FormCustomer = {
@@ -78,23 +78,19 @@ export function BookingForm({
       )}
 
       <div className="grid gap-4 sm:grid-cols-2">
+        <SelectField id="bk-customer" label="Customer" value={customerId} onChange={(e) => onCustomerChange(e.target.value)}>
+          {customers.map((c) => (
+            <option key={c.id} value={c.id}>{c.name}</option>
+          ))}
+        </SelectField>
         <div>
-          <label htmlFor="bk-customer" className="block text-sm font-medium text-slate-700">Customer</label>
-          <select id="bk-customer" value={customerId} onChange={(e) => onCustomerChange(e.target.value)} className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm">
-            {customers.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="bk-address" className="block text-sm font-medium text-slate-700">Service address</label>
-          <select id="bk-address" value={addressId} onChange={(e) => setAddressId(e.target.value)} className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm">
+          <SelectField id="bk-address" label="Service address" value={addressId} onChange={(e) => setAddressId(e.target.value)}>
             {(customer?.addresses ?? []).map((a) => (
               <option key={a.id} value={a.id}>
                 {a.label}: {a.address_line1}, {a.city}
               </option>
             ))}
-          </select>
+          </SelectField>
           {(customer?.addresses ?? []).length === 0 && (
             <p className="mt-1 text-xs text-red-600">This customer has no addresses yet — add one on their profile.</p>
           )}
@@ -102,24 +98,18 @@ export function BookingForm({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <label htmlFor="bk-service" className="block text-sm font-medium text-slate-700">Service</label>
-          <select id="bk-service" value={serviceId} onChange={(e) => setServiceId(e.target.value)} className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm">
-            <option value="">—</option>
-            {services.map((s) => (
-              <option key={s.id} value={s.id}>{s.name}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="bk-recurrence" className="block text-sm font-medium text-slate-700">Repeats</label>
-          <select id="bk-recurrence" value={recurrence} onChange={(e) => setRecurrence(e.target.value)} className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm">
-            <option value="none">One time</option>
-            <option value="weekly">Weekly (next 8 visits)</option>
-            <option value="biweekly">Every 2 weeks (next 8 visits)</option>
-            <option value="monthly">Monthly (next 6 visits)</option>
-          </select>
-        </div>
+        <SelectField id="bk-service" label="Service" value={serviceId} onChange={(e) => setServiceId(e.target.value)}>
+          <option value="">—</option>
+          {services.map((s) => (
+            <option key={s.id} value={s.id}>{s.name}</option>
+          ))}
+        </SelectField>
+        <SelectField id="bk-recurrence" label="Repeats" value={recurrence} onChange={(e) => setRecurrence(e.target.value)}>
+          <option value="none">One time</option>
+          <option value="weekly">Weekly (next 8 visits)</option>
+          <option value="biweekly">Every 2 weeks (next 8 visits)</option>
+          <option value="monthly">Monthly (next 6 visits)</option>
+        </SelectField>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">

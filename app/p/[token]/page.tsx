@@ -5,6 +5,7 @@ import { PortalShell, PortalInvalid } from "@/components/portal/portal-shell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
+import { CardIcon } from "@/components/ui/icons";
 import { formatCents, formatDate, formatTime } from "@/lib/format";
 
 export const instant = false;
@@ -129,7 +130,11 @@ export default async function PortalHomePage({
           </CardHeader>
           <CardContent>
             {(invoices ?? []).length === 0 ? (
-              <EmptyState title="All paid up" description="You have no open invoices." />
+              <EmptyState
+                title="All paid up"
+                description="You have no open invoices."
+                icon={<CardIcon className="h-10 w-10" />}
+              />
             ) : (
               <ul className="divide-y divide-slate-100">
                 {(invoices ?? []).map((inv) => (

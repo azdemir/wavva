@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Field, TextareaField } from "@/components/ui/input";
+import { Field, SelectField, TextareaField } from "@/components/ui/input";
 import { updateCompanySettings } from "@/lib/actions/settings";
 import type { Company } from "@/lib/auth";
 
@@ -59,21 +59,16 @@ export function SettingsForm({ company }: { company: Company }) {
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field id="set-website" name="website" label="Website" defaultValue={company.website ?? ""} />
-          <div>
-            <label htmlFor="set-timezone" className="block text-sm font-medium text-slate-700">
-              Time zone
-            </label>
-            <select
-              id="set-timezone"
-              name="timezone"
-              defaultValue={company.timezone}
-              className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3.5 text-sm text-slate-900"
-            >
-              {timezones.map((tz) => (
-                <option key={tz} value={tz}>{tz.replace("_", " ")}</option>
-              ))}
-            </select>
-          </div>
+          <SelectField
+            id="set-timezone"
+            name="timezone"
+            label="Time zone"
+            defaultValue={company.timezone}
+          >
+            {timezones.map((tz) => (
+              <option key={tz} value={tz}>{tz.replace("_", " ")}</option>
+            ))}
+          </SelectField>
         </div>
       </section>
 

@@ -1,6 +1,7 @@
 import type {
   InputHTMLAttributes,
   ReactNode,
+  SelectHTMLAttributes,
   TextareaHTMLAttributes,
 } from "react";
 
@@ -51,6 +52,63 @@ export function Field({
         } ${className}`}
         {...rest}
       />
+      {hint && !error && (
+        <p id={hintId} className="mt-1.5 text-sm text-slate-500">
+          {hint}
+        </p>
+      )}
+      {error && (
+        <p id={errorId} role="alert" className="mt-1.5 text-sm text-red-600">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+type SelectFieldProps = SelectHTMLAttributes<HTMLSelectElement> & {
+  id: string;
+  label: string;
+  hint?: string;
+  error?: string;
+  children: ReactNode;
+};
+
+/**
+ * Accessible labeled select matching Field's styling and focus treatment,
+ * so selects and inputs sit on the same 44px rhythm in forms.
+ */
+export function SelectField({
+  id,
+  label,
+  hint,
+  error,
+  className = "",
+  children,
+  ...rest
+}: SelectFieldProps) {
+  const hintId = hint ? `${id}-hint` : undefined;
+  const errorId = error ? `${id}-error` : undefined;
+  const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
+
+  return (
+    <div>
+      <label htmlFor={id} className="block text-sm font-medium text-slate-700">
+        {label}
+      </label>
+      <select
+        id={id}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={describedBy}
+        className={`mt-1.5 block h-11 w-full rounded-lg border bg-white px-3.5 text-sm text-slate-900 focus:outline-2 focus:outline-offset-1 ${
+          error
+            ? "border-red-400 focus:outline-red-600"
+            : "border-slate-300 focus:outline-brand-600"
+        } ${className}`}
+        {...rest}
+      >
+        {children}
+      </select>
       {hint && !error && (
         <p id={hintId} className="mt-1.5 text-sm text-slate-500">
           {hint}

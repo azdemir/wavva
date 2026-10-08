@@ -6,7 +6,7 @@ import { portalSetQuoteStatus } from "@/lib/actions/portal";
 import { PortalShell, PortalInvalid } from "@/components/portal/portal-shell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { QuoteStatusPill, type QuoteStatus } from "@/components/ui/badge";
 import { formatCents, formatDate } from "@/lib/format";
 
 export const instant = false;
@@ -49,7 +49,7 @@ export default async function PortalQuotePage({
               {quote.valid_until ? `Valid until ${formatDate(quote.valid_until)}` : "No expiry set"}
             </p>
           </div>
-          <Badge tone={quote.status === "sent" ? "brand" : "slate"}>{quote.status}</Badge>
+          <QuoteStatusPill status={quote.status as QuoteStatus} />
         </div>
 
         <Card>

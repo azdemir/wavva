@@ -40,6 +40,77 @@ const jobStatusLabel: Record<JobStatus, string> = {
 };
 
 /** Status pill used across scheduling, jobs, quotes, and invoices. */
-export function JobStatusPill({ status }: { status: JobStatus }) {
-  return <Badge tone={jobStatusTone[status]}>{jobStatusLabel[status]}</Badge>;
+export function JobStatusPill({
+  status,
+  className,
+}: {
+  status: JobStatus;
+  className?: string;
+}) {
+  return (
+    <Badge tone={jobStatusTone[status]} className={className}>
+      {jobStatusLabel[status]}
+    </Badge>
+  );
+}
+
+/**
+ * Human-friendly label for snake_case enum values: "in_progress" → "In progress".
+ * Use instead of rendering raw status strings inside badges.
+ */
+export function statusLabel(status: string): string {
+  return status
+    .split("_")
+    .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : w))
+    .join(" ");
+}
+
+export type QuoteStatus = "draft" | "sent" | "approved" | "declined" | "expired";
+
+const quoteStatusTone: Record<QuoteStatus, Tone> = {
+  draft: "slate",
+  sent: "brand",
+  approved: "accent",
+  declined: "red",
+  expired: "slate",
+};
+
+/** Status pill for quotes — one shared mapping across dashboard and portal. */
+export function QuoteStatusPill({
+  status,
+  className,
+}: {
+  status: QuoteStatus;
+  className?: string;
+}) {
+  return (
+    <Badge tone={quoteStatusTone[status]} className={className}>
+      {statusLabel(status)}
+    </Badge>
+  );
+}
+
+export type InvoiceStatus = "draft" | "sent" | "overdue" | "paid" | "void";
+
+const invoiceStatusTone: Record<InvoiceStatus, Tone> = {
+  draft: "slate",
+  sent: "brand",
+  overdue: "red",
+  paid: "accent",
+  void: "slate",
+};
+
+/** Status pill for invoices — one shared mapping across dashboard and portal. */
+export function InvoiceStatusPill({
+  status,
+  className,
+}: {
+  status: InvoiceStatus;
+  className?: string;
+}) {
+  return (
+    <Badge tone={invoiceStatusTone[status]} className={className}>
+      {statusLabel(status)}
+    </Badge>
+  );
 }

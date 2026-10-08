@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Field, TextareaField } from "@/components/ui/input";
+import { Field, SelectField, TextareaField } from "@/components/ui/input";
 import { formatCents } from "@/lib/format";
 import { computeTotals } from "@/lib/pricing";
 import { createInvoice } from "@/lib/actions/invoices";
@@ -66,26 +66,25 @@ export function InvoiceBuilder({
       )}
 
       <div className="max-w-md">
-        <label htmlFor="inv-customer" className="block text-sm font-medium text-slate-700">Customer</label>
-        <select
+        <SelectField
           id="inv-customer"
+          label="Customer"
           value={customerId}
           onChange={(e) => setCustomerId(e.target.value)}
-          className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm"
         >
           {customers.map((c) => (
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}
-        </select>
+        </SelectField>
       </div>
 
       <div className="space-y-4">
         <h3 className="text-base font-semibold text-slate-900">Line items</h3>
         {items.map((it, i) => (
           <div key={i} className="grid gap-3 rounded-xl border border-slate-200 p-4 sm:grid-cols-[1fr_90px_130px_auto]">
-            <Field id={`inv-label-${i}`} label={i === 0 ? "Description" : ""} value={it.label} onChange={(e) => set(i, { label: e.target.value })} placeholder="Standard home cleaning — Oct 12" />
-            <Field id={`inv-qty-${i}`} label={i === 0 ? "Qty" : ""} type="number" min="0" step="0.01" value={it.qty} onChange={(e) => set(i, { qty: e.target.value })} />
-            <Field id={`inv-price-${i}`} label={i === 0 ? "Unit price ($)" : ""} type="number" min="0" step="0.01" value={it.unit_price} onChange={(e) => set(i, { unit_price: e.target.value })} />
+            <Field id={`inv-label-${i}`} label="Description" value={it.label} onChange={(e) => set(i, { label: e.target.value })} placeholder="Standard home cleaning — Oct 12" />
+            <Field id={`inv-qty-${i}`} label="Qty" type="number" min="0" step="0.01" value={it.qty} onChange={(e) => set(i, { qty: e.target.value })} />
+            <Field id={`inv-price-${i}`} label="Unit price ($)" type="number" min="0" step="0.01" value={it.unit_price} onChange={(e) => set(i, { unit_price: e.target.value })} />
             {items.length > 1 && (
               <button type="button" onClick={() => setItems((rs) => rs.filter((_, j) => j !== i))} className="text-sm font-medium text-red-600 hover:text-red-700 self-end pb-3">
                 Remove

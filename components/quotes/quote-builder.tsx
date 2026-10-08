@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Field, TextareaField } from "@/components/ui/input";
+import { Field, SelectField, TextareaField } from "@/components/ui/input";
 import { formatCents } from "@/lib/format";
 import { computeTotals } from "@/lib/pricing";
 import { createQuote } from "@/lib/actions/quotes";
@@ -103,19 +103,16 @@ export function QuoteBuilder({
       )}
 
       <div className="max-w-md">
-        <label htmlFor="qb-customer" className="block text-sm font-medium text-slate-700">
-          Customer
-        </label>
-        <select
+        <SelectField
           id="qb-customer"
+          label="Customer"
           value={customerId}
           onChange={(e) => setCustomerId(e.target.value)}
-          className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm"
         >
           {customers.map((c) => (
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}
-        </select>
+        </SelectField>
       </div>
 
       <div className="space-y-4">
@@ -131,34 +128,28 @@ export function QuoteBuilder({
               )}
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
-              <div>
-                <label htmlFor={`qb-svc-${i}`} className="block text-sm font-medium text-slate-700">From service</label>
-                <select
-                  id={`qb-svc-${i}`}
-                  value={it.kind === "service" ? it.ref_id : ""}
-                  onChange={(e) => pickService(i, e.target.value)}
-                  className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm"
-                >
-                  <option value="">Custom line…</option>
-                  {services.map((s) => (
-                    <option key={s.id} value={s.id}>{s.name} — {formatCents(s.base_price_cents)}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label htmlFor={`qb-addon-${i}`} className="block text-sm font-medium text-slate-700">Or add-on</label>
-                <select
-                  id={`qb-addon-${i}`}
-                  value={it.kind === "addon" ? it.ref_id : ""}
-                  onChange={(e) => pickAddon(i, e.target.value)}
-                  className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm"
-                >
-                  <option value="">—</option>
-                  {addons.map((a) => (
-                    <option key={a.id} value={a.id}>{a.name} — {formatCents(a.price_cents)}</option>
-                  ))}
-                </select>
-              </div>
+              <SelectField
+                id={`qb-svc-${i}`}
+                label="From service"
+                value={it.kind === "service" ? it.ref_id : ""}
+                onChange={(e) => pickService(i, e.target.value)}
+              >
+                <option value="">Custom line…</option>
+                {services.map((s) => (
+                  <option key={s.id} value={s.id}>{s.name} — {formatCents(s.base_price_cents)}</option>
+                ))}
+              </SelectField>
+              <SelectField
+                id={`qb-addon-${i}`}
+                label="Or add-on"
+                value={it.kind === "addon" ? it.ref_id : ""}
+                onChange={(e) => pickAddon(i, e.target.value)}
+              >
+                <option value="">—</option>
+                {addons.map((a) => (
+                  <option key={a.id} value={a.id}>{a.name} — {formatCents(a.price_cents)}</option>
+                ))}
+              </SelectField>
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
               <div className="sm:col-span-1">

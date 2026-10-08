@@ -5,7 +5,7 @@ import { getPortalContext } from "@/lib/portal";
 import { createServiceClient } from "@/lib/supabase/server";
 import { PortalShell, PortalInvalid } from "@/components/portal/portal-shell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { InvoiceStatusPill, type InvoiceStatus } from "@/components/ui/badge";
 import { PayButton } from "@/components/portal/pay-button";
 import { formatCents, formatDate } from "@/lib/format";
 
@@ -57,9 +57,7 @@ export default async function PortalInvoicePage({
               {invoice.due_date ? `Due ${formatDate(invoice.due_date)}` : "No due date"}
             </p>
           </div>
-          <Badge tone={invoice.status === "paid" ? "accent" : invoice.status === "overdue" ? "red" : "brand"}>
-            {invoice.status}
-          </Badge>
+          <InvoiceStatusPill status={invoice.status as InvoiceStatus} />
         </div>
 
         {paid && (
