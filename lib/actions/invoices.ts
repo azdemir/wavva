@@ -37,20 +37,23 @@ export async function createInvoice(input: unknown): Promise<ActionResult> {
     return { error: parsed.error.issues[0]?.message ?? "Invalid invoice." };
   }
 
+  // Customer check and the numbering count are independent — run together.
   const supabase = await createClient();
-  const { data: customer } = await supabase
-    .from("customers")
-    .select("id")
-    .eq("id", parsed.data.customer_id)
-    .eq("company_id", ctx.company.id)
-    .maybeSingle();
+  const [{ data: customer }, { count }] = await Promise.all([
+    supabase
+      .from("customers")
+      .select("id")
+      .eq("id", parsed.data.customer_id)
+      .eq("company_id", ctx.company.id)
+      .maybeSingle(),
+    supabase
+      .from("invoices")
+      .select("id", { count: "exact", head: true })
+      .eq("company_id", ctx.company.id),
+  ]);
   if (!customer) return { error: "Customer not found." };
 
   const totals = computeTotals(parsed.data.items, 0, parsed.data.tax_rate);
-  const { count } = await supabase
-    .from("invoices")
-    .select("id", { count: "exact", head: true })
-    .eq("company_id", ctx.company.id);
 
   const { data: invoice, error: iErr } = await supabase
     .from("invoices")

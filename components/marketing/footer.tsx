@@ -59,7 +59,7 @@ export function Footer() {
         </div>
         <div className="flex flex-col items-center justify-between gap-3 border-t border-slate-200 dark:border-slate-800 py-6 sm:flex-row">
           <p className="text-sm text-slate-400">
-            © 2026 {site.name} (working title). All rights reserved.
+            © 2026 {site.name}. All rights reserved.
           </p>
           <p className="text-sm text-slate-400">
             Made for cleaning businesses in Upstate New York.

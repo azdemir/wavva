@@ -58,19 +58,22 @@ export async function createBooking(input: unknown): Promise<ActionResult> {
   if (!address || address.customer_id !== customer.id) {
     return { error: "Service address doesn't belong to this customer." };
   }
-  if (parsed.data.service_id) {
-    const { data: svc } = await supabase.from("services").select("id").eq("id", parsed.data.service_id).eq("company_id", ctx.company.id).maybeSingle();
-    if (!svc) return { error: "Service not found." };
-  }
-  if (parsed.data.quote_id) {
-    const { data: q } = await supabase.from("quotes").select("id").eq("id", parsed.data.quote_id).eq("company_id", ctx.company.id).maybeSingle();
-    if (!q) return { error: "Quote not found." };
-  }
-
-  const { count } = await supabase
-    .from("bookings")
-    .select("id", { count: "exact", head: true })
-    .eq("company_id", ctx.company.id);
+  // Independent lookups run in parallel: service/quote verification and
+  // the numbering count don't depend on each other.
+  const [{ data: svc }, { data: q }, { count }] = await Promise.all([
+    parsed.data.service_id
+      ? supabase.from("services").select("id").eq("id", parsed.data.service_id).eq("company_id", ctx.company.id).maybeSingle()
+      : Promise.resolve({ data: { id: "__skip" } }),
+    parsed.data.quote_id
+      ? supabase.from("quotes").select("id").eq("id", parsed.data.quote_id).eq("company_id", ctx.company.id).maybeSingle()
+      : Promise.resolve({ data: { id: "__skip" } }),
+    supabase
+      .from("bookings")
+      .select("id", { count: "exact", head: true })
+      .eq("company_id", ctx.company.id),
+  ]);
+  if (parsed.data.service_id && !svc) return { error: "Service not found." };
+  if (parsed.data.quote_id && !q) return { error: "Quote not found." };
 
   const settings = ctx.company.settings as { cancellation_policy?: string | null };
   const { data: booking, error: bErr } = await supabase

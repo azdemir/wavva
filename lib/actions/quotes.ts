@@ -33,13 +33,19 @@ export async function createQuote(input: unknown): Promise<ActionResult> {
 
   const supabase = await createClient();
 
-  // Customer must belong to this company.
-  const { data: customer } = await supabase
-    .from("customers")
-    .select("id")
-    .eq("id", parsed.data.customer_id)
-    .eq("company_id", ctx.company.id)
-    .maybeSingle();
+  // Customer check and the numbering count are independent — run together.
+  const [{ data: customer }, { count }] = await Promise.all([
+    supabase
+      .from("customers")
+      .select("id")
+      .eq("id", parsed.data.customer_id)
+      .eq("company_id", ctx.company.id)
+      .maybeSingle(),
+    supabase
+      .from("quotes")
+      .select("id", { count: "exact", head: true })
+      .eq("company_id", ctx.company.id),
+  ]);
   if (!customer) return { error: "Customer not found." };
 
   const totals = computeTotals(
@@ -47,11 +53,6 @@ export async function createQuote(input: unknown): Promise<ActionResult> {
     parsed.data.discount_cents,
     parsed.data.tax_rate,
   );
-
-  const { count } = await supabase
-    .from("quotes")
-    .select("id", { count: "exact", head: true })
-    .eq("company_id", ctx.company.id);
 
   const { data: quote, error: qErr } = await supabase
     .from("quotes")
