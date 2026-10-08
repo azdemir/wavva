@@ -24,6 +24,8 @@ export function SettingsForm({ company }: { company: Company }) {
     default_tax_rate?: number;
     cancellation_policy?: string | null;
     frequency_multipliers?: { weekly?: number; biweekly?: number; monthly?: number };
+    followup_enabled?: boolean;
+    followup_days?: number[];
   };
 
   return (
@@ -121,6 +123,32 @@ export function SettingsForm({ company }: { company: Company }) {
             />
           </div>
         </div>
+      </section>
+
+      <section className="space-y-4">
+        <h3 className="text-base font-semibold text-slate-900">Automatic quote follow-ups</h3>
+        <p className="text-sm text-slate-500">
+          When you send a quote, TidyPro automatically nudges the customer if they go quiet —
+          only the big expensive tools do this. Sending stops the moment they approve, decline,
+          or the quote expires.
+        </p>
+        <label className="flex min-h-11 cursor-pointer items-center gap-3">
+          <input
+            type="checkbox"
+            name="followup_enabled"
+            defaultChecked={settings.followup_enabled !== false}
+            className="h-5 w-5 rounded accent-brand-600"
+          />
+          <span className="text-sm font-medium text-slate-700">Send automatic follow-ups</span>
+        </label>
+        <Field
+          id="set-followup-days"
+          name="followup_days"
+          label="Follow up after (days, comma-separated)"
+          placeholder="2, 5"
+          defaultValue={(settings.followup_days ?? [2, 5]).join(", ")}
+          hint="Up to 3 touches, e.g. “2, 5” emails the customer 2 and 5 days after the quote is sent."
+        />
       </section>
 
       <Button type="submit" disabled={pending}>

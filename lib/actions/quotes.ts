@@ -12,6 +12,7 @@ import { baseUrl } from "@/lib/base-url";
 import { formatDate } from "@/lib/format";
 import { enqueueNotification } from "@/lib/notifications/queue";
 import { getOrCreatePortalLink } from "@/lib/actions/portal";
+import { scheduleQuoteFollowups, cancelQuoteFollowups } from "@/lib/followups";
 
 export type ActionResult = { error?: string; ok?: boolean };
 
@@ -134,6 +135,7 @@ export async function setQuoteStatus(id: string, status: string): Promise<Action
   });
 
   if (status === "sent") {
+    await scheduleQuoteFollowups(supabase, ctx.company.id, id);
     const { data: full } = await supabase
       .from("quotes")
       .select("quote_number, total_cents, valid_until, customer_id, customers(name, email)")
@@ -160,6 +162,10 @@ export async function setQuoteStatus(id: string, status: string): Promise<Action
         },
       });
     }
+  }
+
+  if (status === "approved" || status === "declined" || status === "expired") {
+    await cancelQuoteFollowups(supabase, id);
   }
 
   revalidatePath(`/dashboard/quotes/${id}`);
