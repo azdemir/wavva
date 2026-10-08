@@ -3,6 +3,8 @@ import { site } from "@/lib/site";
 import { requireCompany } from "@/lib/auth";
 import { signOut } from "@/lib/actions/auth";
 import { Badge } from "@/components/ui/badge";
+import { SubscriptionBanner } from "@/components/billing/subscription-banner";
+import { PLANS, isPlanId } from "@/lib/plans";
 
 // Workspace routes render per request (auth session) — never prerendered.
 export const instant = false;
@@ -157,7 +159,15 @@ export default async function DashboardLayout({
       </div>
 
       <main className="min-w-0 flex-1">
-        <div className="mx-auto max-w-6xl px-4 py-6 md:px-8 md:py-8">{children}</div>
+        <div className="mx-auto max-w-6xl px-4 py-6 md:px-8 md:py-8">
+          <SubscriptionBanner
+            status={(company as { subscription_status?: string }).subscription_status ?? "none"}
+            planName={
+              PLANS[isPlanId((company as { plan?: string }).plan) ? (company as { plan: "starter" | "growth" | "pro" }).plan : "starter"].name
+            }
+          />
+          {children}
+        </div>
       </main>
     </div>
   );

@@ -37,9 +37,6 @@ export function Hero() {
       <Container>
         <div className="grid items-center gap-12 py-16 lg:grid-cols-2 lg:py-24">
           <div className="animate-fade-up">
-            <Badge tone="brand" className="mb-5">
-              Built for cleaning businesses in Upstate New York
-            </Badge>
             <h1 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
               Run your cleaning business from{" "}
               <span className="text-brand-600">one tidy place</span>

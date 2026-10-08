@@ -5,10 +5,13 @@ import { createServiceClient } from "@/lib/supabase/server";
 /**
  * Stripe webhook endpoint: <site>/api/webhooks/stripe
  * Verifies the signature, then handles:
- * - checkout.session.completed → record the customer payment
+ * - checkout.session.completed (invoice) → record the customer payment
+ * - checkout.session.completed (platform) → activate the company's TidyPro plan
+ * - customer.subscription.updated / deleted → sync plan + status
  * - account.updated → mark the company's Connect onboarding complete
  *
- * Configure in the Stripe dashboard with STRIPE_WEBHOOK_SECRET.
+ * Register this endpoint in the Stripe dashboard for BOTH Connect events
+ * and Billing events, using STRIPE_WEBHOOK_SECRET.
  */
 export async function POST(request: Request) {
   const stripe = getStripe();
@@ -37,8 +40,40 @@ export async function POST(request: Request) {
       id: string;
       amount_total: number | null;
       payment_intent: string | null;
-      metadata?: { invoice_id?: string; company_id?: string };
+      subscription: string | null;
+      metadata?: { invoice_id?: string; company_id?: string; kind?: string; plan?: string };
     };
+
+    // Platform subscription checkout (the cleaning company subscribing to TidyPro)
+    if (session.metadata?.kind === "platform_billing" && session.metadata?.company_id) {
+      const companyId = session.metadata.company_id;
+      const plan = session.metadata.plan;
+      let status: string | null = null;
+      if (session.subscription) {
+        const sub = (await stripe.subscriptions.retrieve(session.subscription)) as {
+          status: string;
+        };
+        status = sub.status;
+      }
+      await svc
+        .from("companies")
+        .update({
+          stripe_subscription_id: session.subscription,
+          subscription_status: status ?? "active",
+          ...(plan === "starter" || plan === "growth" || plan === "pro" ? { plan } : {}),
+        })
+        .eq("id", companyId);
+      await svc.from("audit_logs").insert({
+        company_id: companyId,
+        actor_user_id: null,
+        action: "billing.subscribed",
+        entity_type: "company",
+        entity_id: companyId,
+        metadata: { plan, status: status ?? "active" },
+      });
+      return NextResponse.json({ received: true });
+    }
+
     const invoiceId = session.metadata?.invoice_id;
     const companyId = session.metadata?.company_id;
     if (invoiceId && companyId && (session.amount_total ?? 0) > 0) {
@@ -104,6 +139,42 @@ export async function POST(request: Request) {
         .from("companies")
         .update({ stripe_onboarded: true })
         .eq("stripe_account_id", account.id);
+    }
+  }
+
+  // Platform subscription lifecycle → keep the company's plan + status in sync.
+  if (event.type === "customer.subscription.updated" || event.type === "customer.subscription.deleted") {
+    const sub = event.data.object as {
+      id: string;
+      status: string;
+      metadata?: { company_id?: string; plan?: string };
+    };
+    const plan = sub.metadata?.plan;
+    const status = event.type === "customer.subscription.deleted" ? "canceled" : sub.status;
+    const update: Record<string, string | null> = { subscription_status: status };
+    if (plan === "starter" || plan === "growth" || plan === "pro") update.plan = plan;
+    if (event.type === "customer.subscription.deleted") update.stripe_subscription_id = null;
+    const query = svc.from("companies").update(update).eq("stripe_subscription_id", sub.id);
+    // Fallback: match by metadata if the subscription id was never stored.
+    const { data: matched } = await query.select("id");
+    if ((!matched || matched.length === 0) && sub.metadata?.company_id) {
+      await svc.from("companies").update(update).eq("id", sub.metadata.company_id);
+    }
+    const { data: company } = await svc
+      .from("companies")
+      .select("id")
+      .eq("stripe_subscription_id", sub.id)
+      .maybeSingle();
+    const companyId = company?.id ?? sub.metadata?.company_id;
+    if (companyId) {
+      await svc.from("audit_logs").insert({
+        company_id: companyId,
+        actor_user_id: null,
+        action: "billing.subscription_changed",
+        entity_type: "company",
+        entity_id: companyId,
+        metadata: { status, plan: plan ?? null },
+      });
     }
   }
 
