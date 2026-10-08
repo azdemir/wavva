@@ -24,3 +24,14 @@ export function formatTime(iso: string, timezone: string): string {
     timeZone: timezone,
   }).format(new Date(iso));
 }
+
+/** Format a timestamptz as date + time, e.g. "Oct 10, 9:30 AM". */
+export function formatDateTime(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(iso));
+}
