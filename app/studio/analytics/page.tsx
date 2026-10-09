@@ -1,11 +1,17 @@
 import Link from "next/link";
 import { requirePlatformAdmin } from "@/lib/admin";
-import { getAnalytics } from "@/lib/studio/analytics";
+import {
+  getAnalytics,
+  parseAnalyticsFilter,
+  ANALYTICS_WEEKS,
+} from "@/lib/studio/analytics";
 import { crmSourceLabel } from "@/lib/studio/crm";
 import { PLANS } from "@/lib/plans";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { FilterPills, FilterSearch } from "@/components/ui/filters";
 import { formatCents, formatDate } from "@/lib/format";
 import { WeeklyBars, PlanDonut, Funnel } from "@/components/studio/charts";
 
@@ -33,11 +39,16 @@ function Kpi({ label, value, sub }: { label: string; value: string; sub?: string
 }
 
 /** Studio analytics — the founder's growth/revenue/pipeline view. */
-export default async function StudioAnalyticsPage() {
+export default async function StudioAnalyticsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ weeks?: string; plan?: string; q?: string }>;
+}) {
   await requirePlatformAdmin();
+  const filter = parseAnalyticsFilter(await searchParams);
   let data;
   try {
-    data = await getAnalytics();
+    data = await getAnalytics(filter);
   } catch {
     return (
       <div className="space-y-6">
@@ -53,13 +64,80 @@ export default async function StudioAnalyticsPage() {
   }
 
   const maxSource = Math.max(1, ...data.sources.map((s) => s.count));
+  const exportQs = new URLSearchParams();
+  exportQs.set("weeks", String(filter.weeks));
+  if (filter.plan !== "all") exportQs.set("plan", filter.plan);
+  if (filter.q) exportQs.set("q", filter.q);
 
   return (
     <div className="space-y-6">
-      <Heading
-        title="Analytics"
-        description="Growth, revenue, and pipeline for the TidyPro SaaS itself."
-      />
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <Heading
+          title="Analytics"
+          description="Growth, revenue, and pipeline for the TidyPro SaaS itself."
+        />
+        <Button
+          variant="outline"
+          href={`/api/studio/exports/analytics?${exportQs.toString()}`}
+        >
+          Export Excel
+        </Button>
+      </div>
+
+      <Card>
+        <CardContent className="flex flex-wrap items-end gap-x-6 gap-y-4 pt-5">
+          <div>
+            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              Range
+            </p>
+            <FilterPills
+              basePath="/studio/analytics"
+              param="weeks"
+              options={ANALYTICS_WEEKS.map((w) => ({
+                value: String(w),
+                label: `${w} wks`,
+              }))}
+              current={String(filter.weeks)}
+              preserve={{
+                plan: filter.plan === "all" ? undefined : filter.plan,
+                q: filter.q || undefined,
+              }}
+            />
+          </div>
+          <div>
+            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              Plan
+            </p>
+            <FilterPills
+              basePath="/studio/analytics"
+              param="plan"
+              options={[
+                { value: "all", label: "All" },
+                { value: "starter", label: "Starter" },
+                { value: "growth", label: "Growth" },
+                { value: "pro", label: "Pro" },
+              ]}
+              current={filter.plan}
+              preserve={{
+                weeks: String(filter.weeks),
+                q: filter.q || undefined,
+              }}
+            />
+          </div>
+          <div className="min-w-52 flex-1">
+            <FilterSearch
+              id="analytics-q"
+              label="Company"
+              defaultValue={filter.q}
+              placeholder="Search companies…"
+              preserve={{
+                weeks: String(filter.weeks),
+                plan: filter.plan === "all" ? undefined : filter.plan,
+              }}
+            />
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Kpi
@@ -87,7 +165,7 @@ export default async function StudioAnalyticsPage() {
       <div className="grid gap-4 lg:grid-cols-5">
         <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle>Signups — last 12 weeks</CardTitle>
+            <CardTitle>Signups — last {filter.weeks} weeks</CardTitle>
           </CardHeader>
           <CardContent>
             <WeeklyBars weeks={data.weeks} />

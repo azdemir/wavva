@@ -33,9 +33,15 @@ export type AnalyticsData = {
   topByCustomers: RecentCompany[];
 };
 
-const WEEKS = 12;
+export type AnalyticsFilter = {
+  weeks: 4 | 12 | 26;
+  plan: "all" | PlanId;
+  q: string;
+};
 
-function weekBuckets(): WeekBucket[] {
+export const ANALYTICS_WEEKS: AnalyticsFilter["weeks"][] = [4, 12, 26];
+
+function weekBuckets(count: number): WeekBucket[] {
   const out: WeekBucket[] = [];
   const now = new Date();
   // Start of the current week (Monday).
@@ -43,7 +49,7 @@ function weekBuckets(): WeekBucket[] {
   const day = (now.getDay() + 6) % 7;
   monday.setDate(now.getDate() - day);
   monday.setHours(0, 0, 0, 0);
-  for (let i = WEEKS - 1; i >= 0; i--) {
+  for (let i = count - 1; i >= 0; i--) {
     const start = new Date(monday);
     start.setDate(monday.getDate() - i * 7);
     out.push({
@@ -56,14 +62,35 @@ function weekBuckets(): WeekBucket[] {
   return out;
 }
 
+export function parseAnalyticsFilter(sp: {
+  weeks?: string;
+  plan?: string;
+  q?: string;
+}): AnalyticsFilter {
+  const weeks = [4, 12, 26].includes(Number(sp.weeks))
+    ? (Number(sp.weeks) as 4 | 12 | 26)
+    : 12;
+  const plan =
+    sp.plan === "starter" || sp.plan === "growth" || sp.plan === "pro"
+      ? sp.plan
+      : "all";
+  return { weeks, plan, q: (sp.q ?? "").trim().slice(0, 80) };
+}
+
 /**
  * Founder analytics for the SaaS itself. Call after requirePlatformAdmin();
  * reads through the service-role client.
+ *
+ * `weeks` scopes the signups chart and the lead window; `plan`/`q` scope the
+ * company tables (and the Excel export). Headline KPIs and the plan mix stay
+ * global.
  */
-export async function getAnalytics(): Promise<AnalyticsData> {
+export async function getAnalytics(
+  filter: AnalyticsFilter = { weeks: 12, plan: "all", q: "" },
+): Promise<AnalyticsData> {
   const svc = await createServiceClient();
   const since = new Date();
-  since.setDate(since.getDate() - WEEKS * 7);
+  since.setDate(since.getDate() - filter.weeks * 7);
 
   const [{ data: companies }, { count: userCount }, { data: leads }] =
     await Promise.all([
@@ -159,7 +186,7 @@ export async function getAnalytics(): Promise<AnalyticsData> {
   const customers = allStageCounts.get("customer") ?? 0;
 
   // Weekly buckets.
-  const weeks = weekBuckets();
+  const weeks = weekBuckets(filter.weeks);
   const starts = weeks.map((w) => new Date(w.start).getTime());
   const bucketOf = (iso: string) => {
     const t = new Date(iso).getTime();
@@ -186,6 +213,14 @@ export async function getAnalytics(): Promise<AnalyticsData> {
     customers: customersByCompany.get(c.id) ?? 0,
   });
 
+  // Company tables honor the plan + search filters.
+  const ql = filter.q.toLowerCase();
+  const tableCompanies = companyRows.filter(
+    (c) =>
+      (filter.plan === "all" || c.plan === filter.plan) &&
+      (!ql || c.name.toLowerCase().includes(ql)),
+  );
+
   return {
     companies: companyRows.length,
     users: userCount ?? 0,
@@ -206,8 +241,8 @@ export async function getAnalytics(): Promise<AnalyticsData> {
       .map(([source, count]) => ({ source, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 6),
-    recent: companyRows.slice(0, 8).map(toRecent),
-    topByCustomers: [...companyRows]
+    recent: tableCompanies.slice(0, 8).map(toRecent),
+    topByCustomers: [...tableCompanies]
       .sort(
         (a, b) =>
           (customersByCompany.get(b.id) ?? 0) - (customersByCompany.get(a.id) ?? 0),
