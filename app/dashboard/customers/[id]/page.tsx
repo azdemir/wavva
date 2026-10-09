@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { requireCompany } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { updateCustomer, deleteCustomer, deleteAddress } from "@/lib/actions/customers";
 import { Heading } from "@/components/ui/heading";
@@ -25,7 +25,7 @@ export default async function CustomerDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { company } = await requireCompany();
+  const { company } = await requirePermission("customers.manage");
   const supabase = await createClient();
 
   const { data: customer } = await supabase
@@ -74,6 +74,7 @@ export default async function CustomerDetailPage({
           <CustomerForm
             initial={{
               name: customer.name,
+              customer_type: customer.customer_type ?? "residential",
               email: customer.email ?? "",
               phone: customer.phone ?? "",
               notes: customer.notes ?? "",

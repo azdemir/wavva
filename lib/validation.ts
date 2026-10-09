@@ -38,8 +38,36 @@ export const inviteSchema = z.object({
   role: z.enum(["owner", "manager", "cleaner"]),
 });
 
+/**
+ * Normalize a person name so each word starts with a capital letter and the
+ * rest is lowercase: "JOHN o'doe-smith" -> "John O'Doe-Smith".
+ * Used for customer names on save.
+ */
+export function normalizePersonName(name: string): string {
+  return name
+    .trim()
+    .replace(/\s+/g, " ")
+    .split(" ")
+    .map((word) =>
+      word
+        .split(/([-'\u2019])/)
+        .map((part) =>
+          part.length === 0 || part === "-" || part === "'" || part === "\u2019"
+            ? part
+            : part.charAt(0).toUpperCase() + part.slice(1).toLowerCase(),
+        )
+        .join(""),
+    )
+    .join(" ");
+}
+
 export const customerSchema = z.object({
-  name: z.string().min(2, "Customer name is required").max(120),
+  name: z
+    .string()
+    .min(2, "Customer name is required")
+    .max(120)
+    .transform(normalizePersonName),
+  customer_type: z.enum(["residential", "commercial"]).catch("residential"),
   email: email.optional().or(z.literal("")),
   phone: phone,
   notes: z.string().max(2000).optional().or(z.literal("")),

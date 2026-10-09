@@ -1,11 +1,11 @@
-import { requireCompany } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 import { createCustomer } from "@/lib/actions/customers";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent } from "@/components/ui/card";
 import { CustomerForm } from "@/components/customers/customer-form";
 
 export default async function NewCustomerPage() {
-  await requireCompany();
+  await requirePermission("customers.manage");
 
   return (
     <div className="max-w-2xl space-y-6">

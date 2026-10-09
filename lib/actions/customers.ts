@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireCompany } from "@/lib/auth";
+import { isStaff, NOT_PERMITTED } from "@/lib/permissions";
 import { logAudit } from "@/lib/audit";
 import { customerSchema, addressSchema } from "@/lib/validation";
 
@@ -12,6 +13,7 @@ export type ActionResult = { error?: string; ok?: boolean };
 function formToCustomer(formData: FormData) {
   return customerSchema.safeParse({
     name: formData.get("name"),
+    customer_type: formData.get("customer_type"),
     email: formData.get("email") || "",
     phone: formData.get("phone") || "",
     notes: formData.get("notes") || "",
@@ -21,6 +23,7 @@ function formToCustomer(formData: FormData) {
 
 export async function createCustomer(formData: FormData): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const parsed = formToCustomer(formData);
   if (!parsed.success) return { error: "Please check the customer details." };
 
@@ -30,6 +33,7 @@ export async function createCustomer(formData: FormData): Promise<ActionResult> 
     .insert({
       company_id: ctx.company.id,
       name: parsed.data.name,
+      customer_type: parsed.data.customer_type,
       email: parsed.data.email || null,
       phone: parsed.data.phone || null,
       notes: parsed.data.notes || null,
@@ -51,6 +55,7 @@ export async function createCustomer(formData: FormData): Promise<ActionResult> 
 
 export async function updateCustomer(id: string, formData: FormData): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const parsed = formToCustomer(formData);
   if (!parsed.success) return { error: "Please check the customer details." };
 
@@ -59,6 +64,7 @@ export async function updateCustomer(id: string, formData: FormData): Promise<Ac
     .from("customers")
     .update({
       name: parsed.data.name,
+      customer_type: parsed.data.customer_type,
       email: parsed.data.email || null,
       phone: parsed.data.phone || null,
       notes: parsed.data.notes || null,
@@ -74,6 +80,7 @@ export async function updateCustomer(id: string, formData: FormData): Promise<Ac
 
 export async function deleteCustomer(id: string): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const supabase = await createClient();
 
   // Don't delete customers with live bookings — cancel those first.
@@ -106,6 +113,7 @@ export async function deleteCustomer(id: string): Promise<ActionResult> {
 
 export async function createAddress(formData: FormData): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const parsed = addressSchema.safeParse({
     customer_id: formData.get("customer_id"),
     label: formData.get("label") || "Home",
@@ -157,6 +165,7 @@ export async function createAddress(formData: FormData): Promise<ActionResult> {
 
 export async function deleteAddress(id: string, customerId: string): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const supabase = await createClient();
 
   const { count } = await supabase
