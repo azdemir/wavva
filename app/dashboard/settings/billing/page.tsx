@@ -83,7 +83,7 @@ export default async function BillingPage({
 
       <div>
         <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Plans</h2>
-        <div className="mt-4 grid gap-4 md:grid-cols-3">
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {PLAN_IDS.map((id) => {
             const p = PLANS[id];
             const isCurrent = id === state.plan && state.hasSubscription;

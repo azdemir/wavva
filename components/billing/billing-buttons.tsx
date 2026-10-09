@@ -41,7 +41,9 @@ export function PlanButton({
           }
         }}
       >
-        {pending ? "Starting checkout…" : label}
+        <span className="whitespace-normal text-center leading-snug">
+          {pending ? "Starting checkout…" : label}
+        </span>
       </Button>
     </div>
   );
