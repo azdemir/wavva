@@ -131,7 +131,13 @@ export default async function CustomerDetailPage({
             Share a private link so this customer can approve quotes, see
             upcoming visits, and pay invoices — no login needed.
           </p>
-          <PortalLinkButton customerId={id} baseUrl={baseUrl} />
+          <PortalLinkButton
+            customerId={id}
+            baseUrl={baseUrl}
+            customerName={customer.name}
+            customerEmail={customer.email}
+            customerPhone={customer.phone}
+          />
         </CardContent>
       </Card>
 
