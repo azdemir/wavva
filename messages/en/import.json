@@ -1,0 +1,195 @@
+{
+  "actions": {
+    "addressCreateFailed": "Couldn't create the service address.",
+    "bookingCreateFailed": "Couldn't create the appointment.",
+    "customerCreateFailed": "Couldn't create the customer.",
+    "duplicateCheckFailed": "We couldn't check for duplicates — please try again.",
+    "invalidInput": "That import request wasn't valid.",
+    "noAddressForBooking": "Skipped the appointment — no complete address (street, city, state, ZIP) was mapped.",
+    "noStartForBooking": "Skipped the appointment — no readable start time.",
+    "tooManyRows": "Imports are limited to 2,000 rows at a time."
+  },
+  "buttons": {
+    "back": "Back",
+    "checkDuplicates": "Check duplicates",
+    "commit": "Import now",
+    "committing": "Importing…",
+    "continue": "Continue",
+    "startOver": "Start over"
+  },
+  "description": "Bring customers and appointments over from another platform with a CSV file.",
+  "duplicates": {
+    "description": "We compared your rows to customers already in TidyPro. Nothing is merged automatically — you decide per row.",
+    "duplicateCount": "{count} possible duplicates",
+    "importAnyway": "Import anyway",
+    "loading": "Checking for duplicates…",
+    "matchedOn": "Matches {name} by {method}",
+    "method": {
+      "email": "email",
+      "name_address": "name + address",
+      "phone": "phone"
+    },
+    "newCount": "{count} new customers",
+    "skip": "Skip",
+    "title": "Possible duplicates"
+  },
+  "mapping": {
+    "column": "CSV column",
+    "description": "Tell us which CSV column becomes which TidyPro field. We've guessed the matches — fix anything wrong.",
+    "doNotImport": "Do not import",
+    "fields": {
+      "address_line1": "Address line 1",
+      "address_line2": "Address line 2",
+      "appt_customer_email": "Appointment → customer (email or name)",
+      "appt_date": "Appointment → date",
+      "appt_end": "Appointment → end",
+      "appt_notes": "Appointment → notes",
+      "appt_recurrence": "Appointment → recurrence",
+      "appt_service": "Appointment → service",
+      "appt_start": "Appointment → start",
+      "city": "City",
+      "customer_type": "Customer type",
+      "email": "Email",
+      "first_name": "First name",
+      "last_name": "Last name",
+      "name": "Name",
+      "notes": "Notes",
+      "phone": "Phone",
+      "state": "State",
+      "zip": "ZIP code"
+    },
+    "mappedTo": "TidyPro field",
+    "title": "Map columns"
+  },
+  "platforms": {
+    "bookingkoala": {
+      "badge": "CSV upload",
+      "description": "Customers exported from BookingKoala.",
+      "name": "BookingKoala"
+    },
+    "generic": {
+      "badge": "CSV upload",
+      "description": "Any CSV file with customer and appointment columns.",
+      "name": "Generic CSV"
+    },
+    "housecallpro": {
+      "description": "Customers and jobs exported from Housecall Pro.",
+      "name": "Housecall Pro",
+      "note": "Or connect your account below to import directly via API."
+    },
+    "jobber": {
+      "description": "Customers and visits exported from Jobber.",
+      "name": "Jobber",
+      "note": "Or connect your account below to import directly via API."
+    },
+    "zenmaid": {
+      "badge": "CSV upload",
+      "description": "Customers and appointments exported from ZenMaid.",
+      "name": "ZenMaid"
+    }
+  },
+  "preview": {
+    "appointment": "Appointment",
+    "contact": "Contact",
+    "customer": "Customer",
+    "description": "These are the first 20 rows and how they'll be imported. Fix any errors, then check for duplicates.",
+    "noAppointment": "No appointment",
+    "noErrors": "Looks good — no validation errors.",
+    "row": "Row",
+    "title": "Preview",
+    "unmappedWarning": "Some rows have no name mapped — they can't be imported until a name is mapped."
+  },
+  "results": {
+    "bookingsCreated": "{count} appointments created",
+    "customersCreated": "{count} customers created",
+    "errorsTitle": "Rows that couldn't be imported",
+    "row": "Row",
+    "startOver": "Import another file",
+    "title": "Import complete"
+  },
+  "steps": {
+    "duplicates": "Duplicates",
+    "mapping": "Map columns",
+    "preview": "Preview",
+    "results": "Results",
+    "source": "Source"
+  },
+  "title": "Import data",
+  "upload": {
+    "drop": "Drop your CSV here, or browse",
+    "errors": {
+      "empty": "That CSV has no data rows.",
+      "parse": "We couldn't read that file as CSV.",
+      "size": "That file is too large — the limit is 5 MB.",
+      "tooMany": "That CSV has too many rows — the limit is 2,000.",
+      "type": "Please choose a .csv file."
+    },
+    "hint": "CSV files only, up to 5 MB.",
+    "selected": "Selected file"
+  },
+  "validation": {
+    "dateInvalid": "Start date/time couldn't be read.",
+    "emailInvalid": "Email address looks invalid.",
+    "endBeforeStart": "Appointment end must be after its start.",
+    "endInvalid": "End date/time couldn't be read.",
+    "nameRequired": "A name (or first + last name) is required.",
+    "phoneInvalid": "Phone number looks invalid.",
+    "recurrenceInvalid": "Recurrence must be one of: none, weekly, biweekly, monthly."
+  },
+  "api": {
+    "callbackErrors": {
+      "not_configured": "This integration isn't set up yet — contact support.",
+      "not_permitted": "Only owners and managers can manage imports.",
+      "oauth_denied": "You declined the connection — nothing was imported.",
+      "oauth_failed": "The connection failed — please try again.",
+      "state_mismatch": "Security check failed — please try connecting again."
+    },
+    "connect": "Connect",
+    "connectedAs": "Connected as {name}",
+    "connectedMessage": "{provider} connected — now fetch your data below.",
+    "description": "Connect Jobber, Housecall Pro, or Google Calendar to pull customers and appointments straight in — no CSV needed.",
+    "disconnect": "Disconnect",
+    "disconnecting": "Disconnecting…",
+    "errors": {
+      "disconnectFailed": "Couldn't disconnect — please try again.",
+      "fetchFailed": "Couldn't fetch data: {detail}",
+      "invalidKey": "That API key didn't work — check it and try again.",
+      "notConfigured": "This integration isn't set up yet — contact support.",
+      "notConnected": "Not connected — connect this provider first.",
+      "notPermitted": "Only owners and managers can manage imports.",
+      "saveFailed": "Couldn't save the API key — please try again.",
+      "statusFailed": "Couldn't load integration status.",
+      "tokenExpired": "The connection expired — please reconnect.",
+      "tokenInvalid": "The saved connection is invalid — please reconnect.",
+      "unauthorized": "The provider rejected the connection — please reconnect."
+    },
+    "fetch": "Fetch data",
+    "fetchedCount": "{count} records fetched — review them below.",
+    "fetching": "Fetching…",
+    "keyLabel": "Housecall Pro API key",
+    "keyPlaceholder": "Paste your API key",
+    "providers": {
+      "google": {
+        "description": "Calendar events become appointments; the first invitee becomes the customer.",
+        "name": "Google Calendar",
+        "verificationNote": "Google OAuth verification (homepage, privacy policy, domain) is required before production use."
+      },
+      "housecallpro": {
+        "description": "Customers and jobs, pulled with your Housecall Pro API key.",
+        "maxPlanNote": "Requires Housecall Pro MAX plan to generate an API key — otherwise use CSV upload.",
+        "name": "Housecall Pro"
+      },
+      "jobber": {
+        "description": "Clients and job visits, pulled from your Jobber account.",
+        "name": "Jobber",
+        "note": "Connects with your Jobber account via secure OAuth."
+      }
+    },
+    "saveKey": "Save key",
+    "savingKey": "Saving…",
+    "setupRequired": "Setup required",
+    "setupRequiredHint": "This integration isn't configured yet — ask support to set it up.",
+    "title": "Import from your other apps",
+    "connected": "Connected"
+  }
+}

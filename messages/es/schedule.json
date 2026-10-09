@@ -1,1 +1,18 @@
-{"crewFilter": {"everyone": "Todos", "label": "Equipo"}, "heading": {"description": "La semana de tu equipo de un vistazo.", "title": "Calendario"}, "noVisits": "Sin visitas", "weekNav": {"next": "Siguiente →", "prev": "← Anterior", "today": "Hoy"}, "unknownMember": "Desconocido"}
+{
+  "addBooking": "Agregar reserva",
+  "crewFilter": {
+    "everyone": "Todos",
+    "label": "Equipo"
+  },
+  "heading": {
+    "description": "La semana de tu equipo de un vistazo.",
+    "title": "Calendario"
+  },
+  "noVisits": "Sin visitas",
+  "unknownMember": "Desconocido",
+  "weekNav": {
+    "next": "Siguiente →",
+    "prev": "← Anterior",
+    "today": "Hoy"
+  }
+}
