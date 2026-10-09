@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireCompany } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { one } from "@/lib/relations";
 import { setInvoiceStatus, recordPayment, deleteInvoice } from "@/lib/actions/invoices";
@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge, InvoiceStatusPill, statusLabel, type InvoiceStatus } from "@/components/ui/badge";
 import { Field } from "@/components/ui/input";
+import { PrinterIcon } from "@/components/ui/icons";
 import { formatCents, formatDate } from "@/lib/format";
 
 export const instant = false;
@@ -27,7 +28,7 @@ export default async function InvoiceDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { company } = await requireCompany();
+  const { company } = await requirePermission("invoices.manage");
   const supabase = await createClient();
 
   // One round trip: line items and payments come embedded with the
@@ -70,7 +71,12 @@ export default async function InvoiceDetailPage({
           title={`Invoice ${invoice.invoice_number}`}
           description={`${customer?.name ?? "Customer"} · created ${formatDate(invoice.created_at)}`}
         />
-        <InvoiceStatusPill status={invoice.status as InvoiceStatus} className="text-sm" />
+        <div className="flex items-center gap-2">
+          <InvoiceStatusPill status={invoice.status as InvoiceStatus} className="text-sm" />
+          <Button href={`/dashboard/invoices/${id}/print`} variant="outline" size="sm">
+            <PrinterIcon className="h-4 w-4" /> Print
+          </Button>
+        </div>
       </div>
 
       <Card>

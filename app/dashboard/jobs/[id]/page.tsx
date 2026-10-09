@@ -61,13 +61,17 @@ export default async function JobDetailPage({
   const booking = one(job.bookings);
   const checklist = (job.checklist ?? []) as ChecklistItem[];
   const readOnly = job.status === "completed" || job.status === "canceled";
+  const whenLabel =
+    job.scheduled_start === job.scheduled_end
+      ? `${formatDate(job.scheduled_start)}, ${formatTime(job.scheduled_start, tz)}`
+      : `${formatDate(job.scheduled_start)}, ${formatTime(job.scheduled_start, tz)} – ${formatTime(job.scheduled_end, tz)}`;
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <Heading
           title={customer?.name ?? "Job"}
-          description={`${formatDate(job.scheduled_start)}, ${formatTime(job.scheduled_start, tz)} – ${formatTime(job.scheduled_end, tz)}`}
+          description={whenLabel}
         />
         <JobStatusPill status={job.status as JobStatus} className="text-sm" />
       </div>
@@ -122,40 +126,45 @@ export default async function JobDetailPage({
 
       {!readOnly && (
         <Card>
-          <CardContent className="flex flex-wrap gap-2 pt-6">
-            {job.status === "scheduled" && (
-              <form action={async () => { "use server"; await startJob(id); }}>
-                <Button type="submit">Start job</Button>
-              </form>
-            )}
+          <CardHeader>
+            <CardTitle>Actions</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <div className="flex flex-wrap items-center gap-2">
+              {job.status === "scheduled" && (
+                <form action={async () => { "use server"; await startJob(id); }}>
+                  <Button type="submit">Start job</Button>
+                </form>
+              )}
+              {isStaff && (
+                <form action={async () => { "use server"; await cancelJob(id); }} className="ml-auto">
+                  <Button type="submit" variant="outline" className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950">
+                    Cancel job
+                  </Button>
+                </form>
+              )}
+            </div>
             {(job.status === "scheduled" || job.status === "in_progress") && (
               <form
                 action={async (formData) => {
                   "use server";
                   await completeJob(id, formData);
                 }}
-                className="flex flex-1 flex-wrap items-end gap-2"
+                className="space-y-3 border-t border-slate-200 pt-5 dark:border-slate-800"
               >
-                <div className="min-w-48 flex-1">
-                  <TextareaField
-                    id="job-notes"
-                    name="notes"
-                    label="Completion notes (optional)"
-                    rows={2}
-                    defaultValue={job.completion_notes ?? ""}
-                    placeholder="Anything the customer should know…"
-                  />
-                </div>
-                <Button type="submit" variant="outline" className="border-accent-300 text-accent-700 hover:bg-accent-50 dark:border-accent-800 dark:text-accent-400 dark:hover:bg-accent-950">
+                <TextareaField
+                  id="job-notes"
+                  name="notes"
+                  label="Completion notes (optional)"
+                  rows={3}
+                  defaultValue={job.completion_notes ?? ""}
+                  placeholder="Anything the customer should know…"
+                />
+                <Button type="submit" variant="outline" className="w-full border-accent-300 text-accent-700 hover:bg-accent-50 dark:border-accent-800 dark:text-accent-400 dark:hover:bg-accent-950 sm:w-auto">
                   Complete job
                 </Button>
               </form>
             )}
-            <form action={async () => { "use server"; await cancelJob(id); }}>
-              <Button type="submit" variant="outline" className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950">
-                Cancel
-              </Button>
-            </form>
           </CardContent>
         </Card>
       )}
