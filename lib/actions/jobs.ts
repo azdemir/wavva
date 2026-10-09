@@ -9,7 +9,8 @@ import { logAudit } from "@/lib/audit";
 import { one } from "@/lib/relations";
 import { baseUrl } from "@/lib/base-url";
 import { formatDate, formatTime } from "@/lib/format";
-import { enqueueNotification } from "@/lib/notifications/queue";
+import { enqueueCustomerNotification } from "@/lib/communications/notify";
+import { getOrCreatePortalLink } from "@/lib/actions/portal";
 import { getTranslations } from "next-intl/server";
 
 export type ActionResult = { error?: string; ok?: boolean };
@@ -79,6 +80,41 @@ export async function completeJob(id: string, formData: FormData): Promise<Actio
     entity_type: "job",
     entity_id: id,
   });
+
+  // Thank the customer and ask for a review.
+  const { data: doneJob } = await supabase
+    .from("jobs")
+    .select("scheduled_start, customer_id, customers(name, email, phone, sms_consent)")
+    .eq("id", id)
+    .single();
+  const doneCustomer = one(doneJob?.customers) as {
+    name: string;
+    email: string | null;
+    phone: string | null;
+    sms_consent: boolean | null;
+  } | null;
+  if (doneJob && doneCustomer) {
+    const bUrl = await baseUrl();
+    const portal = await getOrCreatePortalLink(doneJob.customer_id, bUrl);
+    await enqueueCustomerNotification(supabase, {
+      company_id: ctx.company.id,
+      recipient_type: "customer",
+      recipient_id: doneJob.customer_id,
+      template: "job_completed",
+      payload: {
+        recipient_name: doneCustomer.name,
+        company_name: ctx.company.name,
+        date: formatDate(doneJob.scheduled_start),
+        portal_link: portal.link,
+      },
+      contact: {
+        email: doneCustomer.email,
+        phone: doneCustomer.phone,
+        smsConsent: doneCustomer.sms_consent ?? false,
+      },
+    });
+  }
+
   revalidatePath(`/dashboard/jobs/${id}`);
   revalidatePath("/dashboard/schedule");
   revalidatePath("/dashboard/my-jobs");
@@ -107,6 +143,47 @@ export async function cancelJob(id: string): Promise<ActionResult> {
     entity_type: "job",
     entity_id: id,
   });
+
+  // Tell the assigned crew the job was cancelled.
+  const cancelledIds = (job.assigned_user_ids ?? []) as string[];
+  if (cancelledIds.length > 0) {
+    const [{ data: cancelledJob }, { data: cancelledAssignees }] = await Promise.all([
+      supabase
+        .from("jobs")
+        .select("scheduled_start, scheduled_end, customers(name), service_addresses(address_line1, city)")
+        .eq("id", id)
+        .single(),
+      supabase
+        .from("memberships")
+        .select("user_id, email")
+        .eq("company_id", ctx.company.id)
+        .in("user_id", cancelledIds),
+    ]);
+    const cancelTz = ctx.company.timezone || "America/New_York";
+    const cName = one(cancelledJob?.customers)?.name ?? "";
+    const cAddr = one(cancelledJob?.service_addresses);
+    for (const a of cancelledAssignees ?? []) {
+      if (!a.email) continue;
+      await enqueueCustomerNotification(supabase, {
+        company_id: ctx.company.id,
+        recipient_type: "user",
+        recipient_id: a.user_id,
+        template: "job_cancelled",
+        payload: {
+          company_name: ctx.company.name,
+          date: formatDate(cancelledJob?.scheduled_start ?? ""),
+          time: cancelledJob
+            ? `${formatTime(cancelledJob.scheduled_start, cancelTz)} – ${formatTime(cancelledJob.scheduled_end, cancelTz)}`
+            : undefined,
+          customer_name: cName,
+          address: `${cAddr?.address_line1 ?? ""}, ${cAddr?.city ?? ""}`,
+        },
+        contact: { email: a.email },
+        skipConsentCheck: true,
+      });
+    }
+  }
+
   revalidatePath(`/dashboard/jobs/${id}`);
   revalidatePath("/dashboard/schedule");
   revalidatePath("/dashboard/my-jobs");
@@ -165,14 +242,12 @@ export async function assignJob(id: string, userIds: string[]): Promise<ActionRe
     const tz2 = ctx.company.timezone || "America/New_York";
     for (const a of assignees ?? []) {
       if (!a.email) continue;
-      await enqueueNotification(supabase, {
+      await enqueueCustomerNotification(supabase, {
         company_id: ctx.company.id,
         recipient_type: "user",
         recipient_id: a.user_id,
-        channel: "email",
         template: "job_assigned",
         payload: {
-          email: a.email,
           company_name: ctx.company.name,
           date: formatDate(jobFull?.scheduled_start ?? ""),
           time: jobFull ? `${formatTime(jobFull.scheduled_start, tz2)} – ${formatTime(jobFull.scheduled_end, tz2)}` : undefined,
@@ -180,6 +255,10 @@ export async function assignJob(id: string, userIds: string[]): Promise<ActionRe
           address: `${one(jobFull?.service_addresses)?.address_line1 ?? ""}, ${one(jobFull?.service_addresses)?.city ?? ""}`,
           job_link: `${bUrl}/dashboard/jobs/${id}`,
         },
+        contact: { email: a.email },
+        // Team members: no phone numbers are collected yet, so the SMS
+        // channel stays dormant for crew until then.
+        skipConsentCheck: true,
       });
     }
   }

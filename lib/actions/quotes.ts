@@ -12,7 +12,7 @@ import { computeTotals, nextNumber } from "@/lib/pricing";
 import { one } from "@/lib/relations";
 import { baseUrl } from "@/lib/base-url";
 import { formatDate } from "@/lib/format";
-import { enqueueNotification } from "@/lib/notifications/queue";
+import { enqueueCustomerNotification } from "@/lib/communications/notify";
 import { getOrCreatePortalLink } from "@/lib/actions/portal";
 import { scheduleQuoteFollowups, cancelQuoteFollowups } from "@/lib/followups";
 
@@ -150,27 +150,67 @@ export async function setQuoteStatus(id: string, status: string): Promise<Action
     await scheduleQuoteFollowups(supabase, ctx.company.id, id);
     const { data: full } = await supabase
       .from("quotes")
-      .select("quote_number, total_cents, valid_until, customer_id, customers(name, email)")
+      .select("quote_number, total_cents, valid_until, customer_id, customers(name, email, phone, sms_consent)")
       .eq("id", id)
       .single();
-    const customer = one(full?.customers);
-    if (full && customer?.email) {
+    const customer = one(full?.customers) as {
+      name: string;
+      email: string | null;
+      phone: string | null;
+      sms_consent: boolean | null;
+    } | null;
+    if (full && customer) {
       const bUrl = await baseUrl();
       const portal = await getOrCreatePortalLink(full.customer_id, bUrl);
-      await enqueueNotification(supabase, {
+      await enqueueCustomerNotification(supabase, {
         company_id: ctx.company.id,
         recipient_type: "customer",
         recipient_id: full.customer_id,
-        channel: "email",
         template: "quote_sent",
         payload: {
-          email: customer.email,
           recipient_name: customer.name,
           company_name: ctx.company.name,
           quote_number: full.quote_number,
           total_cents: full.total_cents,
           valid_until: full.valid_until ? formatDate(full.valid_until) : undefined,
           portal_link: portal.link,
+        },
+        contact: {
+          email: customer.email,
+          phone: customer.phone,
+          smsConsent: customer.sms_consent ?? false,
+        },
+      });
+    }
+  }
+
+  if (status === "approved") {
+    const { data: full } = await supabase
+      .from("quotes")
+      .select("quote_number, customer_id, customers(name, email, phone, sms_consent)")
+      .eq("id", id)
+      .single();
+    const customer = one(full?.customers) as {
+      name: string;
+      email: string | null;
+      phone: string | null;
+      sms_consent: boolean | null;
+    } | null;
+    if (full && customer) {
+      await enqueueCustomerNotification(supabase, {
+        company_id: ctx.company.id,
+        recipient_type: "customer",
+        recipient_id: full.customer_id,
+        template: "quote_approved",
+        payload: {
+          recipient_name: customer.name,
+          company_name: ctx.company.name,
+          quote_number: full.quote_number,
+        },
+        contact: {
+          email: customer.email,
+          phone: customer.phone,
+          smsConsent: customer.sms_consent ?? false,
         },
       });
     }

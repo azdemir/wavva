@@ -19,6 +19,8 @@ export type BookingPrefill = {
   addressId?: string;
   serviceId?: string;
   notes?: string;
+  /** YYYY-MM-DD date to prefill the start/end datetime fields (from the schedule). */
+  startDate?: string;
 };
 
 export function BookingForm({
@@ -41,8 +43,8 @@ export function BookingForm({
   );
   const [serviceId, setServiceId] = useState(prefill?.serviceId ?? "");
   const [recurrence, setRecurrence] = useState("none");
-  const [start, setStart] = useState("");
-  const [end, setEnd] = useState("");
+  const [start, setStart] = useState(prefill?.startDate ? `${prefill.startDate}T09:00` : "");
+  const [end, setEnd] = useState(prefill?.startDate ? `${prefill.startDate}T11:00` : "");
   const [notes, setNotes] = useState(prefill?.notes ?? "");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);

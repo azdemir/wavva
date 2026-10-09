@@ -11,9 +11,11 @@ import { computeTotals, nextNumber } from "@/lib/pricing";
 import { one } from "@/lib/relations";
 import { baseUrl } from "@/lib/base-url";
 import { formatDate } from "@/lib/format";
-import { enqueueNotification } from "@/lib/notifications/queue";
+import { enqueueCustomerNotification } from "@/lib/communications/notify";
 import { getOrCreatePortalLink } from "@/lib/actions/portal";
 import { getTranslations } from "next-intl/server";
+import { isQuickBooksConfigured } from "@/lib/quickbooks/config";
+import { pushInvoice } from "@/lib/quickbooks/sync";
 
 export type ActionResult = { error?: string; ok?: boolean };
 
@@ -151,27 +153,35 @@ export async function setInvoiceStatus(id: string, status: string): Promise<Acti
   if (status === "sent") {
     const { data: full } = await supabase
       .from("invoices")
-      .select("invoice_number, total_cents, due_date, customer_id, customers(name, email)")
+      .select("invoice_number, total_cents, due_date, customer_id, customers(name, email, phone, sms_consent)")
       .eq("id", id)
       .single();
-    const customer = one(full?.customers);
-    if (full && customer?.email) {
+    const customer = one(full?.customers) as {
+      name: string;
+      email: string | null;
+      phone: string | null;
+      sms_consent: boolean | null;
+    } | null;
+    if (full && customer) {
       const bUrl = await baseUrl();
       const portal = await getOrCreatePortalLink(full.customer_id, bUrl);
-      await enqueueNotification(supabase, {
+      await enqueueCustomerNotification(supabase, {
         company_id: ctx.company.id,
         recipient_type: "customer",
         recipient_id: full.customer_id,
-        channel: "email",
         template: "invoice_sent",
         payload: {
-          email: customer.email,
           recipient_name: customer.name,
           company_name: ctx.company.name,
           invoice_number: full.invoice_number,
           total_cents: full.total_cents,
           due_date: full.due_date ? formatDate(full.due_date) : undefined,
           portal_link: portal.link,
+        },
+        contact: {
+          email: customer.email,
+          phone: customer.phone,
+          smsConsent: customer.sms_consent ?? false,
         },
       });
     }
@@ -180,6 +190,12 @@ export async function setInvoiceStatus(id: string, status: string): Promise<Acti
   revalidatePath(`/dashboard/invoices/${id}`);
   revalidatePath("/dashboard/invoices");
   revalidatePath("/dashboard");
+
+  // QuickBooks push (Pro): no-op until QBO is configured; never blocks the save.
+  if (status !== "draft" && isQuickBooksConfigured()) {
+    pushInvoice(id).catch(() => {});
+  }
+
   return { ok: true };
 }
 
@@ -231,6 +247,38 @@ export async function recordPayment(id: string, formData: FormData): Promise<Act
     entity_id: id,
     metadata: { amount_cents: amountCents },
   });
+
+  // Thank the customer for the payment (email + SMS when consented).
+  const { data: paidInvoice } = await supabase
+    .from("invoices")
+    .select("invoice_number, customer_id, customers(name, email, phone, sms_consent)")
+    .eq("id", id)
+    .single();
+  const paidCustomer = one(paidInvoice?.customers) as {
+    name: string;
+    email: string | null;
+    phone: string | null;
+    sms_consent: boolean | null;
+  } | null;
+  if (paidInvoice && paidCustomer) {
+    await enqueueCustomerNotification(supabase, {
+      company_id: ctx.company.id,
+      recipient_type: "customer",
+      recipient_id: paidInvoice.customer_id,
+      template: "payment_received",
+      payload: {
+        recipient_name: paidCustomer.name,
+        company_name: ctx.company.name,
+        amount_cents: amountCents,
+        invoice_number: paidInvoice.invoice_number,
+      },
+      contact: {
+        email: paidCustomer.email,
+        phone: paidCustomer.phone,
+        smsConsent: paidCustomer.sms_consent ?? false,
+      },
+    });
+  }
 
   revalidatePath(`/dashboard/invoices/${id}`);
   revalidatePath("/dashboard/invoices");

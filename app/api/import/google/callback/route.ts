@@ -1,0 +1,57 @@
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { requireCompany } from "@/lib/auth";
+import { isStaff } from "@/lib/permissions";
+import { baseUrl } from "@/lib/base-url";
+import { verifyState } from "@/lib/import/encryption";
+import {
+  exchangeGoogleCode,
+  fetchGoogleAccountEmail,
+} from "@/lib/import/providers/google";
+import { storeOAuthTokens } from "@/lib/actions/import-connections";
+
+const STATE_COOKIE = "tidypro-import-oauth-state-google";
+
+/**
+ * Google Calendar OAuth callback: verifies the signed state cookie (CSRF),
+ * exchanges the code for tokens, encrypts + stores them, then returns to
+ * the import page. Failures redirect back with ?import_error=<code>.
+ */
+export async function GET(request: Request) {
+  const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) {
+    redirect("/dashboard/import?import_error=not_permitted");
+  }
+
+  const { searchParams } = new URL(request.url);
+  const jar = await cookies();
+  const signed = jar.get(STATE_COOKIE)?.value;
+  jar.delete(STATE_COOKIE);
+
+  let stateOk = false;
+  try {
+    stateOk = verifyState(signed ?? "", searchParams.get("state") ?? "");
+  } catch {
+    stateOk = false;
+  }
+  if (!stateOk) redirect("/dashboard/import?import_error=state_mismatch");
+  if (searchParams.get("error")) redirect("/dashboard/import?import_error=oauth_denied");
+
+  const code = searchParams.get("code");
+  if (!code) redirect("/dashboard/import?import_error=oauth_failed");
+
+  try {
+    const url = await baseUrl();
+    const redirectUri = `${url}/api/import/google/callback`;
+    const tokens = await exchangeGoogleCode(code, redirectUri);
+    const accountEmail = await fetchGoogleAccountEmail(tokens.accessToken);
+    await storeOAuthTokens(ctx.company.id, "google_calendar", {
+      ...tokens,
+      meta: accountEmail ? { account_name: accountEmail } : {},
+    });
+  } catch {
+    redirect("/dashboard/import?import_error=oauth_failed");
+  }
+
+  redirect("/dashboard/import?connected=google");
+}

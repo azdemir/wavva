@@ -6,7 +6,58 @@ All notable changes to TidyPro. Dates are in America/New_York.
 
 ### Added
 
-- **Dashboard in Spanish and Ukrainian** — the entire dashboard (all 27
+- **Calendar management from the week view** — each day column on the
+  Schedule page now has an "Add booking" (+) button (staff only) that opens
+  the new-booking form with that date pre-filled.
+- **Import Data** (`/dashboard/import`, owner/manager) — migrate customers
+  and scheduling data from other platforms:
+  - 5-step CSV importer (upload → field mapping → preview → duplicate
+    detection → commit) with per-platform column presets for Jobber,
+    ZenMaid, Booking Koala, and Housecall Pro. ZenMaid and Booking Koala
+    are labeled "CSV upload" only — they have no public API.
+  - API imports reusing the same preview → dedupe → commit pipeline:
+    Jobber (OAuth2, GraphQL), Housecall Pro (pasted API key, MAX plan
+    required), Google Calendar (OAuth2, appointments only). Credentials
+    are AES-256-GCM encrypted per company; nothing is presented as
+    supported until built. Requires new env vars (`IMPORT_ENCRYPTION_KEY`,
+    `JOBBER_CLIENT_ID/SECRET`, `GOOGLE_CLIENT_ID/SECRET`) and migration
+    `0013_import_connections.sql`.
+- **Automated SMS + email communications** — a data-driven template system
+  (`lib/communications/templates.ts`) with 14 templates: 10 for customers
+  (quote sent/follow-up/approved, booking confirmed, day-before booking
+  reminder, job completed + review ask, invoice sent, overdue payment
+  reminder, payment received, portal invite) and 4 for cleaners (job
+  assigned, day-before job reminder, job cancelled, job updated), each with
+  email + SMS copy and a documented `{{variable}}` registry (name,
+  description, value source, preview sample). A substitution engine
+  HTML-escapes values in email and leaves SMS plain text.
+- **Settings → Communications editor** (owner-only) — templates grouped by
+  audience (Customers / Cleaners); edit email subject/body and SMS text per
+  template with clickable `{{variable}}` chips, per-channel enable/disable
+  toggles, and a live preview with sample values. Overrides are stored per
+  company in the new `communication_templates` table (migration
+  `0011_communication_templates.sql`, tenant-isolated RLS); defaults stay in
+  code so future default improvements propagate. Disabled templates mark
+  their queued rows `skipped` (new notification status) instead of failing.
+- **SMS via Twilio** (`lib/notifications/sms.ts`, plain fetch, no SDK) —
+  `TWILIO_ACCOUNT_SID` / `TWILIO_AUTH_TOKEN` / `TWILIO_FROM_NUMBER` (see
+  `.env.example`; `TWILIO_PHONE_NUMBER` still accepted as an alias). The
+  notification queue now drains both email and SMS; SMS rows stay queued
+  (counted as skipped) until Twilio is configured, so the backlog sends once
+  keys are added. Customer SMS only goes to customers with the SMS-reminders
+  consent checkbox on their profile.
+- **New automatic triggers** — booking created → booking_confirmed; booking
+  rescheduled → job_updated (customer + assigned cleaners); booking or job
+  cancelled → job_cancelled (assigned cleaners); job assigned →
+  job_assigned; job completed → job_completed + review ask; quote approved →
+  quote_approved (dashboard and customer-portal paths); invoice sent →
+  invoice_sent; manual payment recorded and Stripe online payments →
+  payment_received. The daily `/api/cron/notifications` run now also sends
+  day-before **job_reminder** emails to assigned cleaners and **payment
+  reminders** (one per channel per day) for overdue invoices, auto-flipping
+  `sent` → `overdue` with an audit entry. Quote follow-ups (migration 0005)
+  keep working and now render through the template system.
+- **"Dashboard in Spanish and Ukrainian"** — the entire dashboard (all 27
   pages), onboarding, sidebar nav, status pills, pagination, upgrade prompts,
   and user-facing action messages are now available in English (default),
   Español, and Українська via a language switcher in the dashboard header.

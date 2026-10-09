@@ -4,6 +4,7 @@ import { requireOwner } from "@/lib/auth";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent } from "@/components/ui/card";
 import { SettingsForm } from "@/components/settings/settings-form";
+import { QuickBooksCard } from "@/components/settings/quickbooks-card";
 
 export default async function SettingsPage() {
   const { company } = await requireOwner();
@@ -28,11 +29,25 @@ export default async function SettingsPage() {
           </CardContent>
         </Card>
       </Link>
+      <Link href="/dashboard/settings/communications" className="block">
+        <Card className="transition hover:border-brand-300 hover:shadow-sm">
+          <CardContent className="flex items-center justify-between py-5">
+            <div>
+              <p className="font-semibold text-slate-900 dark:text-slate-100">{t("communicationsCard.title")}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
+                {t("communicationsCard.description")}
+              </p>
+            </div>
+            <span className="text-sm font-semibold text-brand-700 dark:text-brand-400">{t("communicationsCard.manage")}</span>
+          </CardContent>
+        </Card>
+      </Link>
       <Card>
         <CardContent className="pt-6">
           <SettingsForm company={company} />
         </CardContent>
       </Card>
+      <QuickBooksCard />
     </div>
   );
 }

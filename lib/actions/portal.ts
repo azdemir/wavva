@@ -7,6 +7,7 @@ import { isStaff, NOT_PERMITTED } from "@/lib/permissions";
 import { logAudit } from "@/lib/audit";
 import { getStripe } from "@/lib/stripe";
 import { getPortalContext } from "@/lib/portal";
+import { enqueueCustomerNotification } from "@/lib/communications/notify";
 
 /** Company member: get (or create) the customer's portal link. */
 export async function getOrCreatePortalLink(
@@ -105,6 +106,40 @@ export async function portalSetQuoteStatus(
     entity_id: quoteId,
     metadata: { via: "portal" },
   });
+
+  if (status === "approved") {
+    const { data: full } = await svc
+      .from("quotes")
+      .select("quote_number, customers(name, email, phone, sms_consent)")
+      .eq("id", quoteId)
+      .single();
+    const customer = (
+      Array.isArray(full?.customers) ? full.customers[0] : full?.customers
+    ) as {
+      name: string;
+      email: string | null;
+      phone: string | null;
+      sms_consent: boolean | null;
+    } | null;
+    if (full && customer) {
+      await enqueueCustomerNotification(svc, {
+        company_id: ctx.company.id,
+        recipient_type: "customer",
+        recipient_id: ctx.customer.id,
+        template: "quote_approved",
+        payload: {
+          recipient_name: customer.name,
+          company_name: ctx.company.name,
+          quote_number: full.quote_number,
+        },
+        contact: {
+          email: customer.email,
+          phone: customer.phone,
+          smsConsent: customer.sms_consent ?? false,
+        },
+      });
+    }
+  }
 
   revalidatePath(`/p/${token}`);
   revalidatePath(`/p/${token}/quotes/${quoteId}`);
