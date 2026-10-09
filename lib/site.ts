@@ -20,6 +20,8 @@ export const site = {
   ],
 } as const;
 
+import { PLANS, PLAN_IDS } from "./plans";
+
 export type Plan = {
   name: string;
   price: number;
@@ -29,50 +31,22 @@ export type Plan = {
   features: string[];
 };
 
-/** Suggested pricing — shown for illustration; final plans confirmed at launch. */
-export const plans: Plan[] = [
-  {
-    name: "Starter",
-    price: 49,
-    blurb: "For solo cleaners getting organized.",
-    cta: "Start free trial",
-    features: [
-      "1 user",
-      "Up to 50 active customers",
-      "Quotes & bookings",
-      "Basic invoicing",
-      "Email support",
-    ],
-  },
-  {
-    name: "Growth",
-    price: 99,
-    blurb: "For growing teams winning more jobs.",
-    cta: "Start free trial",
-    featured: true,
-    features: [
-      "Up to 5 users",
-      "Unlimited customers",
-      "Recurring bookings",
-      "Customer portal",
-      "Crew scheduling & conflict alerts",
-      "Priority support",
-    ],
-  },
-  {
-    name: "Pro",
-    price: 199,
-    blurb: "For established companies running crews.",
-    cta: "Talk to us",
-    features: [
-      "Unlimited users",
-      "Multi-crew scheduling",
-      "Before/after photo uploads",
-      "Business reports",
-      "Dedicated onboarding",
-    ],
-  },
-];
+/**
+ * Marketing plans, derived from the single source of truth in lib/plans.ts
+ * (which also drives the dashboard billing page, seat limits, and feature
+ * gating) so the landing page can never drift from the dashboard again.
+ */
+export const plans: Plan[] = PLAN_IDS.map((id) => {
+  const p = PLANS[id];
+  return {
+    name: p.name,
+    price: p.priceCents / 100,
+    blurb: p.blurb,
+    cta: id === "pro" ? "Talk to us" : "Start free trial",
+    featured: id === "growth",
+    features: p.features,
+  };
+});
 
 export type Faq = { q: string; a: string };
 

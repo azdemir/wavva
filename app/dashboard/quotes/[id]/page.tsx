@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireCompany } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { setQuoteStatus, deleteQuote } from "@/lib/actions/quotes";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { QuoteStatusPill, statusLabel, type QuoteStatus } from "@/components/ui/badge";
+import { PrinterIcon } from "@/components/ui/icons";
 import { formatCents, formatDate } from "@/lib/format";
 import { one } from "@/lib/relations";
 import { FollowupStatus } from "@/components/quotes/followup-status";
@@ -29,7 +30,7 @@ export default async function QuoteDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { company } = await requireCompany();
+  const { company } = await requirePermission("quotes.manage");
   const supabase = await createClient();
 
   // One round trip: line items come embedded with the parent quote,
@@ -61,7 +62,12 @@ export default async function QuoteDetailPage({
           title={`Quote ${quote.quote_number}`}
           description={`${customer?.name ?? "Customer"} · created ${formatDate(quote.created_at)}`}
         />
-        <QuoteStatusPill status={quote.status as QuoteStatus} className="text-sm" />
+        <div className="flex items-center gap-2">
+          <QuoteStatusPill status={quote.status as QuoteStatus} className="text-sm" />
+          <Button href={`/dashboard/quotes/${id}/print`} variant="outline" size="sm">
+            <PrinterIcon className="h-4 w-4" /> Print
+          </Button>
+        </div>
       </div>
 
       <Card>

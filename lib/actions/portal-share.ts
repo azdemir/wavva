@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { requireCompany } from "@/lib/auth";
+import { isStaff, NOT_PERMITTED } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { one } from "@/lib/relations";
 import { rateLimit } from "@/lib/rate-limit";
@@ -20,7 +21,8 @@ export async function sendPortalLinkEmail(
   const parsed = schema.safeParse({ customerId, link });
   if (!parsed.success) return { ok: false, error: "Invalid request." };
 
-  const { company } = await requireCompany();
+  const { company, membership } = await requireCompany();
+  if (!isStaff(membership.role)) return { ok: false, error: NOT_PERMITTED };
 
   // Rate limit: 10 portal emails per hour.
   const rl = await rateLimit("portal-email", 10, 60 * 60 * 1000);

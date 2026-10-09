@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireCompany } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,7 +11,7 @@ export default async function NewBookingPage({
 }: {
   searchParams: Promise<{ quoteId?: string }>;
 }) {
-  const { company } = await requireCompany();
+  const { company } = await requirePermission("bookings.manage");
   const supabase = await createClient();
   const { quoteId } = await searchParams;
 

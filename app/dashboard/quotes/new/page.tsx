@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { requireCompany } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent } from "@/components/ui/card";
 import { QuoteBuilder } from "@/components/quotes/quote-builder";
 
 export default async function NewQuotePage() {
-  const { company } = await requireCompany();
+  const { company } = await requirePermission("quotes.manage");
   const supabase = await createClient();
 
   const [{ data: customers }, { data: services }, { data: addons }] = await Promise.all([

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { requireCompany } from "@/lib/auth";
+import { isStaff, NOT_PERMITTED } from "@/lib/permissions";
 import { logAudit } from "@/lib/audit";
 import { getStripe } from "@/lib/stripe";
 import { getPortalContext } from "@/lib/portal";
@@ -13,6 +14,7 @@ export async function getOrCreatePortalLink(
   baseUrl: string,
 ): Promise<{ error?: string; link?: string }> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const supabase = await createClient();
 
   const { data: customer } = await supabase
@@ -56,6 +58,7 @@ export async function getOrCreatePortalLink(
 /** Company member: revoke all portal links for a customer. */
 export async function revokePortalLinks(customerId: string) {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const supabase = await createClient();
   await supabase
     .from("portal_tokens")

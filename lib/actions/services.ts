@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireCompany } from "@/lib/auth";
+import { isStaff, NOT_PERMITTED } from "@/lib/permissions";
 import { logAudit } from "@/lib/audit";
 import { serviceSchema, addonSchema } from "@/lib/validation";
 
@@ -15,6 +16,7 @@ function dollarsToCents(v: FormDataEntryValue | null): number {
 
 export async function createService(formData: FormData): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const parsed = serviceSchema.safeParse({
     name: formData.get("name"),
     category: formData.get("category"),
@@ -51,6 +53,7 @@ export async function createService(formData: FormData): Promise<ActionResult> {
 
 export async function updateService(id: string, formData: FormData): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const parsed = serviceSchema.safeParse({
     name: formData.get("name"),
     category: formData.get("category"),
@@ -79,6 +82,7 @@ export async function updateService(id: string, formData: FormData): Promise<Act
 
 export async function setServiceActive(id: string, active: boolean): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const supabase = await createClient();
   const { error } = await supabase
     .from("services")
@@ -92,6 +96,7 @@ export async function setServiceActive(id: string, active: boolean): Promise<Act
 
 export async function deleteService(id: string): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const supabase = await createClient();
 
   const [{ count: quoteRefs }, { count: bookingRefs }] = await Promise.all([
@@ -117,6 +122,7 @@ export async function deleteService(id: string): Promise<ActionResult> {
 
 export async function createAddon(formData: FormData): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const parsed = addonSchema.safeParse({
     name: formData.get("name"),
     price_cents: dollarsToCents(formData.get("price")),
@@ -136,6 +142,7 @@ export async function createAddon(formData: FormData): Promise<ActionResult> {
 
 export async function updateAddon(id: string, formData: FormData): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const parsed = addonSchema.safeParse({
     name: formData.get("name"),
     price_cents: dollarsToCents(formData.get("price")),
@@ -155,6 +162,7 @@ export async function updateAddon(id: string, formData: FormData): Promise<Actio
 
 export async function setAddonActive(id: string, active: boolean): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const supabase = await createClient();
   const { error } = await supabase
     .from("addons")
@@ -168,6 +176,7 @@ export async function setAddonActive(id: string, active: boolean): Promise<Actio
 
 export async function deleteAddon(id: string): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const supabase = await createClient();
 
   const { count } = await supabase

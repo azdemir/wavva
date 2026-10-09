@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireCompany } from "@/lib/auth";
+import { isStaff, NOT_PERMITTED } from "@/lib/permissions";
 import { logAudit } from "@/lib/audit";
 import { bookingSchema } from "@/lib/validation";
 import { localInputToUtc } from "@/lib/dates";
@@ -38,6 +39,7 @@ function occurrences(start: Date, end: Date, recurrence: string): Occurrence[] {
 
 export async function createBooking(input: unknown): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const parsed = bookingSchema.safeParse(input);
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid booking." };
@@ -155,6 +157,7 @@ export async function rescheduleBooking(
   newEndInput: string,
 ): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const tz = ctx.company.timezone || "America/New_York";
   const newStart = localInputToUtc(newStartInput, tz);
   const newEnd = localInputToUtc(newEndInput, tz);
@@ -210,6 +213,7 @@ export async function rescheduleBooking(
 
 export async function cancelBooking(id: string): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const supabase = await createClient();
 
   const { error: bErr } = await supabase

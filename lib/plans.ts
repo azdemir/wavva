@@ -22,21 +22,29 @@ export const PLANS: Record<PlanId, Plan> = {
     id: "starter",
     name: "Starter",
     priceCents: 4900,
-    seats: 3,
+    seats: 1,
     blurb: "For solo cleaners getting organized.",
-    features: ["Up to 3 team seats", "Quotes & bookings", "Invoices & customer portal", "Email notifications"],
+    features: [
+      "1 user",
+      "Up to 50 active customers",
+      "Quotes & bookings",
+      "Basic invoicing",
+      "Email support",
+    ],
   },
   growth: {
     id: "growth",
     name: "Growth",
     priceCents: 9900,
-    seats: 10,
-    blurb: "For growing crews that need scheduling muscle.",
+    seats: 5,
+    blurb: "For growing teams winning more jobs.",
     features: [
-      "Up to 10 team seats",
-      "Everything in Starter",
-      "Week schedule view",
-      "Job checklists & crew assignment",
+      "Up to 5 users",
+      "Unlimited customers",
+      "Recurring bookings",
+      "Customer portal",
+      "Crew scheduling & conflict alerts",
+      "Priority support",
     ],
   },
   pro: {
@@ -44,12 +52,13 @@ export const PLANS: Record<PlanId, Plan> = {
     name: "Pro",
     priceCents: 19900,
     seats: null,
-    blurb: "For established companies running multiple crews.",
+    blurb: "For established companies running crews.",
     features: [
-      "Unlimited team seats",
-      "Everything in Growth",
-      "Platform admin reporting",
-      "Priority support",
+      "Unlimited users",
+      "Multi-crew scheduling",
+      "Before/after photo uploads",
+      "Business reports",
+      "Dedicated onboarding",
     ],
   },
 };
@@ -82,7 +91,7 @@ export function seatsAvailable(plan: PlanId, memberCount: number): boolean {
 
 export function seatLimitLabel(plan: PlanId): string {
   const limit = PLANS[plan].seats;
-  return limit === null ? "Unlimited" : `${limit} seats`;
+  return limit === null ? "Unlimited" : `${limit} seat${limit === 1 ? "" : "s"}`;
 }
 
 /**

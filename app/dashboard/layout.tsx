@@ -22,6 +22,7 @@ import {
 import { Logo, LogoMark } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { hasFeature, type PlanFeature } from "@/lib/plans";
+import { type Role } from "@/lib/permissions";
 
 type NavItem = {
   href: string;
@@ -30,28 +31,34 @@ type NavItem = {
   soon?: boolean;
   /** If set, only shown to plans that include this feature. */
   feature?: PlanFeature;
+  /** If set, only shown to these roles. Omitted = everyone. */
+  roles?: Role[];
 };
 
+const STAFF: Role[] = ["owner", "manager"];
+
 const nav: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard", icon: HomeIcon },
-  { href: "/dashboard/customers", label: "Customers", icon: UsersIcon },
-  { href: "/dashboard/services", label: "Services & Pricing", icon: TagIcon },
-  { href: "/dashboard/quotes", label: "Quotes", icon: QuoteIcon },
-  { href: "/dashboard/bookings", label: "Bookings", icon: CalendarIcon },
-  { href: "/dashboard/jobs", label: "Jobs", icon: ClockIcon },
-  { href: "/dashboard/schedule", label: "Schedule", icon: CalendarIcon, feature: "schedule" },
+  { href: "/dashboard", label: "Dashboard", icon: HomeIcon, roles: STAFF },
+  { href: "/dashboard/customers", label: "Customers", icon: UsersIcon, roles: STAFF },
+  { href: "/dashboard/services", label: "Services & Pricing", icon: TagIcon, roles: STAFF },
+  { href: "/dashboard/quotes", label: "Quotes", icon: QuoteIcon, roles: STAFF },
+  { href: "/dashboard/bookings", label: "Bookings", icon: CalendarIcon, roles: STAFF },
+  { href: "/dashboard/jobs", label: "Jobs", icon: ClockIcon, roles: STAFF },
+  { href: "/dashboard/schedule", label: "Schedule", icon: CalendarIcon, feature: "schedule", roles: STAFF },
   { href: "/dashboard/my-jobs", label: "My jobs", icon: ClockIcon },
-  { href: "/dashboard/invoices", label: "Invoices", icon: CardIcon },
-  { href: "/dashboard/reports", label: "Reports", icon: ChartIcon, feature: "reports" },
-  { href: "/dashboard/billing", label: "Billing", icon: CardIcon },
-  { href: "/dashboard/team", label: "Team", icon: UsersIcon },
-  { href: "/dashboard/settings", label: "Settings", icon: GearIcon },
-  { href: "/dashboard/audit", label: "Audit log", icon: BellIcon },
+  { href: "/dashboard/invoices", label: "Invoices", icon: CardIcon, roles: STAFF },
+  { href: "/dashboard/reports", label: "Reports", icon: ChartIcon, feature: "reports", roles: ["owner"] },
+  { href: "/dashboard/billing", label: "Billing", icon: CardIcon, roles: ["owner"] },
+  { href: "/dashboard/team", label: "Team", icon: UsersIcon, roles: ["owner"] },
+  { href: "/dashboard/settings", label: "Settings", icon: GearIcon, roles: ["owner"] },
+  { href: "/dashboard/audit", label: "Audit log", icon: BellIcon, roles: ["owner"] },
 ];
 
-function NavLinks({ onNavigate, plan }: { onNavigate?: () => void; plan: "starter" | "growth" | "pro" }) {
+function NavLinks({ onNavigate, plan, role }: { onNavigate?: () => void; plan: "starter" | "growth" | "pro"; role: Role }) {
   const visible = nav.filter(
-    (item) => !item.feature || hasFeature(plan, item.feature),
+    (item) =>
+      (!item.feature || hasFeature(plan, item.feature)) &&
+      (!item.roles || item.roles.includes(role)),
   );
   return (
     <nav className="space-y-1" aria-label="Workspace">
@@ -118,7 +125,7 @@ export default async function DashboardLayout({
 <LogoMark className="h-9 w-9" />
           </Link>
           <div className="flex-1 overflow-y-auto px-3">
-            <NavLinks plan={plan} />
+            <NavLinks plan={plan} role={membership.role} />
           </div>
           <div className="border-t border-slate-200 p-4 dark:border-slate-800">
             <p className="truncate text-sm font-semibold text-slate-900">
@@ -143,7 +150,7 @@ export default async function DashboardLayout({
       </aside>
 
       {/* Mobile header */}
-      <div className="border-b border-slate-200 bg-white md:hidden dark:border-slate-800 dark:bg-slate-900">
+      <div className="no-print border-b border-slate-200 bg-white md:hidden dark:border-slate-800 dark:bg-slate-900">
         <div className="flex items-center justify-between px-4 py-3">
           <Link href="/dashboard" className="flex items-center gap-2">
 <Logo />
@@ -170,7 +177,7 @@ export default async function DashboardLayout({
               ⌂ Home
             </Link>
             {nav
-              .filter((n) => !n.soon && (!n.feature || hasFeature(plan, n.feature)))
+              .filter((n) => !n.soon && (!n.feature || hasFeature(plan, n.feature)) && (!n.roles || n.roles.includes(membership.role)))
               .map((item) => (
                 <Link
                   key={item.href}

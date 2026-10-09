@@ -1,11 +1,11 @@
-import { requireCompany } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ServiceManager, AddonManager } from "@/components/services/catalog";
 
 export default async function ServicesPage() {
-  const { company } = await requireCompany();
+  const { company } = await requirePermission("services.manage");
   const supabase = await createClient();
 
   const [{ data: services }, { data: addons }] = await Promise.all([

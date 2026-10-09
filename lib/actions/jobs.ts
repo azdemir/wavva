@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { requireCompany } from "@/lib/auth";
+import { requireCompany, type Membership, type Company } from "@/lib/auth";
+import { isStaff, NOT_PERMITTED } from "@/lib/permissions";
 import { logAudit } from "@/lib/audit";
 import { one } from "@/lib/relations";
 import { baseUrl } from "@/lib/base-url";
@@ -16,17 +17,28 @@ async function getJob(id: string, companyId: string) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("jobs")
-    .select("id, status")
+    .select("id, status, assigned_user_ids")
     .eq("id", id)
     .eq("company_id", companyId)
     .single();
-  return { supabase, job: data };
+  return { supabase, job: data as { id: string; status: string; assigned_user_ids: string[] | null } | null };
+}
+
+/** Staff can work any job; cleaners only jobs assigned to them. */
+function canWorkJob(
+  ctx: { membership: Membership; company: Company },
+  job: { assigned_user_ids: string[] | null } | null,
+): boolean {
+  if (isStaff(ctx.membership.role)) return true;
+  if (!job) return false;
+  return (job.assigned_user_ids ?? []).includes(ctx.membership.user_id);
 }
 
 export async function startJob(id: string): Promise<ActionResult> {
   const ctx = await requireCompany();
   const { supabase, job } = await getJob(id, ctx.company.id);
   if (!job) return { error: "Job not found." };
+  if (!canWorkJob(ctx, job)) return { error: NOT_PERMITTED };
   if (job.status !== "scheduled") return { error: "Only scheduled jobs can be started." };
 
   const { error } = await supabase
@@ -52,6 +64,7 @@ export async function completeJob(id: string, formData: FormData): Promise<Actio
   const ctx = await requireCompany();
   const { supabase, job } = await getJob(id, ctx.company.id);
   if (!job) return { error: "Job not found." };
+  if (!canWorkJob(ctx, job)) return { error: NOT_PERMITTED };
   if (!["scheduled", "in_progress"].includes(job.status)) {
     return { error: "This job can't be completed from its current state." };
   }
@@ -82,6 +95,7 @@ export async function completeJob(id: string, formData: FormData): Promise<Actio
 
 export async function cancelJob(id: string): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const { supabase, job } = await getJob(id, ctx.company.id);
   if (!job) return { error: "Job not found." };
   if (job.status === "completed") return { error: "Completed jobs can't be canceled." };
@@ -108,6 +122,7 @@ export async function cancelJob(id: string): Promise<ActionResult> {
 /** Replace the crew assigned to a job. */
 export async function assignJob(id: string, userIds: string[]): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const supabase = await createClient();
 
   // Every assignee must be a member of this company.
@@ -188,6 +203,17 @@ export async function saveChecklist(id: string, items: unknown): Promise<ActionR
   if (!parsed.success) return { error: "Invalid checklist." };
 
   const supabase = await createClient();
+  const { data: job } = await supabase
+    .from("jobs")
+    .select("assigned_user_ids")
+    .eq("id", id)
+    .eq("company_id", ctx.company.id)
+    .single();
+  if (!job) return { error: "Job not found." };
+  if (!canWorkJob(ctx, job as { assigned_user_ids: string[] | null })) {
+    return { error: NOT_PERMITTED };
+  }
+
   const { error } = await supabase
     .from("jobs")
     .update({ checklist: parsed.data })
@@ -200,6 +226,7 @@ export async function saveChecklist(id: string, items: unknown): Promise<ActionR
 
 export async function saveJobNotes(id: string, formData: FormData): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const supabase = await createClient();
   const { error } = await supabase
     .from("jobs")

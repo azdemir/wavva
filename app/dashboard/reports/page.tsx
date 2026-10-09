@@ -1,4 +1,4 @@
-import { requireCompany } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { one } from "@/lib/relations";
 import { Heading } from "@/components/ui/heading";
@@ -36,7 +36,7 @@ function monthLabel(key: string) {
 }
 
 export default async function ReportsPage() {
-  const { company } = await requireCompany();
+  const { company } = await requirePermission("reports.view");
   const plan = isPlanId(company.plan) ? company.plan : "starter";
 
   if (!hasFeature(plan, "reports")) {

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireCompany } from "@/lib/auth";
+import { isStaff, NOT_PERMITTED } from "@/lib/permissions";
 import { logAudit } from "@/lib/audit";
 import { quoteSchema } from "@/lib/validation";
 import { computeTotals, nextNumber } from "@/lib/pricing";
@@ -26,6 +27,7 @@ const transitions: Record<string, string[]> = {
 
 export async function createQuote(input: unknown): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const parsed = quoteSchema.safeParse(input);
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid quote." };
@@ -106,6 +108,7 @@ export async function createQuote(input: unknown): Promise<ActionResult> {
 
 export async function setQuoteStatus(id: string, status: string): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const supabase = await createClient();
 
   const { data: quote } = await supabase
@@ -176,6 +179,7 @@ export async function setQuoteStatus(id: string, status: string): Promise<Action
 
 export async function deleteQuote(id: string): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const supabase = await createClient();
 
   const { data: quote } = await supabase

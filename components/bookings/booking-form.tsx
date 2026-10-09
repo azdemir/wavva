@@ -52,21 +52,34 @@ export function BookingForm({
   }
 
   async function submit() {
+    // Instant check before the round trip: the end must be after the start.
+    if (start && end && new Date(end).getTime() <= new Date(start).getTime()) {
+      setError("End time must be after start time.");
+      return;
+    }
     setPending(true);
     setError(null);
-    const result = await createBooking({
-      customer_id: customerId,
-      service_address_id: addressId,
-      service_id: serviceId || "",
-      quote_id: prefill?.quoteId || "",
-      recurrence,
-      scheduled_start: start,
-      scheduled_end: end,
-      notes,
-    });
-    setPending(false);
-    if (result?.error) setError(result.error);
-    // Success redirects to the booking detail page.
+    try {
+      const result = await createBooking({
+        customer_id: customerId,
+        service_address_id: addressId,
+        service_id: serviceId || "",
+        quote_id: prefill?.quoteId || "",
+        recurrence,
+        scheduled_start: start,
+        scheduled_end: end,
+        notes,
+      });
+      if (result?.error) setError(result.error);
+      // Success redirects to the booking detail page.
+    } catch (e) {
+      // A successful create navigates away via redirect() — let that through.
+      const digest = (e as { digest?: unknown })?.digest;
+      if (typeof digest === "string" && digest.startsWith("NEXT_REDIRECT")) throw e;
+      setError("Couldn't create the booking. Please check your connection and try again.");
+    } finally {
+      setPending(false);
+    }
   }
 
   return (

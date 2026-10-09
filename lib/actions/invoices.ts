@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { requireCompany } from "@/lib/auth";
+import { isStaff, NOT_PERMITTED } from "@/lib/permissions";
 import { logAudit } from "@/lib/audit";
 import { computeTotals, nextNumber } from "@/lib/pricing";
 import { one } from "@/lib/relations";
@@ -32,6 +33,7 @@ const invoiceSchema = z.object({
 
 export async function createInvoice(input: unknown): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const parsed = invoiceSchema.safeParse(input);
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid invoice." };
@@ -111,6 +113,7 @@ const invoiceTransitions: Record<string, string[]> = {
 
 export async function setInvoiceStatus(id: string, status: string): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const supabase = await createClient();
 
   const { data: invoice } = await supabase
@@ -176,6 +179,7 @@ export async function setInvoiceStatus(id: string, status: string): Promise<Acti
 /** Record an offline payment (cash, check, bank transfer). */
 export async function recordPayment(id: string, formData: FormData): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const amountCents = Math.round(Number(formData.get("amount") || 0) * 100);
   if (!(amountCents > 0)) return { error: "Enter a payment amount." };
 
@@ -227,6 +231,7 @@ export async function recordPayment(id: string, formData: FormData): Promise<Act
 
 export async function deleteInvoice(id: string): Promise<ActionResult> {
   const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const supabase = await createClient();
 
   const { data: invoice } = await supabase

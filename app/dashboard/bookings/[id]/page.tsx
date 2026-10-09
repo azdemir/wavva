@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireCompany } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { rescheduleBooking, cancelBooking } from "@/lib/actions/bookings";
 import { Heading } from "@/components/ui/heading";
@@ -23,7 +23,7 @@ export default async function BookingDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { company } = await requireCompany();
+  const { company } = await requirePermission("bookings.manage");
   const supabase = await createClient();
   const tz = company.timezone || "America/New_York";
 

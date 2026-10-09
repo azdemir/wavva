@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { requireCompany } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { dayBoundsUtc } from "@/lib/dates";
@@ -17,7 +18,9 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { PlusIcon, CalendarIcon, QuoteIcon, UsersIcon, CardIcon } from "@/components/ui/icons";
 
 export default async function DashboardPage() {
-  const { company } = await requireCompany();
+  const { membership, company } = await requireCompany();
+  // Cleaners work from My jobs — the stats dashboard is staff-only.
+  if (membership.role === "cleaner") redirect("/dashboard/my-jobs");
   const supabase = await createClient();
   const tz = company.timezone || "America/New_York";
   const { start, end } = dayBoundsUtc(tz);
