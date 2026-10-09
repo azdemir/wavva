@@ -37,14 +37,14 @@ export const metadata: Metadata = {
     description:
       "Quotes, scheduling, teams, invoicing, and customers in one simple place for cleaning businesses.",
     url: "/",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "TidyPro" }],
+    images: [{ url: "/og-image.jpg", width: 1000, height: 525, alt: "TidyPro" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "TidyPro — Operations software for cleaning businesses",
     description:
       "Quotes, scheduling, teams, invoicing, and customers in one simple place for cleaning businesses.",
-    images: ["/og-image.png"],
+    images: ["/og-image.jpg"],
   },
   robots: {
     index: true,
