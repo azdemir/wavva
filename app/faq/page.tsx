@@ -4,6 +4,8 @@ import { Footer } from "@/components/marketing/footer";
 import { Cta } from "@/components/marketing/cta";
 import { PageHero } from "@/components/marketing/page-hero";
 import { Container } from "@/components/ui/container";
+import { getContent } from "@/lib/studio/content";
+
 
 export const metadata: Metadata = {
   title: "FAQ",
@@ -11,83 +13,32 @@ export const metadata: Metadata = {
     "Answers about getting started with TidyPro, the product, billing, and how your business data stays private.",
 };
 
-type FaqGroup = { title: string; items: { q: string; a: string }[] };
+type FaqEntry = { group: string; q: string; a: string };
 
-const groups: FaqGroup[] = [
-  {
-    title: "Getting started",
-    items: [
-      {
-        q: "Is TidyPro only for cleaning businesses in Upstate New York?",
-        a: "We designed TidyPro with Upstate cleaners in mind — service areas by city, county, ZIP code, or radius, Eastern Time scheduling, and USD pricing. But any residential or commercial cleaning business in the US can use it.",
-      },
-      {
-        q: "I'm not technical. Is it hard to set up?",
-        a: "No. A guided setup walks you through your business profile, services, pricing, and service area, then helps you invite your team. Most owners finish in under 30 minutes, and there's no software to install.",
-      },
-      {
-        q: "What happens after my 14-day trial?",
-        a: "Choose a plan to keep going — we'll remind you before the trial ends. If you don't pick a plan, your workspace is paused, not deleted, and you can reactivate it anytime.",
-      },
-      {
-        q: "Do you offer onboarding help?",
-        a: "Every plan includes a guided setup wizard and email support. The Pro plan adds dedicated onboarding where we help configure your services, pricing, and team.",
-      },
-    ],
-  },
-  {
-    title: "Product",
-    items: [
-      {
-        q: "Can my cleaners use it on their phones?",
-        a: "Yes. Job views are designed mobile-first: cleaners see their day's jobs, tap into job details, work through checklists, upload before-and-after photos, and mark jobs complete — all from a phone browser.",
-      },
-      {
-        q: "I run multiple crews. Can TidyPro handle that?",
-        a: "Yes. The Growth plan includes crew scheduling with conflict alerts, and Pro adds multi-crew scheduling views plus business reports for larger operations.",
-      },
-      {
-        q: "Can customers reschedule without calling me?",
-        a: "Yes — through the customer portal, using the cancellation and rescheduling rules you configure for your business. You stay in control of the policy; customers get the convenience.",
-      },
-      {
-        q: "Where do job photos go?",
-        a: "Before-and-after photos upload from the job site into secure storage attached to the job record (Pro plan). They're visible to your team and can be shared with the customer through their portal.",
-      },
-    ],
-  },
-  {
-    title: "Billing & privacy",
-    items: [
-      {
-        q: "How do my customers pay me?",
-        a: "You create and send invoices from TidyPro, and customers pay by card through their customer portal. Payments go directly to your business account — completely separate from your TidyPro subscription.",
-      },
-      {
-        q: "Does TidyPro handle sales tax for me?",
-        a: "You can configure tax rates on your invoices, but tax rules vary by location and situation. Have your accountant verify what's required for your business — we don't assume tax requirements on your behalf.",
-      },
-      {
-        q: "Can I cancel anytime?",
-        a: "Yes. Plans are month-to-month with no contracts, and you keep access until the end of your billing period.",
-      },
-      {
-        q: "Is my business data private from other cleaning companies?",
-        a: "Yes. Every company gets its own private workspace — your customers, staff, schedules, and financial records are isolated and never visible to any other company on the platform.",
-      },
-    ],
-  },
-];
+export default async function FaqPage() {
+  const [eyebrow, title, description, entries] = await Promise.all([
+    getContent<string>("faq.hero.eyebrow"),
+    getContent<string>("faq.hero.title"),
+    getContent<string>("faq.hero.description"),
+    getContent<FaqEntry[]>("faq.groups"),
+  ]);
+  // Group flat entries under their headings, preserving order.
+  const grouped = new Map<string, FaqEntry[]>();
+  for (const e of entries) {
+    const list = grouped.get(e.group) ?? [];
+    list.push(e);
+    grouped.set(e.group, list);
+  }
+  const groups = [...grouped.entries()].map(([gtitle, items]) => ({ title: gtitle, items }));
 
-export default function FaqPage() {
   return (
     <>
       <Navbar />
       <main>
         <PageHero
-          eyebrow="FAQ"
-          title="Questions cleaning owners ask us"
-          description="Straight answers — including the ones about tax, payments, and privacy."
+          eyebrow={eyebrow}
+          title={title}
+          description={description}
         />
 
         <section className="bg-white py-16 sm:py-20 dark:bg-slate-950">

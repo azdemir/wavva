@@ -228,3 +228,54 @@ test.describe("Mobile viewport (390px)", () => {
     await expect(table).toBeVisible();
   });
 });
+
+test.describe("Studio (founder HQ) end-to-end", () => {
+  const studioRoutes = ["/studio", "/studio/website", "/studio/crm", "/studio/crm/new"];
+
+  for (const route of studioRoutes) {
+    test(`${route} redirects anonymous visitors to the homepage`, async ({
+      page,
+    }) => {
+      await page.goto(route);
+      await page.waitForURL((url) => !url.pathname.startsWith("/studio"), {
+        timeout: 20000,
+      });
+      expect(new URL(page.url()).pathname).toBe("/");
+    });
+  }
+
+  test("trial request page renders a working form", async ({ page }) => {
+    const errors = await watchErrors(page);
+    await page.goto("/demo");
+    await expect(
+      page.getByRole("heading", { name: /free 14-day trial/i }),
+    ).toBeVisible();
+    await expect(page.getByLabel(/your name/i)).toBeVisible();
+    await expect(page.getByLabel(/company name/i)).toBeVisible();
+    await expect(page.getByLabel(/work email/i)).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /request my trial/i }),
+    ).toBeVisible();
+    expectCleanConsole(errors, "/demo");
+  });
+
+  test("marketing pages render CMS-driven sections", async ({ page }) => {
+    const errors = await watchErrors(page);
+    await page.goto("/");
+    // Hero (CMS: home.hero.*), proof strip, features, stories, FAQ, CTA.
+    await expect(
+      page.getByRole("heading", { name: /run your cleaning business/i }),
+    ).toBeVisible();
+    await expect(page.getByText(/flat pricing, no per-user fees/i)).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /everything a cleaning business needs/i }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /loved by cleaning businesses/i }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /questions cleaning owners ask us/i }),
+    ).toBeVisible();
+    expectCleanConsole(errors, "/ (cms sections)");
+  });
+});

@@ -64,6 +64,33 @@ All notable changes to TidyPro. Dates are in America/New_York.
   tidy place." / "without missed calls." / "that follows up for you."),
   respecting `prefers-reduced-motion`; removed the dead space the old
   placeholder headline reserved.
+- **TidyPro Studio (founder HQ)** — new `/studio` area for the founder and
+  developer, gated by the existing `PLATFORM_ADMIN_EMAILS` allowlist.
+  - **No-code website editor** (`/studio/website`): a low-code CMS backed by a
+    new `site_content` table (migration `0009_studio.sql`). A content registry
+    (`lib/studio/registry.ts`) defines every editable marketing field with its
+    control type, default, and affected routes — adding a registry entry
+    automatically generates its editor field, so no editor UI code is needed
+    for new fields. Covers global brand fields plus the home hero, rotating
+    headlines, proof cards, features, workflow steps, pricing headings,
+    testimonials, FAQ, CTA, and the features/pricing/FAQ/contact/demo page
+    sections. Saving validates against the registry and purges the CMS cache
+    tag + revalidates affected routes, so edits go live without a redeploy;
+    Reset restores the code default. All marketing pages keep code fallbacks
+    and render even when Supabase is unreachable.
+  - **Founder CRM** (`/studio/crm`): lead pipeline with stages (New,
+    Contacted, On trial, Customer, Lost), kanban board, manual lead entry,
+    lead detail with stage movement/deal value/notes, activity timeline
+    (notes, calls, emails, meetings, automatic stage-change entries), and an
+    overview dashboard (companies, users, MRR estimate, pipeline value, latest
+    leads). New `crm_contacts` + `crm_activities` tables (same migration).
+  - **Trial + contact lead capture**: `/demo` is now a working trial-request
+    form (validated, rate-limited); submissions become CRM leads
+    (`source=trial`, duplicate emails update the existing lead). Contact-form
+    submissions are also recorded as CRM leads. Owner notification via Resend
+    is best-effort.
+  - Studio routes redirect anonymous visitors to the homepage (covered by new
+    Playwright tests).
 
 ### Changed
 

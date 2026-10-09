@@ -12,6 +12,8 @@ import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckIcon } from "@/components/ui/icons";
+import { getContent } from "@/lib/studio/content";
+
 
 export const metadata: Metadata = {
   title: "Pricing",
@@ -31,34 +33,21 @@ const comparisonRows: { label: string; values: (string | boolean)[] }[] = [
   { label: "Support", values: ["Email", "Priority", "Dedicated onboarding"] },
 ];
 
-const billingFaqs = [
-  {
-    q: "How does billing work?",
-    a: "TidyPro is a monthly subscription per cleaning company — not per customer. Your subscription is completely separate from the payments your customers make to you, which go directly to your business.",
-  },
-  {
-    q: "Can I cancel anytime?",
-    a: "Yes. Plans are month-to-month with no contracts. If you cancel, you keep access until the end of your billing period.",
-  },
-  {
-    q: "What counts as a user?",
-    a: "Each team member who logs in — owners, managers, and cleaners. Your customers don't count as users; they use the free customer portal.",
-  },
-  {
-    q: "Do my customers pay extra to use the portal?",
-    a: "No. The customer portal is included in your plan at no extra cost to your customers.",
-  },
-];
-
-export default function PricingPage() {
+export default async function PricingPage() {
+  const [heroEyebrow, heroTitle, heroDescription, faqs] = await Promise.all([
+    getContent<string>("pricing.hero.eyebrow"),
+    getContent<string>("pricing.hero.title"),
+    getContent<string>("pricing.hero.description"),
+    getContent<{ q: string; a: string }[]>("pricing.billing_faqs"),
+  ]);
   return (
     <>
       <Navbar />
       <main>
         <PageHero
-          eyebrow="Pricing"
-          title="Simple pricing that pays for itself"
-          description="One extra booking a month covers TidyPro for most companies. Start free for 14 days — no credit card required."
+          eyebrow={heroEyebrow}
+          title={heroTitle}
+          description={heroDescription}
         />
 
         <section className="bg-white pt-4 pb-16 sm:pb-20 dark:bg-slate-950">
@@ -142,7 +131,7 @@ export default function PricingPage() {
               title="How billing works"
             />
             <div className="mx-auto mt-10 grid max-w-4xl gap-6 md:grid-cols-2">
-              {billingFaqs.map((f) => (
+              {faqs.map((f) => (
                 <Card key={f.q}>
                   <CardContent>
                     <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">

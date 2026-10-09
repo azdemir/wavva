@@ -7,21 +7,38 @@ import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ContactForm } from "@/components/marketing/contact-form";
+import { getContent } from "@/lib/studio/content";
+
 
 export const metadata: Metadata = {
   title: "Contact",
   description: `Contact the ${site.name} team about plans, the pilot program, or whether TidyPro fits your cleaning business.`,
 };
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const [
+    heroEyebrow,
+    heroTitle,
+    heroDescription,
+    pilotTitle,
+    pilotBody,
+    siteEmail,
+  ] = await Promise.all([
+    getContent<string>("contact.hero.eyebrow"),
+    getContent<string>("contact.hero.title"),
+    getContent<string>("contact.hero.description"),
+    getContent<string>("contact.pilot.title"),
+    getContent<string>("contact.pilot.body"),
+    getContent<string>("site.email"),
+  ]);
   return (
     <>
       <Navbar />
       <main>
         <PageHero
-          eyebrow="Contact"
-          title="Talk to us"
-          description="Questions about plans, the pilot program, or whether TidyPro fits your business — we reply within one business day."
+          eyebrow={heroEyebrow}
+          title={heroTitle}
+          description={heroDescription}
         />
 
         <section className="bg-white py-16 sm:py-20 dark:bg-slate-950">
@@ -37,23 +54,20 @@ export default function ContactPage() {
                       The fastest way to reach a human.
                     </p>
                     <a
-                      href={`mailto:${site.email}`}
+                      href={`mailto:${siteEmail}`}
                       className="mt-3 inline-block text-base font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400"
                     >
-                      {site.email}
+                      {siteEmail}
                     </a>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent>
                     <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                      Join the pilot program
+                      {pilotTitle}
                     </h2>
                     <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                      We&apos;re onboarding a small group of cleaning businesses
-                      now and building the roadmap around their feedback. Pilot
-                      members get extra onboarding help and a voice in what we
-                      build next.
+                      {pilotBody}
                     </p>
                     <Button href="/demo" variant="outline" className="mt-4">
                       Start free trial

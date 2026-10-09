@@ -33,15 +33,26 @@ export function LogoMark({ className = "h-8 w-8" }: LogoMarkProps) {
 type LogoProps = {
   className?: string;
   markClassName?: string;
+  /** Override the wordmark (Studio CMS: site.name). Defaults to TidyPro. */
+  wordmark?: string;
 };
 
 /** Full lockup: mark + wordmark. */
-export function Logo({ className = "", markClassName = "h-8 w-8" }: LogoProps) {
+export function Logo({ className = "", markClassName = "h-8 w-8", wordmark }: LogoProps) {
+  const name = wordmark?.trim() || "TidyPro";
+  const proSuffix = name.endsWith("Pro") ? name.slice(0, -3) : null;
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
       <LogoMark className={markClassName} />
       <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
-        Tidy<span className="text-brand-600 dark:text-brand-400">Pro</span>
+        {proSuffix !== null ? (
+          <>
+            {proSuffix}
+            <span className="text-brand-600 dark:text-brand-400">Pro</span>
+          </>
+        ) : (
+          name
+        )}
       </span>
     </span>
   );
