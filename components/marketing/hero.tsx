@@ -6,6 +6,7 @@ import { ArrowRightIcon } from "@/components/ui/icons";
 import { DashboardTour } from "@/components/marketing/dashboard-tour";
 import { HeroHeadlines } from "@/components/marketing/hero-headlines";
 import { getSessionUser } from "@/lib/auth";
+import { getContent } from "@/lib/studio/content";
 
 /** Session-aware hero CTA. Streams in after the static shell. */
 async function HeroCta() {
@@ -24,17 +25,24 @@ async function HeroCta() {
   );
 }
 
-export function Hero() {
+export async function Hero() {
+  const [staticLine, dynamicLines, subcopy, trialNote, showTour] =
+    await Promise.all([
+      getContent<string>("home.hero.static_line"),
+      getContent<string[]>("home.hero.dynamic_lines"),
+      getContent<string>("home.hero.subcopy"),
+      getContent<string>("home.hero.trial_note"),
+      getContent<boolean>("home.hero.show_tour"),
+    ]);
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-brand-50/60 to-white dark:from-brand-950/50 dark:to-slate-950">
       <Container>
         <div className="grid items-center gap-12 py-16 lg:grid-cols-2 lg:py-24">
           <div className="animate-fade-up">
-            <HeroHeadlines />
+            <HeroHeadlines staticLine={staticLine} dynamicLines={dynamicLines} />
 
             <p className="mt-6 max-w-xl text-lg text-slate-600 dark:text-slate-400">
-              Quotes, scheduling, crew, invoices, and customer messages — in one
-              simple workspace for every cleaning company.
+              {subcopy}
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -50,14 +58,16 @@ export function Hero() {
               </Button>
             </div>
             <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
-              Free 14-day trial · No credit card required · Cancel anytime
+              {trialNote}
             </p>
           </div>
 
           {/* Auto-playing dashboard tour — sample data, not a screenshot */}
-          <div className="animate-fade-in min-w-0">
-            <DashboardTour />
-          </div>
+          {showTour && (
+            <div className="animate-fade-in min-w-0">
+              <DashboardTour />
+            </div>
+          )}
         </div>
       </Container>
     </section>

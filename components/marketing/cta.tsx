@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { cookies } from "next/headers";
-import { site } from "@/lib/site";
 import { Container } from "@/components/ui/container";
 import { ArrowRightIcon } from "@/components/ui/icons";
 import { getSessionUser } from "@/lib/auth";
+import { getContent } from "@/lib/studio/content";
 
 /** Session-aware CTA button. Streams in after the static shell. */
 async function CtaButton() {
@@ -21,17 +21,25 @@ async function CtaButton() {
   );
 }
 
-export function Cta() {
+export async function Cta() {
+  const [title, body, siteName, siteEmail] = await Promise.all([
+    getContent<string>("home.cta.title"),
+    getContent<string>("home.cta.body"),
+    getContent<string>("site.name"),
+    getContent<string>("site.email"),
+  ]);
+  // The body default mentions the product name; keep it in sync when the
+  // name is customized but the body still carries the default text.
+  const renderedBody = body.replace("TidyPro", siteName);
   return (
     <section id="contact" className="scroll-mt-20 bg-brand-700 py-20 sm:py-24 dark:bg-brand-900">
       <Container>
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Ready to spend less time on paperwork?
+            {title}
           </h2>
           <p className="mt-4 text-lg text-brand-100">
-            Join the cleaning businesses getting organized with {site.name}.
-            Set up in under 30 minutes — your first 14 days are free.
+            {renderedBody}
           </p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             {/* Explicit styles (not Button overrides): on a dark background the
@@ -46,7 +54,7 @@ export function Cta() {
               <CtaButton />
             </Suspense>
             <Link
-              href={`mailto:${site.email}`}
+              href={`mailto:${siteEmail}`}
               className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-white/40 px-7 text-base font-semibold whitespace-nowrap text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               Talk to us

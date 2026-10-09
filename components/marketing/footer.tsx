@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { site } from "@/lib/site";
 import { Container } from "@/components/ui/container";
 import { Logo } from "@/components/ui/logo";
+import { getContent } from "@/lib/studio/content";
 
 const columns = [
   {
@@ -23,17 +23,21 @@ const columns = [
   },
 ];
 
-export function Footer() {
+export async function Footer() {
+  const [siteName, tagline] = await Promise.all([
+    getContent<string>("site.name"),
+    getContent<string>("site.tagline"),
+  ]);
   return (
     <footer className="border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
       <Container>
         <div className="grid gap-10 py-12 md:grid-cols-[1.5fr_1fr_1fr]">
           <div>
             <div className="flex items-center gap-2.5">
-<Logo />
+<Logo wordmark={siteName} />
             </div>
             <p className="mt-4 max-w-sm text-sm text-slate-500 dark:text-slate-400">
-              {site.tagline}. Quotes, scheduling, teams, invoices, and
+              {tagline}. Quotes, scheduling, teams, invoices, and
               customers — in one simple workspace for every cleaning company.
             </p>
           </div>
@@ -59,7 +63,7 @@ export function Footer() {
         </div>
         <div className="flex flex-col items-center justify-between gap-3 border-t border-slate-200 dark:border-slate-800 py-6 sm:flex-row">
           <p className="text-sm text-slate-400">
-            © 2026 {site.name}. All rights reserved.
+            © 2026 {siteName}. All rights reserved.
           </p>
           <p className="text-center text-sm text-slate-400">
             Proudly locally owned in Upstate New York · Made for cleaning businesses here.

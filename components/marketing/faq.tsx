@@ -1,15 +1,23 @@
-import { faqs } from "@/lib/site";
 import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
+import { getContent } from "@/lib/studio/content";
 
-export function Faq() {
+export type FaqItem = { q: string; a: string };
+
+export async function Faq() {
+  const [eyebrow, title, description, faqs] = await Promise.all([
+    getContent<string>("home.faq.eyebrow"),
+    getContent<string>("home.faq.title"),
+    getContent<string>("home.faq.description"),
+    getContent<FaqItem[]>("site.faqs"),
+  ]);
   return (
     <section id="faq" className="scroll-mt-20 bg-white py-20 sm:py-24 dark:bg-slate-950">
       <Container>
         <SectionHeading
-          eyebrow="FAQ"
-          title="Questions cleaning owners ask us"
-          description="Straight answers — including the ones about tax and payments."
+          eyebrow={eyebrow}
+          title={title}
+          description={description}
         />
         <div className="mx-auto mt-12 max-w-3xl space-y-4">
           {faqs.map((f) => (

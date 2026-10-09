@@ -1,29 +1,17 @@
 import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Card, CardContent } from "@/components/ui/card";
+import { getContent } from "@/lib/studio/content";
 
-const steps = [
-  {
-    n: "1",
-    title: "Set up your company",
-    description:
-      "Add your business profile, logo, services, and pricing. Define your service area by city, county, ZIP code, or radius — then invite your team and set permissions.",
-  },
-  {
-    n: "2",
-    title: "Win jobs and schedule crews",
-    description:
-      "Share your online quote form, approve quotes into one-time or recurring bookings, and assign cleaners with conflict warnings keeping every day realistic.",
-  },
-  {
-    n: "3",
-    title: "Get paid faster",
-    description:
-      "Send invoices the moment a job is done, track what's outstanding at a glance, and let customers pay online through their portal. Reminders go out automatically.",
-  },
-];
+export type HowStep = { title: string; description: string };
 
-export function HowItWorks() {
+export async function HowItWorks() {
+  const [eyebrow, title, description, steps] = await Promise.all([
+    getContent<string>("home.how.eyebrow"),
+    getContent<string>("home.how.title"),
+    getContent<string>("home.how.description"),
+    getContent<HowStep[]>("home.how.steps"),
+  ]);
   return (
     <section
       id="how-it-works"
@@ -31,16 +19,16 @@ export function HowItWorks() {
     >
       <Container>
         <SectionHeading
-          eyebrow="How it works"
-          title="From first quote to paid invoice in three steps"
-          description="Built for owners who are not technically experienced — if you can send a text, you can run TidyPro."
+          eyebrow={eyebrow}
+          title={title}
+          description={description}
         />
         <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {steps.map((s) => (
-            <Card key={s.n}>
+          {steps.map((s, i) => (
+            <Card key={s.title}>
               <CardContent>
                 <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-brand-600 text-lg font-bold text-white">
-                  {s.n}
+                  {i + 1}
                 </span>
                 <h3 className="mt-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
                   {s.title}

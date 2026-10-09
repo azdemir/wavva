@@ -5,6 +5,7 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckIcon } from "@/components/ui/icons";
+import { getContent } from "@/lib/studio/content";
 
 /** The three plan cards without any surrounding heading — reusable on the
  * dedicated pricing page where the page hero already introduces them. */
@@ -62,22 +63,31 @@ export function PlanCards() {
 }
 
 export function PricingDisclaimer({ className = "" }: { className?: string }) {
+  return <PricingDisclaimerText className={className} />;
+}
+
+async function PricingDisclaimerText({ className = "" }: { className?: string }) {
+  const text = await getContent<string>("home.pricing.disclaimer");
   return (
     <p className={`text-center text-sm text-slate-500 ${className}`}>
-      Suggested pricing shown for illustration — final plans confirmed at
-      launch. Prices in USD. Cancel anytime.
+      {text}
     </p>
   );
 }
 
-export function Pricing() {
+export async function Pricing() {
+  const [eyebrow, title, description] = await Promise.all([
+    getContent<string>("home.pricing.eyebrow"),
+    getContent<string>("home.pricing.title"),
+    getContent<string>("home.pricing.description"),
+  ]);
   return (
     <section id="pricing" className="scroll-mt-20 bg-white py-20 sm:py-24 dark:bg-slate-950">
       <Container>
         <SectionHeading
-          eyebrow="Pricing"
-          title="Simple plans that pay for themselves"
-          description="One booking a month covers the subscription for most companies. Start free, upgrade when you grow."
+          eyebrow={eyebrow}
+          title={title}
+          description={description}
         />
         <div className="mt-12">
           <PlanCards />

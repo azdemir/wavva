@@ -6,6 +6,7 @@ import { Container } from "@/components/ui/container";
 import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { getSessionUser } from "@/lib/auth";
+import { getContent } from "@/lib/studio/content";
 
 const links = [
   { label: "Features", href: "/features" },
@@ -67,7 +68,8 @@ function ActionsFallback() {
   );
 }
 
-export function Navbar() {
+export async function Navbar() {
+  const siteName = await getContent<string>("site.name");
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/85 backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
       <Container>
@@ -76,7 +78,7 @@ export function Navbar() {
           className="flex h-16 items-center justify-between"
         >
           <Link href="/" className="flex items-center gap-2.5">
-            <Logo />
+            <Logo wordmark={siteName} />
           </Link>
 
           <div className="hidden items-center gap-1 md:flex">

@@ -2,23 +2,28 @@
 
 import { useEffect, useState } from "react";
 
-const STATIC_LINE = "Run your cleaning business";
-const DYNAMIC_LINES = [
-  "from one tidy place.",
-  "without missed calls.",
-  "that follows up for you.",
-];
-
-// Tallest dynamic phrase — reserved as invisible text so the rotating
-// line never shifts the layout below it.
-const TALLEST = "that follows up for you.";
-
 /**
  * Two-line hero headline, mortgage-sample style:
  * first line static in ink, second line cycling in brand blue.
  * Soft fade cycling; prefers-reduced-motion shows the first line statically.
+ * Copy comes from the Studio CMS (props) with code defaults.
  */
-export function HeroHeadlines() {
+export function HeroHeadlines({
+  staticLine: staticText = "Run your cleaning business",
+  dynamicLines: dynamicTexts = [
+    "from one tidy place.",
+    "without missed calls.",
+    "that follows up for you.",
+  ],
+}: {
+  staticLine?: string;
+  dynamicLines?: string[];
+}) {
+  const lines =
+    dynamicTexts.length > 0 ? dynamicTexts : ["from one tidy place."];
+  // Reserve height for the tallest phrase so the rotating line never
+  // shifts the layout below it.
+  const tallest = lines.reduce((a, b) => (a.length >= b.length ? a : b));
   const [index, setIndex] = useState(0);
   const [reduced, setReduced] = useState(
     () =>
@@ -34,17 +39,17 @@ export function HeroHeadlines() {
       return () => mq.removeEventListener("change", onChange);
     }
     const t = setInterval(() => {
-      setIndex((i) => (i + 1) % DYNAMIC_LINES.length);
+      setIndex((i) => (i + 1) % lines.length);
     }, 4500);
     return () => {
       clearInterval(t);
       mq.removeEventListener("change", onChange);
     };
-  }, []);
+  }, [lines.length]);
 
   const staticLine = (
     <span className="block text-slate-900 dark:text-slate-50">
-      {STATIC_LINE}
+      {staticText}
     </span>
   );
 
@@ -53,7 +58,7 @@ export function HeroHeadlines() {
       <h1 className="font-serif text-4xl font-medium tracking-tight sm:text-5xl">
         {staticLine}
         <span className="block text-brand-600 dark:text-brand-400">
-          {DYNAMIC_LINES[0]}
+          {lines[0]}
         </span>
       </h1>
     );
@@ -68,9 +73,9 @@ export function HeroHeadlines() {
       >
         {/* Reserve height for the tallest phrase to avoid layout shift */}
         <span className="invisible block" aria-hidden="true">
-          {TALLEST}
+          {tallest}
         </span>
-        {DYNAMIC_LINES.map((line, i) => (
+        {lines.map((line, i) => (
           <span
             key={line}
             aria-hidden={i !== index}
@@ -83,7 +88,7 @@ export function HeroHeadlines() {
             {line}
           </span>
         ))}
-        <span className="sr-only">{DYNAMIC_LINES[index]}</span>
+        <span className="sr-only">{lines[index]}</span>
       </span>
     </h1>
   );
