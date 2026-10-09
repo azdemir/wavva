@@ -6,6 +6,15 @@ All notable changes to TidyPro. Dates are in America/New_York.
 
 ### Changed
 
+- **New Basic $10/mo tier; Starter moves to $15/mo** — four plans now: Basic
+  $10 (1 user, 50 customers), Starter $15 (3 users, 100 customers), Growth $35,
+  Pro $45. Both entry tiers include scheduling, quotes & bookings, invoicing
+  with online payments, and the customer portal. Added migration
+  `0010_basic_plan.sql` (widens the `companies.plan` check constraint),
+  `STRIPE_PRICE_BASIC` env var, and `isPlanId()` in the Stripe webhook so new
+  tiers never need hardcoded plan lists again. Pricing page now shows four
+  cards plus a four-column comparison table.
+
 - **Pricing realigned to match ZenMaid** — plans are now Starter **$19/mo**,
   Growth **$39/mo**, Pro **$49/mo** (tier names unchanged). Feature lists
   restructured to mirror the competitor's shape while staying honest to what

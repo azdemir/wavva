@@ -16,22 +16,22 @@ import { getContent } from "@/lib/studio/content";
 
 
 export const metadata: Metadata = {
-  title: "Flat Pricing from $15/mo — No Per-User Fees",
+  title: "Flat Pricing from $10/mo — No Per-User Fees",
   description:
-    "TidyPro pricing: flat monthly plans — Starter $15, Growth $35, Pro $45. No per-user fees, ever. 14-day free trial, no credit card required. Cancel anytime.",
+    "TidyPro pricing: flat monthly plans — Basic $10, Starter $15, Growth $35, Pro $45. No per-user fees, ever. 14-day free trial, no credit card required. Cancel anytime.",
   alternates: { canonical: "/pricing" },
 };
 
 const comparisonRows: { label: string; values: (string | boolean)[] }[] = [
-  { label: "Users", values: ["1", "Up to 5", "Unlimited"] },
-  { label: "Active customers", values: ["Up to 50", "Unlimited", "Unlimited"] },
-  { label: "Quotes & bookings", values: [true, true, true] },
-  { label: "Recurring bookings", values: [false, true, true] },
-  { label: "Customer portal", values: [false, true, true] },
-  { label: "Crew scheduling & conflict alerts", values: [false, true, true] },
-  { label: "Before/after photo uploads", values: [false, false, true] },
-  { label: "Business reports", values: [false, false, true] },
-  { label: "Support", values: ["Email", "Priority", "Priority"] },
+  { label: "Users", values: ["1", "Up to 3", "Up to 5", "Unlimited"] },
+  { label: "Active customers", values: ["Up to 50", "Up to 100", "Unlimited", "Unlimited"] },
+  { label: "Quotes & bookings", values: [true, true, true, true] },
+  { label: "Recurring bookings", values: [false, false, true, true] },
+  { label: "Customer portal", values: [true, true, true, true] },
+  { label: "Crew scheduling & conflict alerts", values: [false, false, true, true] },
+  { label: "Before/after photo uploads", values: [false, false, false, true] },
+  { label: "Business reports", values: [false, false, false, true] },
+  { label: "Support", values: ["Email", "Email", "Priority", "Priority"] },
 ];
 
 export default async function PricingPage() {

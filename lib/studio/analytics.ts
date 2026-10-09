@@ -132,6 +132,7 @@ export async function getAnalytics(
   let paying = 0;
   let trialing = 0;
   const planCounts: Record<PlanId, { count: number; mrrCents: number }> = {
+    basic: { count: 0, mrrCents: 0 },
     starter: { count: 0, mrrCents: 0 },
     growth: { count: 0, mrrCents: 0 },
     pro: { count: 0, mrrCents: 0 },

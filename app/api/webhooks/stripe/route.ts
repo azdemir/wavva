@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { createServiceClient } from "@/lib/supabase/server";
+import { isPlanId } from "@/lib/plans";
 
 /**
  * Stripe webhook endpoint: <site>/api/webhooks/stripe
@@ -60,7 +61,7 @@ export async function POST(request: Request) {
         .update({
           stripe_subscription_id: session.subscription,
           subscription_status: status ?? "active",
-          ...(plan === "starter" || plan === "growth" || plan === "pro" ? { plan } : {}),
+          ...(isPlanId(plan) ? { plan } : {}),
         })
         .eq("id", companyId);
       await svc.from("audit_logs").insert({
@@ -152,7 +153,7 @@ export async function POST(request: Request) {
     const plan = sub.metadata?.plan;
     const status = event.type === "customer.subscription.deleted" ? "canceled" : sub.status;
     const update: Record<string, string | null> = { subscription_status: status };
-    if (plan === "starter" || plan === "growth" || plan === "pro") update.plan = plan;
+    if (isPlanId(plan)) update.plan = plan;
     if (event.type === "customer.subscription.deleted") update.stripe_subscription_id = null;
     const query = svc.from("companies").update(update).eq("stripe_subscription_id", sub.id);
     // Fallback: match by metadata if the subscription id was never stored.

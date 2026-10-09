@@ -8,6 +8,7 @@ import { isPlanId, type PlanId } from "@/lib/plans";
 import { logAudit } from "@/lib/audit";
 
 const PRICE_ENV: Record<PlanId, string> = {
+  basic: "STRIPE_PRICE_BASIC",
   starter: "STRIPE_PRICE_STARTER",
   growth: "STRIPE_PRICE_GROWTH",
   pro: "STRIPE_PRICE_PRO",

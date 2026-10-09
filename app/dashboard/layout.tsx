@@ -4,7 +4,7 @@ import { requireCompany } from "@/lib/auth";
 import { signOut } from "@/lib/actions/auth";
 import { Badge } from "@/components/ui/badge";
 import { SubscriptionBanner } from "@/components/billing/subscription-banner";
-import { PLANS, isPlanId } from "@/lib/plans";
+import { PLANS, isPlanId, type PlanId } from "@/lib/plans";
 
 // Workspace routes render per request (auth session) — never prerendered.
 export const instant = false;
@@ -60,7 +60,7 @@ const nav: NavItem[] = [
   { href: "/dashboard/audit", label: "Audit log", icon: BellIcon, roles: ["owner"] },
 ];
 
-function NavLinks({ onNavigate, plan, role }: { onNavigate?: () => void; plan: "starter" | "growth" | "pro"; role: Role }) {
+function NavLinks({ onNavigate, plan, role }: { onNavigate?: () => void; plan: PlanId; role: Role }) {
   const visible = nav.filter(
     (item) =>
       (!item.feature || hasFeature(plan, item.feature)) &&

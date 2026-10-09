@@ -2,10 +2,11 @@
  * TidyPro platform plans — what the cleaning company itself pays us.
  * Separate from Stripe Connect, which the company uses to charge
  * ITS customers. Prices are informational; Stripe Price IDs live in
- * STRIPE_PRICE_STARTER / STRIPE_PRICE_GROWTH / STRIPE_PRICE_PRO.
+ * STRIPE_PRICE_BASIC / STRIPE_PRICE_STARTER / STRIPE_PRICE_GROWTH /
+ * STRIPE_PRICE_PRO.
  */
 
-export type PlanId = "starter" | "growth" | "pro";
+export type PlanId = "basic" | "starter" | "growth" | "pro";
 
 export type Plan = {
   id: PlanId;
@@ -18,16 +19,32 @@ export type Plan = {
 };
 
 export const PLANS: Record<PlanId, Plan> = {
+  basic: {
+    id: "basic",
+    name: "Basic",
+    priceCents: 1000,
+    seats: 1,
+    blurb: "For solo cleaners getting started.",
+    features: [
+      "1 user",
+      "Up to 50 active customers",
+      "Scheduling",
+      "Quotes & bookings",
+      "Invoicing with online payments",
+      "Customer portal",
+      "Email support",
+    ],
+  },
   starter: {
     id: "starter",
     name: "Starter",
     priceCents: 1500,
-    seats: 1,
-    blurb: "Perfect for new cleaning businesses just getting started.",
+    seats: 3,
+    blurb: "Perfect for small teams getting organized.",
     features: [
-      "1 user",
-      "Up to 50 active customers",
-      "Easy scheduling with calendar views",
+      "3 users",
+      "Up to 100 active customers",
+      "Scheduling",
       "Quotes & bookings",
       "Invoicing with online payments",
       "Customer portal",
@@ -110,7 +127,7 @@ const FEATURE_MIN_PLAN: Record<PlanFeature, PlanId> = {
   photos: "pro", // Before/after job photo uploads
 };
 
-const PLAN_RANK: Record<PlanId, number> = { starter: 0, growth: 1, pro: 2 };
+const PLAN_RANK: Record<PlanId, number> = { basic: 0, starter: 1, growth: 2, pro: 3 };
 
 export function hasFeature(plan: PlanId, feature: PlanFeature): boolean {
   return PLAN_RANK[plan] >= PLAN_RANK[FEATURE_MIN_PLAN[feature]];
