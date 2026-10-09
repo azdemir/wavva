@@ -1,30 +1,43 @@
 import Link from "next/link";
-import { requireCompany } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { QuoteStatusPill, statusLabel, type QuoteStatus } from "@/components/ui/badge";
+import { QuoteStatusPill, type QuoteStatus } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
 import { parsePageParam, PAGE_SIZE } from "@/lib/pagination";
 import { PlusIcon, QuoteIcon } from "@/components/ui/icons";
 import { formatCents, formatDate } from "@/lib/format";
 import { one } from "@/lib/relations";
+import { FilterPills, FilterSearch } from "@/components/ui/filters";
 
 const statuses = ["all", "draft", "sent", "approved", "declined", "expired"] as const;
 
 export default async function QuotesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; page?: string }>;
+  searchParams: Promise<{ status?: string; q?: string; page?: string }>;
 }) {
-  const { company } = await requireCompany();
+  const { company } = await requirePermission("quotes.manage");
   const supabase = await createClient();
   const params = await searchParams;
   const status = params.status ?? "all";
   const valid = statuses.includes(status as (typeof statuses)[number]) ? status : "all";
+  const q = (params.q ?? "").trim();
+  const like = `%${q.replace(/[%_]/g, "")}%`;
   const page = parsePageParam(params.page);
+
+  let customerIds: string[] | null = null;
+  if (q) {
+    const { data: matched } = await supabase
+      .from("customers")
+      .select("id")
+      .eq("company_id", company.id)
+      .ilike("name", like);
+    customerIds = (matched ?? []).map((m) => m.id as string);
+  }
 
   let query = supabase
     .from("quotes")
@@ -32,9 +45,17 @@ export default async function QuotesPage({
     .eq("company_id", company.id)
     .order("created_at", { ascending: false });
   if (valid !== "all") query = query.eq("status", valid);
+  if (q) {
+    query =
+      customerIds && customerIds.length > 0
+        ? query.or(`quote_number.ilike.${like},customer_id.in.(${customerIds.join(",")})`)
+        : query.ilike("quote_number", like);
+  }
 
   const { data: quotes, count } = await query.range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
   const total = count ?? 0;
+  const filtering = valid !== "all" || q !== "";
+  const keep = { status: valid !== "all" ? valid : undefined, q: q || undefined };
 
   return (
     <div className="space-y-6">
@@ -45,27 +66,34 @@ export default async function QuotesPage({
         </Button>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {statuses.map((s) => (
-          <Link
-            key={s}
-            href={s === "all" ? "/dashboard/quotes" : `/dashboard/quotes?status=${s}`}
-            className={`inline-flex min-h-9 items-center rounded-full px-3.5 py-1.5 text-sm font-medium capitalize ${
-              valid === s ? "bg-brand-600 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-300 dark:ring-slate-700 dark:hover:bg-slate-800"
-            }`}
-          >
-            {statusLabel(s)}
-          </Link>
-        ))}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <FilterPills
+          basePath="/dashboard/quotes"
+          param="status"
+          options={statuses.map((s) => ({ value: s }))}
+          current={valid}
+          preserve={{ q: q || undefined }}
+        />
+        <FilterSearch
+          id="quote-search"
+          label="Search quotes"
+          defaultValue={q}
+          placeholder="Quote # or customer name…"
+          preserve={{ status: valid !== "all" ? valid : undefined }}
+        />
       </div>
 
       {(quotes ?? []).length === 0 ? (
         <Card>
           <CardContent>
             <EmptyState
-              title="No quotes here"
-              description="Create your first quote — it takes about a minute."
-              action={<Button href="/dashboard/quotes/new">New quote</Button>}
+              title={filtering ? "No quotes match" : "No quotes here"}
+              description={
+                filtering
+                  ? "Try a different search or status."
+                  : "Create your first quote — it takes about a minute."
+              }
+              action={filtering ? undefined : <Button href="/dashboard/quotes/new">New quote</Button>}
               icon={<QuoteIcon className="h-10 w-10" />}
             />
           </CardContent>
@@ -102,7 +130,7 @@ export default async function QuotesPage({
                 total={total}
                 pageSize={PAGE_SIZE}
                 basePath="/dashboard/quotes"
-                searchParams={{ status: valid !== "all" ? valid : undefined }}
+                searchParams={keep}
               />
             </div>
           )}

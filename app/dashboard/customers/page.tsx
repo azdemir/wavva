@@ -1,32 +1,43 @@
 import Link from "next/link";
-import { requireCompany } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Field } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
+import { FilterPills, FilterSearch, ExportButton } from "@/components/ui/filters";
 import { parsePageParam, PAGE_SIZE } from "@/lib/pagination";
 import { PlusIcon, UsersIcon } from "@/components/ui/icons";
+
+const types = ["all", "residential", "commercial"] as const;
+const typeTones = { residential: "slate", commercial: "brand" } as const;
 
 export default async function CustomersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; page?: string }>;
+  searchParams: Promise<{ q?: string; type?: string; page?: string }>;
 }) {
-  const { company } = await requireCompany();
+  const { company } = await requirePermission("customers.manage");
   const supabase = await createClient();
   const params = await searchParams;
   const q = (params.q ?? "").trim();
+  const type = (types as readonly string[]).includes(params.type ?? "")
+    ? (params.type as (typeof types)[number])
+    : "all";
   const page = parsePageParam(params.page);
 
   let query = supabase
     .from("customers")
-    .select("id, name, email, phone, created_at", { count: "exact" })
+    .select("id, name, customer_type, email, phone, created_at", { count: "exact" })
     .eq("company_id", company.id)
     .order("name", { ascending: true });
-  if (q) query = query.ilike("name", `%${q}%`);
+  if (type !== "all") query = query.eq("customer_type", type);
+  if (q) {
+    const like = `%${q.replace(/[%_]/g, "")}%`;
+    query = query.or(`name.ilike.${like},email.ilike.${like},phone.ilike.${like}`);
+  }
 
   const { data: customers, count } = await query.range(
     (page - 1) * PAGE_SIZE,
@@ -34,38 +45,53 @@ export default async function CustomersPage({
   );
   const total = count ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const filtering = type !== "all" || q !== "";
+  const keep = { q: q || undefined, type: type !== "all" ? type : undefined };
+  const exportQs = new URLSearchParams(
+    Object.entries(keep).filter(([, v]) => v !== undefined) as [string, string][],
+  ).toString();
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <Heading title="Customers" description="Everyone your business cleans for." />
-        <Button href="/dashboard/customers/new">
-          <PlusIcon className="h-4 w-4" /> New customer
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <ExportButton href={`/api/exports/customers${exportQs ? `?${exportQs}` : ""}`} />
+          <Button href="/dashboard/customers/new">
+            <PlusIcon className="h-4 w-4" /> New customer
+          </Button>
+        </div>
       </div>
 
-      <form method="get" className="max-w-sm">
-        <Field
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <FilterPills
+          basePath="/dashboard/customers"
+          param="type"
+          options={types.map((t) => ({ value: t }))}
+          current={type}
+          preserve={{ q: q || undefined }}
+        />
+        <FilterSearch
           id="cust-search"
-          name="q"
           label="Search customers"
           defaultValue={q}
-          placeholder="Search by name…"
+          placeholder="Search by name, email, or phone…"
+          preserve={{ type: type !== "all" ? type : undefined }}
         />
-      </form>
+      </div>
 
       {(customers ?? []).length === 0 ? (
         <Card>
           <CardContent>
             <EmptyState
-              title={q ? "No customers match" : "No customers yet"}
+              title={filtering ? "No customers match" : "No customers yet"}
               description={
-                q
-                  ? "Try a different search."
+                filtering
+                  ? "Try a different search or filter."
                   : "Add your first customer to start quoting and booking."
               }
               action={
-                q ? undefined : (
+                filtering ? undefined : (
                   <Button href="/dashboard/customers/new">New customer</Button>
                 )
               }
@@ -84,7 +110,12 @@ export default async function CustomersPage({
                     className="flex items-center justify-between gap-3 px-5 py-4 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-900"
                   >
                     <div className="min-w-0">
-                      <p className="truncate font-medium text-slate-900 dark:text-slate-100">{c.name}</p>
+                      <p className="flex items-center gap-2 truncate font-medium text-slate-900 dark:text-slate-100">
+                        <span className="truncate">{c.name}</span>
+                        <Badge tone={typeTones[(c.customer_type as keyof typeof typeTones) ?? "residential"] ?? "slate"} className="shrink-0">
+                          {(c.customer_type as string) === "commercial" ? "Commercial" : "Residential"}
+                        </Badge>
+                      </p>
                       <p className="truncate text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
                         {[c.email, c.phone].filter(Boolean).join(" · ") || "No contact info"}
                       </p>
@@ -102,7 +133,7 @@ export default async function CustomersPage({
               total={total}
               pageSize={PAGE_SIZE}
               basePath="/dashboard/customers"
-              searchParams={{ q: q || undefined }}
+              searchParams={keep}
             />
           </div>
         </Card>

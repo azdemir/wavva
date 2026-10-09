@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { requireCompany } from "@/lib/auth";
+import { Suspense } from "react";
+import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { one } from "@/lib/relations";
 import { Heading } from "@/components/ui/heading";
@@ -7,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { JobStatusPill, type JobStatus } from "@/components/ui/badge";
 import { UpgradePrompt } from "@/components/billing/upgrade-prompt";
+import { CrewFilter } from "@/components/schedule/crew-filter";
 import { hasFeature, isPlanId } from "@/lib/plans";
 import { formatTime } from "@/lib/format";
 
@@ -21,9 +23,9 @@ function weekStart(date: Date): Date {
 export default async function SchedulePage({
   searchParams,
 }: {
-  searchParams: Promise<{ week?: string }>;
+  searchParams: Promise<{ week?: string; crew?: string }>;
 }) {
-  const { company, membership } = await requireCompany();
+  const { company, membership } = await requirePermission("schedule.view");
   const plan = isPlanId(company.plan) ? company.plan : "starter";
   if (!hasFeature(plan, "schedule")) {
     return (
@@ -37,6 +39,7 @@ export default async function SchedulePage({
   const tz = company.timezone || "America/New_York";
 
   const offset = parseInt((await searchParams).week ?? "0", 10) || 0;
+  const crewParam = (await searchParams).crew ?? "all";
   const start = weekStart(new Date());
   start.setDate(start.getDate() + offset * 7);
   const end = new Date(start);
@@ -62,6 +65,11 @@ export default async function SchedulePage({
   ]);
   const emailByUserId = new Map((members ?? []).map((m) => [m.user_id, m.email]));
   const emailOf = (uid: string) => emailByUserId.get(uid) ?? "Unknown";
+  // Crew filter: only show jobs assigned to the selected member (validated).
+  const crew = (members ?? []).some((m) => m.user_id === crewParam) ? crewParam : "all";
+  const crewJobs = (jobs ?? []).filter(
+    (j) => crew === "all" || ((j.assigned_user_ids ?? []) as string[]).includes(crew),
+  );
 
   // Group by local day.
   const days: { date: Date; jobs: NonNullable<typeof jobs> }[] = [];
@@ -73,12 +81,20 @@ export default async function SchedulePage({
   const dayKey = (d: Date) =>
     new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
   const byKey = new Map(days.map((d) => [dayKey(d.date), d]));
-  for (const job of jobs ?? []) {
+  for (const job of crewJobs) {
     const bucket = byKey.get(dayKey(new Date(job.scheduled_start)));
     bucket?.jobs.push(job);
   }
 
   const isCleaner = membership.role === "cleaner";
+  // Week links preserve the crew filter.
+  const weekHref = (w: number) => {
+    const sp = new URLSearchParams();
+    if (w !== 0) sp.set("week", String(w));
+    if (crew !== "all") sp.set("crew", crew);
+    const qs = sp.toString();
+    return qs ? `/dashboard/schedule?${qs}` : "/dashboard/schedule";
+  };
   const fmtDay = (d: Date) =>
     new Intl.DateTimeFormat("en-US", { timeZone: tz, weekday: "short", month: "numeric", day: "numeric" }).format(d);
   const monthLabel = new Intl.DateTimeFormat("en-US", { timeZone: tz, month: "long", year: "numeric" }).format(start);
@@ -87,18 +103,21 @@ export default async function SchedulePage({
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <Heading title="Schedule" description={monthLabel} />
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Suspense>
+            <CrewFilter members={(members ?? []) as { user_id: string; email: string }[]} />
+          </Suspense>
           <Button
-            href={offset <= 0 ? "/dashboard/schedule" : `/dashboard/schedule?week=${offset - 1}`}
+            href={weekHref(offset - 1)}
             variant="outline"
             size="sm"
           >
             ← Prev
           </Button>
-          <Button href="/dashboard/schedule" variant="outline" size="sm">
+          <Button href={weekHref(0)} variant="outline" size="sm">
             Today
           </Button>
-          <Button href={`/dashboard/schedule?week=${offset + 1}`} variant="outline" size="sm">
+          <Button href={weekHref(offset + 1)} variant="outline" size="sm">
             Next →
           </Button>
         </div>

@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import { requireCompany } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { createInvite, deleteInvite } from "@/lib/actions/team";
 import { Heading } from "@/components/ui/heading";
@@ -7,21 +7,32 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Field, SelectField } from "@/components/ui/input";
 import { Badge, statusLabel } from "@/components/ui/badge";
-import { EmptyState } from "@/components/ui/empty-state";
+import { FilterPills } from "@/components/ui/filters";
 
 const roleTones = { owner: "brand", manager: "accent", cleaner: "slate" } as const;
+const roles = ["all", "owner", "manager", "cleaner"] as const;
 
-export default async function TeamPage() {
-  const { membership, company } = await requireCompany();
+export default async function TeamPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ role?: string }>;
+}) {
+  const { company } = await requirePermission("team.manage");
   const supabase = await createClient();
-  const isOwner = membership.role === "owner";
+  const params = await searchParams;
+  const role = (roles as readonly string[]).includes(params.role ?? "")
+    ? (params.role as (typeof roles)[number])
+    : "all";
+
+  let memberQuery = supabase
+    .from("memberships")
+    .select("id, email, role, created_at")
+    .eq("company_id", company.id)
+    .order("created_at", { ascending: true });
+  if (role !== "all") memberQuery = memberQuery.eq("role", role);
 
   const [{ data: members }, { data: invites }] = await Promise.all([
-    supabase
-      .from("memberships")
-      .select("id, email, role, created_at")
-      .eq("company_id", company.id)
-      .order("created_at", { ascending: true }),
+    memberQuery,
     supabase
       .from("invites")
       .select("id, email, role, token, created_at")
@@ -45,6 +56,14 @@ export default async function TeamPage() {
           <CardTitle>Members ({members?.length ?? 0})</CardTitle>
         </CardHeader>
         <CardContent>
+          <div className="mb-4">
+            <FilterPills
+              basePath="/dashboard/team"
+              param="role"
+              options={roles.map((r) => ({ value: r }))}
+              current={role}
+            />
+          </div>
           <ul className="divide-y divide-slate-100 dark:divide-slate-800">
             {(members ?? []).map((m) => (
               <li key={m.id} className="flex items-center justify-between gap-3 py-3">
@@ -63,10 +82,9 @@ export default async function TeamPage() {
         </CardContent>
       </Card>
 
-      {isOwner && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Invite a teammate</CardTitle>
+      <Card>
+        <CardHeader>
+          <CardTitle>Invite a teammate</CardTitle>
           </CardHeader>
           <CardContent>
             <form
@@ -102,7 +120,6 @@ export default async function TeamPage() {
             </p>
           </CardContent>
         </Card>
-      )}
 
       {(invites ?? []).length > 0 && (
         <Card>
@@ -124,30 +141,21 @@ export default async function TeamPage() {
                       {baseUrl}/invite/{inv.token}
                     </code>
                   </div>
-                  {isOwner && (
-                    <form
-                      action={async () => {
-                        "use server";
-                        await deleteInvite(inv.id);
-                      }}
-                    >
-                      <Button type="submit" variant="outline">
-                        Revoke
-                      </Button>
-                    </form>
-                  )}
+                  <form
+                    action={async () => {
+                      "use server";
+                      await deleteInvite(inv.id);
+                    }}
+                  >
+                    <Button type="submit" variant="outline">
+                      Revoke
+                    </Button>
+                  </form>
                 </li>
               ))}
             </ul>
           </CardContent>
         </Card>
-      )}
-
-      {!isOwner && (
-        <EmptyState
-          title="Only owners can invite"
-          description="Ask your company owner to invite new teammates."
-        />
       )}
     </div>
   );

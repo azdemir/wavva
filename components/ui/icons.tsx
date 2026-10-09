@@ -177,6 +177,22 @@ export function PlusIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function DownloadIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Base {...props}>
+      <path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14" />
+    </Base>
+  );
+}
+
+export function PrinterIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Base {...props}>
+      <path d="M7 8V4h10v4M7 17H4v-7h16v7h-3M7 14h10v6H7z" />
+    </Base>
+  );
+}
+
 export function ClockIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <Base {...props}>

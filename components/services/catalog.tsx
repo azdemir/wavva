@@ -62,12 +62,23 @@ function ErrorNote({ message }: { message: string | null }) {
 export function ServiceManager({ initial }: { initial: ServiceRow[] }) {
   const { error, pending, run } = useFeedback();
   const [editing, setEditing] = useState<string | null>(null);
+  const [q, setQ] = useState("");
+  const rows = initial.filter((s) =>
+    `${s.name} ${s.description ?? ""}`.toLowerCase().includes(q.trim().toLowerCase()),
+  );
 
   return (
     <div className="space-y-4">
       <ErrorNote message={error} />
+      <Field
+        id="service-search"
+        label="Search services"
+        placeholder="Search by name…"
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+      />
       <ul className="divide-y divide-slate-100 dark:divide-slate-800">
-        {initial.map((s) => (
+        {rows.map((s) => (
           <li key={s.id} className="py-4">
             {editing === s.id ? (
               <form
@@ -154,12 +165,23 @@ export function ServiceManager({ initial }: { initial: ServiceRow[] }) {
 export function AddonManager({ initial }: { initial: AddonRow[] }) {
   const { error, pending, run } = useFeedback();
   const [editing, setEditing] = useState<string | null>(null);
+  const [q, setQ] = useState("");
+  const rows = initial.filter((a) =>
+    a.name.toLowerCase().includes(q.trim().toLowerCase()),
+  );
 
   return (
     <div className="space-y-4">
       <ErrorNote message={error} />
+      <Field
+        id="addon-search"
+        label="Search add-ons"
+        placeholder="Search by name…"
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+      />
       <ul className="divide-y divide-slate-100 dark:divide-slate-800">
-        {initial.map((a) => (
+        {rows.map((a) => (
           <li key={a.id} className="py-3">
             {editing === a.id ? (
               <form

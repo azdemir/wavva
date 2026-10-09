@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireCompany } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { one } from "@/lib/relations";
 import { Heading } from "@/components/ui/heading";
@@ -10,8 +10,11 @@ import { Pagination } from "@/components/ui/pagination";
 import { parsePageParam, PAGE_SIZE } from "@/lib/pagination";
 import { ClockIcon } from "@/components/ui/icons";
 import { formatTime, formatDate } from "@/lib/format";
+import { FilterPills, FilterSearch } from "@/components/ui/filters";
 
 export const instant = false;
+
+const statuses = ["all", "scheduled", "in_progress", "completed", "canceled"] as const;
 
 type JobRow = {
   id: string;
@@ -26,16 +29,32 @@ type JobRow = {
 export default async function JobsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ status?: string; q?: string; page?: string }>;
 }) {
-  const { company, membership } = await requireCompany();
+  const { company, membership } = await requirePermission("jobs.manage");
   const supabase = await createClient();
   const tz = company.timezone || "America/New_York";
   const isStaff = membership.role === "owner" || membership.role === "manager";
 
-  const page = parsePageParam((await searchParams).page);
+  const params = await searchParams;
+  const status = (statuses as readonly string[]).includes(params.status ?? "")
+    ? (params.status as (typeof statuses)[number])
+    : "all";
+  const q = (params.q ?? "").trim();
+  const like = `%${q.replace(/[%_]/g, "")}%`;
+  const page = parsePageParam(params.page);
   const from = (page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
+
+  let customerIds: string[] | null = null;
+  if (q) {
+    const { data: matched } = await supabase
+      .from("customers")
+      .select("id")
+      .eq("company_id", company.id)
+      .ilike("name", like);
+    customerIds = (matched ?? []).map((m) => m.id as string);
+  }
 
   let query = supabase
     .from("jobs")
@@ -47,6 +66,14 @@ export default async function JobsPage({
     .order("scheduled_start", { ascending: false })
     .range(from, to);
 
+  if (status !== "all") query = query.eq("status", status);
+  if (q) {
+    query =
+      customerIds && customerIds.length > 0
+        ? query.in("customer_id", customerIds)
+        : query.eq("customer_id", "00000000-0000-0000-0000-000000000000"); // no match
+  }
+
   // Cleaners only see their own jobs.
   if (!isStaff) {
     query = query.contains("assigned_user_ids", [membership.user_id]);
@@ -55,6 +82,8 @@ export default async function JobsPage({
   const { data, count } = await query;
   const jobs = (data ?? []) as unknown as JobRow[];
   const totalPages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
+  const filtering = status !== "all" || q !== "";
+  const keep = { status: status !== "all" ? status : undefined, q: q || undefined };
 
   return (
     <div className="space-y-6">
@@ -66,6 +95,22 @@ export default async function JobsPage({
             : "Visits assigned to you."
         }
       />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <FilterPills
+          basePath="/dashboard/jobs"
+          param="status"
+          options={statuses.map((s) => ({ value: s }))}
+          current={status}
+          preserve={{ q: q || undefined }}
+        />
+        <FilterSearch
+          id="job-search"
+          label="Search jobs"
+          defaultValue={q}
+          placeholder="Customer name…"
+          preserve={{ status: status !== "all" ? status : undefined }}
+        />
+      </div>
       <Card>
         <CardHeader>
           <CardTitle>All jobs</CardTitle>
@@ -75,8 +120,12 @@ export default async function JobsPage({
             <div className="p-6">
               <EmptyState
                 icon={<ClockIcon className="h-8 w-8" />}
-                title="No jobs yet"
-                description="Jobs are created automatically when you add a booking."
+                title={filtering ? "No jobs match" : "No jobs yet"}
+                description={
+                  filtering
+                    ? "Try a different search or status."
+                    : "Jobs are created automatically when you add a booking."
+                }
                 action={
                   isStaff ? (
                     <Link
@@ -127,6 +176,7 @@ export default async function JobsPage({
                   total={count ?? 0}
                   pageSize={PAGE_SIZE}
                   basePath="/dashboard/jobs"
+                  searchParams={keep}
                 />
               </div>
             </>

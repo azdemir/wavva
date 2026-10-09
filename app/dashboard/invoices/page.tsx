@@ -1,13 +1,14 @@
 import Link from "next/link";
-import { requireCompany } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { one } from "@/lib/relations";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { InvoiceStatusPill, statusLabel, type InvoiceStatus } from "@/components/ui/badge";
+import { InvoiceStatusPill, type InvoiceStatus } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
+import { FilterPills, FilterSearch, ExportButton } from "@/components/ui/filters";
 import { parsePageParam, PAGE_SIZE } from "@/lib/pagination";
 import { PlusIcon, CardIcon } from "@/components/ui/icons";
 import { formatCents, formatDate } from "@/lib/format";
@@ -19,14 +20,26 @@ const statuses = ["all", "draft", "sent", "overdue", "paid", "void"] as const;
 export default async function InvoicesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; page?: string }>;
+  searchParams: Promise<{ status?: string; q?: string; page?: string }>;
 }) {
-  const { company } = await requireCompany();
+  const { company } = await requirePermission("invoices.manage");
   const supabase = await createClient();
   const params = await searchParams;
   const status = params.status ?? "all";
   const valid = (statuses as readonly string[]).includes(status) ? status : "all";
+  const q = (params.q ?? "").trim();
+  const like = `%${q.replace(/[%_]/g, "")}%`;
   const page = parsePageParam(params.page);
+
+  let customerIds: string[] | null = null;
+  if (q) {
+    const { data: matched } = await supabase
+      .from("customers")
+      .select("id")
+      .eq("company_id", company.id)
+      .ilike("name", like);
+    customerIds = (matched ?? []).map((m) => m.id as string);
+  }
 
   let query = supabase
     .from("invoices")
@@ -34,39 +47,60 @@ export default async function InvoicesPage({
     .eq("company_id", company.id)
     .order("created_at", { ascending: false });
   if (valid !== "all") query = query.eq("status", valid);
+  if (q) {
+    query =
+      customerIds && customerIds.length > 0
+        ? query.or(`invoice_number.ilike.${like},customer_id.in.(${customerIds.join(",")})`)
+        : query.ilike("invoice_number", like);
+  }
   const { data: invoices, count } = await query.range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
   const total = count ?? 0;
+  const filtering = valid !== "all" || q !== "";
+  const keep = { status: valid !== "all" ? valid : undefined, q: q || undefined };
+  const exportQs = new URLSearchParams(
+    Object.entries(keep).filter(([, v]) => v !== undefined) as [string, string][],
+  ).toString();
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <Heading title="Invoices" description="Bill customers and track payments." />
-        <Button href="/dashboard/invoices/new">
-          <PlusIcon className="h-4 w-4" /> New invoice
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <ExportButton href={`/api/exports/invoices${exportQs ? `?${exportQs}` : ""}`} />
+          <Button href="/dashboard/invoices/new">
+            <PlusIcon className="h-4 w-4" /> New invoice
+          </Button>
+        </div>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {statuses.map((s) => (
-          <Link
-            key={s}
-            href={s === "all" ? "/dashboard/invoices" : `/dashboard/invoices?status=${s}`}
-            className={`inline-flex min-h-9 items-center rounded-full px-3.5 py-1.5 text-sm font-medium capitalize ${
-              valid === s ? "bg-brand-600 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-300 dark:ring-slate-700 dark:hover:bg-slate-800"
-            }`}
-          >
-            {statusLabel(s)}
-          </Link>
-        ))}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <FilterPills
+          basePath="/dashboard/invoices"
+          param="status"
+          options={statuses.map((s) => ({ value: s }))}
+          current={valid}
+          preserve={{ q: q || undefined }}
+        />
+        <FilterSearch
+          id="invoice-search"
+          label="Search invoices"
+          defaultValue={q}
+          placeholder="Invoice # or customer name…"
+          preserve={{ status: valid !== "all" ? valid : undefined }}
+        />
       </div>
 
       {(invoices ?? []).length === 0 ? (
         <Card>
           <CardContent>
             <EmptyState
-              title="No invoices here"
-              description="Create an invoice to bill a customer."
-              action={<Button href="/dashboard/invoices/new">New invoice</Button>}
+              title={filtering ? "No invoices match" : "No invoices here"}
+              description={
+                filtering
+                  ? "Try a different search or status."
+                  : "Create an invoice to bill a customer."
+              }
+              action={filtering ? undefined : <Button href="/dashboard/invoices/new">New invoice</Button>}
               icon={<CardIcon className="h-10 w-10" />}
             />
           </CardContent>
@@ -107,7 +141,7 @@ export default async function InvoicesPage({
                 total={total}
                 pageSize={PAGE_SIZE}
                 basePath="/dashboard/invoices"
-                searchParams={{ status: valid !== "all" ? valid : undefined }}
+                searchParams={keep}
               />
             </div>
           )}

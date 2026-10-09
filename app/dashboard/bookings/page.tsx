@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireCompany } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { JobStatusPill, type JobStatus } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
+import { FilterPills, FilterSearch, ExportButton } from "@/components/ui/filters";
 import { parsePageParam, PAGE_SIZE } from "@/lib/pagination";
 import { PlusIcon, CalendarIcon } from "@/components/ui/icons";
 import { formatTime, formatDate } from "@/lib/format";
@@ -46,37 +47,62 @@ function BookingList({ bookings, tz }: { bookings: BookingRow[]; tz: string }) {
   );
 }
 
+const statuses = ["all", "scheduled", "in_progress", "completed", "canceled"] as const;
+
 export default async function BookingsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; pastPage?: string }>;
+  searchParams: Promise<{ status?: string; q?: string; page?: string; pastPage?: string }>;
 }) {
-  const { company } = await requireCompany();
+  const { company } = await requirePermission("bookings.manage");
   const supabase = await createClient();
   const tz = company.timezone || "America/New_York";
   const now = new Date().toISOString();
   const params = await searchParams;
+  const status = (statuses as readonly string[]).includes(params.status ?? "")
+    ? (params.status as (typeof statuses)[number])
+    : "all";
+  const q = (params.q ?? "").trim();
   const page = parsePageParam(params.page);
   const pastPage = parsePageParam(params.pastPage);
+  const like = `%${q.replace(/[%_]/g, "")}%`;
+
+  // Customer-name search needs customer ids first (cross-table ilike).
+  let customerIds: string[] | null = null;
+  if (q) {
+    const { data: matched } = await supabase
+      .from("customers")
+      .select("id")
+      .eq("company_id", company.id)
+      .ilike("name", like);
+    customerIds = (matched ?? []).map((m) => m.id as string);
+  }
 
   const select =
     "id, booking_number, scheduled_start, scheduled_end, status, recurrence, customers(name), service_addresses(address_line1, city)";
 
+  // Shared status + search filters for both the upcoming and past queries.
+  // Customer-name search resolves to customer ids first (cross-table ilike).
+  const baseQuery = () =>
+    supabase.from("bookings").select(select, { count: "exact" }).eq("company_id", company.id);
+  const applyFilters = (query: ReturnType<typeof baseQuery>) => {
+    let q2 = query;
+    if (status !== "all") q2 = q2.eq("status", status);
+    if (q) {
+      q2 =
+        customerIds && customerIds.length > 0
+          ? q2.or(`booking_number.ilike.${like},customer_id.in.(${customerIds.join(",")})`)
+          : q2.ilike("booking_number", like);
+    }
+    return q2;
+  };
+
   const [{ data: upcoming, count: upcomingCount }, { data: past, count: pastCount }] =
     await Promise.all([
-      supabase
-        .from("bookings")
-        .select(select, { count: "exact" })
-        .eq("company_id", company.id)
-        .gte("scheduled_start", now)
-        .neq("status", "canceled")
+      applyFilters(baseQuery().gte("scheduled_start", now).neq("status", "canceled"))
         .order("scheduled_start", { ascending: true })
         .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1),
-      supabase
-        .from("bookings")
-        .select(select, { count: "exact" })
-        .eq("company_id", company.id)
-        .or(`scheduled_start.lt.${now},status.eq.canceled`)
+      applyFilters(baseQuery().or(`scheduled_start.lt.${now},status.eq.canceled`))
         .order("scheduled_start", { ascending: false })
         .range((pastPage - 1) * PAGE_SIZE, pastPage * PAGE_SIZE - 1),
     ]);
@@ -86,14 +112,43 @@ export default async function BookingsPage({
   const upcomingTotal = upcomingCount ?? 0;
   const pastTotal = pastCount ?? 0;
   const hasAny = upcomingTotal + pastTotal > 0;
+  const filtering = status !== "all" || q !== "";
+
+  const keep = {
+    status: status !== "all" ? status : undefined,
+    q: q || undefined,
+  };
+  const exportQs = new URLSearchParams(
+    Object.entries(keep).filter(([, v]) => v !== undefined) as [string, string][],
+  ).toString();
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <Heading title="Bookings" description="Scheduled cleanings and their visits." />
-        <Button href="/dashboard/bookings/new">
-          <PlusIcon className="h-4 w-4" /> New booking
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <ExportButton href={`/api/exports/bookings${exportQs ? `?${exportQs}` : ""}`} />
+          <Button href="/dashboard/bookings/new">
+            <PlusIcon className="h-4 w-4" /> New booking
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <FilterPills
+          basePath="/dashboard/bookings"
+          param="status"
+          options={statuses.map((s) => ({ value: s }))}
+          current={status}
+          preserve={{ q: q || undefined }}
+        />
+        <FilterSearch
+          id="booking-search"
+          label="Search bookings"
+          defaultValue={q}
+          placeholder="Booking # or customer name…"
+          preserve={{ status: status !== "all" ? status : undefined }}
+        />
       </div>
 
       {hasAny ? (
@@ -117,7 +172,7 @@ export default async function BookingsPage({
                   total={upcomingTotal}
                   pageSize={PAGE_SIZE}
                   basePath="/dashboard/bookings"
-                  searchParams={{ pastPage: pastPage > 1 ? String(pastPage) : undefined }}
+                  searchParams={{ ...keep, pastPage: pastPage > 1 ? String(pastPage) : undefined }}
                 />
               </div>
             )}
@@ -139,7 +194,7 @@ export default async function BookingsPage({
                     pageSize={PAGE_SIZE}
                     basePath="/dashboard/bookings"
                     pageParam="pastPage"
-                    searchParams={{ page: page > 1 ? String(page) : undefined }}
+                    searchParams={{ ...keep, page: page > 1 ? String(page) : undefined }}
                   />
                 </div>
               )}
@@ -150,9 +205,13 @@ export default async function BookingsPage({
         <Card>
           <CardContent>
             <EmptyState
-              title="No bookings yet"
-              description="Book a cleaning and its job visits will be generated automatically."
-              action={<Button href="/dashboard/bookings/new">New booking</Button>}
+              title={filtering ? "No bookings match" : "No bookings yet"}
+              description={
+                filtering
+                  ? "Try a different search or status."
+                  : "Book a cleaning and its job visits will be generated automatically."
+              }
+              action={filtering ? undefined : <Button href="/dashboard/bookings/new">New booking</Button>}
               icon={<CalendarIcon className="h-10 w-10" />}
             />
           </CardContent>
