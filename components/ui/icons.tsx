@@ -193,6 +193,15 @@ export function PrinterIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function CameraIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Base {...props}>
+      <path d="M4 8h3l2-2h6l2 2h3v11H4z" />
+      <circle cx="12" cy="13" r="3.5" />
+    </Base>
+  );
+}
+
 export function ClockIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <Base {...props}>

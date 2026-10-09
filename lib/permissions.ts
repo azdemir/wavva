@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { requireCompany, type Membership } from "@/lib/auth";
+import { requireCompany, type Membership, type Company } from "@/lib/auth";
 
 export type Role = Membership["role"];
 
@@ -44,6 +44,20 @@ export function can(role: Role, permission: Permission): boolean {
 /** Owners and managers. */
 export function isStaff(role: Role): boolean {
   return role === "owner" || role === "manager";
+}
+
+/**
+ * Staff can work any job; cleaners only jobs assigned to them.
+ * Pure helper (not a server action) — lives here so "use server" modules
+ * can share it without violating the async-export rule.
+ */
+export function canWorkJob(
+  ctx: { membership: Membership; company: Company },
+  job: { assigned_user_ids: string[] | null } | null,
+): boolean {
+  if (isStaff(ctx.membership.role)) return true;
+  if (!job) return false;
+  return (job.assigned_user_ids ?? []).includes(ctx.membership.user_id);
 }
 
 export const NOT_PERMITTED = "You don't have permission to do that.";

@@ -98,12 +98,13 @@ export function seatLimitLabel(plan: PlanId): string {
  * Feature gating by plan. Tiers are cumulative: Growth includes everything
  * in Starter, Pro includes everything in Growth.
  */
-export type PlanFeature = "schedule" | "checklists" | "reports";
+export type PlanFeature = "schedule" | "checklists" | "reports" | "photos";
 
 const FEATURE_MIN_PLAN: Record<PlanFeature, PlanId> = {
   schedule: "growth", // Week schedule view
   checklists: "growth", // Job checklists & crew assignment
   reports: "pro", // Company reporting dashboard
+  photos: "pro", // Before/after job photo uploads
 };
 
 const PLAN_RANK: Record<PlanId, number> = { starter: 0, growth: 1, pro: 2 };

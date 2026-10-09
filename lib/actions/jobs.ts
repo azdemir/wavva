@@ -3,8 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { requireCompany, type Membership, type Company } from "@/lib/auth";
-import { isStaff, NOT_PERMITTED } from "@/lib/permissions";
+import { requireCompany } from "@/lib/auth";
+import { isStaff, NOT_PERMITTED, canWorkJob } from "@/lib/permissions";
 import { logAudit } from "@/lib/audit";
 import { one } from "@/lib/relations";
 import { baseUrl } from "@/lib/base-url";
@@ -22,16 +22,6 @@ async function getJob(id: string, companyId: string) {
     .eq("company_id", companyId)
     .single();
   return { supabase, job: data as { id: string; status: string; assigned_user_ids: string[] | null } | null };
-}
-
-/** Staff can work any job; cleaners only jobs assigned to them. */
-function canWorkJob(
-  ctx: { membership: Membership; company: Company },
-  job: { assigned_user_ids: string[] | null } | null,
-): boolean {
-  if (isStaff(ctx.membership.role)) return true;
-  if (!job) return false;
-  return (job.assigned_user_ids ?? []).includes(ctx.membership.user_id);
 }
 
 export async function startJob(id: string): Promise<ActionResult> {

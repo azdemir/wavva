@@ -11,8 +11,10 @@ import { JobStatusPill, type JobStatus } from "@/components/ui/badge";
 import { TextareaField } from "@/components/ui/input";
 import { JobChecklist, type ChecklistItem } from "@/components/jobs/job-checklist";
 import { AssignCrew } from "@/components/jobs/assign-crew";
+import { JobPhotos, type JobPhoto } from "@/components/jobs/job-photos";
 import { UpgradePrompt } from "@/components/billing/upgrade-prompt";
 import { hasFeature, isPlanId } from "@/lib/plans";
+import { isStorageConfigured, getPhotoViewUrl } from "@/lib/storage";
 import { formatTime, formatDate } from "@/lib/format";
 
 export const instant = false;
@@ -26,6 +28,8 @@ export default async function JobDetailPage({
   const { company, membership } = await requireCompany();
   const plan = isPlanId(company.plan) ? company.plan : "starter";
   const canUseChecklists = hasFeature(plan, "checklists");
+  const canUsePhotos = hasFeature(plan, "photos");
+  const storageReady = isStorageConfigured();
   const supabase = await createClient();
   const tz = company.timezone || "America/New_York";
   const isStaff = membership.role === "owner" || membership.role === "manager";
@@ -60,6 +64,27 @@ export default async function JobDetailPage({
   const address = one(job.service_addresses);
   const booking = one(job.bookings);
   const checklist = (job.checklist ?? []) as ChecklistItem[];
+
+  // Before/after photos with fresh signed view URLs (1h expiry).
+  let photos: JobPhoto[] = [];
+  if (canUsePhotos && storageReady) {
+    const { data: rows } = await supabase
+      .from("job_photos")
+      .select("id, kind, storage_key, created_at")
+      .eq("job_id", id)
+      .eq("company_id", company.id)
+      .order("created_at", { ascending: true });
+    photos = (
+      await Promise.all(
+        (rows ?? []).map(async (r) => ({
+          id: r.id,
+          kind: r.kind as "before" | "after",
+          viewUrl: await getPhotoViewUrl(r.storage_key),
+          createdAt: r.created_at,
+        })),
+      )
+    ).filter((p): p is JobPhoto => p.viewUrl !== null);
+  }
   const readOnly = job.status === "completed" || job.status === "canceled";
   const whenLabel =
     job.scheduled_start === job.scheduled_end
@@ -178,6 +203,25 @@ export default async function JobDetailPage({
             <JobChecklist jobId={id} initial={checklist} readOnly={readOnly} />
           ) : (
             <UpgradePrompt feature="checklists" />
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Before / after photos</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {!canUsePhotos ? (
+            <UpgradePrompt feature="photos" />
+          ) : !storageReady ? (
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              {isStaff
+                ? "Photo uploads need object storage. Set STORAGE_BUCKET, STORAGE_ENDPOINT, STORAGE_ACCESS_KEY_ID, and STORAGE_SECRET_ACCESS_KEY to enable them."
+                : "Photo uploads aren't enabled yet — ask your manager."}
+            </p>
+          ) : (
+            <JobPhotos jobId={id} initial={photos} readOnly={readOnly} />
           )}
         </CardContent>
       </Card>
