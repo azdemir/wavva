@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { getTranslations } from "next-intl/server";
 import { requireOwner } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
 import { getStripe } from "@/lib/stripe";
@@ -14,11 +15,11 @@ export async function startConnectOnboarding(
   baseUrl: string,
 ): Promise<{ error?: string; url?: string }> {
   const ctx = await requireOwner();
+  const t = await getTranslations("billing");
   const stripe = getStripe();
   if (!stripe) {
     return {
-      error:
-        "Stripe isn't configured yet. Add STRIPE_SECRET_KEY to the environment, then try again.",
+      error: t("errors.connectNotConfigured"),
     };
   }
 
@@ -61,6 +62,6 @@ export async function startConnectOnboarding(
 
     return { url: link.url };
   } catch (e) {
-    return { error: e instanceof Error ? e.message : "Stripe onboarding failed." };
+    return { error: e instanceof Error ? e.message : t("errors.stripeOnboardingFailed") };
   }
 }

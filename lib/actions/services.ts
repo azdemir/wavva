@@ -1,5 +1,6 @@
 "use server";
 
+import { getTranslations } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireCompany } from "@/lib/auth";
@@ -17,6 +18,7 @@ function dollarsToCents(v: FormDataEntryValue | null): number {
 export async function createService(formData: FormData): Promise<ActionResult> {
   const ctx = await requireCompany();
   if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
+  const t = await getTranslations("services");
   const parsed = serviceSchema.safeParse({
     name: formData.get("name"),
     category: formData.get("category"),
@@ -24,7 +26,7 @@ export async function createService(formData: FormData): Promise<ActionResult> {
     base_price_cents: dollarsToCents(formData.get("price")),
     unit: formData.get("unit"),
   });
-  if (!parsed.success) return { error: "Please check the service details." };
+  if (!parsed.success) return { error: t("errors.checkService") };
 
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -39,7 +41,7 @@ export async function createService(formData: FormData): Promise<ActionResult> {
     })
     .select("id")
     .single();
-  if (error || !data) return { error: error?.message ?? "Could not create service." };
+  if (error || !data) return { error: error?.message ?? t("errors.createFailed") };
 
   await logAudit(supabase, {
     company_id: ctx.company.id,
@@ -54,6 +56,7 @@ export async function createService(formData: FormData): Promise<ActionResult> {
 export async function updateService(id: string, formData: FormData): Promise<ActionResult> {
   const ctx = await requireCompany();
   if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
+  const t = await getTranslations("services");
   const parsed = serviceSchema.safeParse({
     name: formData.get("name"),
     category: formData.get("category"),
@@ -61,7 +64,7 @@ export async function updateService(id: string, formData: FormData): Promise<Act
     base_price_cents: dollarsToCents(formData.get("price")),
     unit: formData.get("unit"),
   });
-  if (!parsed.success) return { error: "Please check the service details." };
+  if (!parsed.success) return { error: t("errors.checkService") };
 
   const supabase = await createClient();
   const { error } = await supabase
@@ -97,6 +100,7 @@ export async function setServiceActive(id: string, active: boolean): Promise<Act
 export async function deleteService(id: string): Promise<ActionResult> {
   const ctx = await requireCompany();
   if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
+  const t = await getTranslations("services");
   const supabase = await createClient();
 
   const [{ count: quoteRefs }, { count: bookingRefs }] = await Promise.all([
@@ -105,8 +109,7 @@ export async function deleteService(id: string): Promise<ActionResult> {
   ]);
   if ((quoteRefs ?? 0) > 0 || (bookingRefs ?? 0) > 0) {
     return {
-      error:
-        "This service is used on quotes or bookings. Deactivate it instead of deleting.",
+      error: t("errors.serviceInUse"),
     };
   }
 
@@ -123,11 +126,12 @@ export async function deleteService(id: string): Promise<ActionResult> {
 export async function createAddon(formData: FormData): Promise<ActionResult> {
   const ctx = await requireCompany();
   if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
+  const t = await getTranslations("services");
   const parsed = addonSchema.safeParse({
     name: formData.get("name"),
     price_cents: dollarsToCents(formData.get("price")),
   });
-  if (!parsed.success) return { error: "Please check the add-on details." };
+  if (!parsed.success) return { error: t("errors.checkAddon") };
 
   const supabase = await createClient();
   const { error } = await supabase.from("addons").insert({
@@ -143,11 +147,12 @@ export async function createAddon(formData: FormData): Promise<ActionResult> {
 export async function updateAddon(id: string, formData: FormData): Promise<ActionResult> {
   const ctx = await requireCompany();
   if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
+  const t = await getTranslations("services");
   const parsed = addonSchema.safeParse({
     name: formData.get("name"),
     price_cents: dollarsToCents(formData.get("price")),
   });
-  if (!parsed.success) return { error: "Please check the add-on details." };
+  if (!parsed.success) return { error: t("errors.checkAddon") };
 
   const supabase = await createClient();
   const { error } = await supabase
@@ -177,6 +182,7 @@ export async function setAddonActive(id: string, active: boolean): Promise<Actio
 export async function deleteAddon(id: string): Promise<ActionResult> {
   const ctx = await requireCompany();
   if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
+  const t = await getTranslations("services");
   const supabase = await createClient();
 
   const { count } = await supabase
@@ -184,7 +190,7 @@ export async function deleteAddon(id: string): Promise<ActionResult> {
     .select("id", { count: "exact", head: true })
     .eq("ref_id", id);
   if ((count ?? 0) > 0) {
-    return { error: "This add-on is used on quotes. Deactivate it instead." };
+    return { error: t("errors.addonInUse") };
   }
 
   const { error } = await supabase

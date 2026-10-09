@@ -1,5 +1,6 @@
 "use server";
 
+import { getTranslations } from "next-intl/server";
 import { rateLimit, limits, rateLimitError } from "@/lib/rate-limit";
 
 import { redirect } from "next/navigation";
@@ -8,7 +9,7 @@ import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { requireUser, requireOwner, getActiveMembership } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
 import { inviteSchema } from "@/lib/validation";
-import { PLANS, isPlanId, seatsAvailable, seatLimitLabel } from "@/lib/plans";
+import { PLANS, isPlanId, seatsAvailable } from "@/lib/plans";
 
 /** Owner creates a single invite from the Team page. */
 export async function createInvite(
@@ -17,11 +18,12 @@ export async function createInvite(
   const rl = await rateLimit("invite", limits.spammy.max, limits.spammy.windowMs);
   if (!rl.allowed) return rateLimitError(rl.resetIn);
   const ctx = await requireOwner();
+  const t = await getTranslations("team");
   const parsed = inviteSchema.safeParse({
     email: formData.get("email"),
     role: formData.get("role"),
   });
-  if (!parsed.success) return { error: "Enter a valid email and role." };
+  if (!parsed.success) return { error: t("errors.invalidInvite") };
 
   const supabase = await createClient();
 
@@ -41,7 +43,10 @@ export async function createInvite(
   const planId = isPlanId(companyRow?.plan) ? companyRow.plan : "starter";
   if (!seatsAvailable(planId, memberCount ?? 0)) {
     return {
-      error: `Your ${PLANS[planId].name} plan includes ${seatLimitLabel(planId)}. Upgrade in Settings → Billing to invite more people.`,
+      error: t("errors.seatLimit", {
+        plan: PLANS[planId].name,
+        seats: PLANS[planId].seats ?? 0,
+      }),
     };
   }
 
@@ -90,6 +95,7 @@ export type AcceptResult = { error?: string };
  */
 export async function acceptInvite(token: string): Promise<AcceptResult> {
   const user = await requireUser();
+  const t = await getTranslations("team");
   const svc = await createServiceClient();
 
   const { data: invite } = await svc
@@ -100,11 +106,11 @@ export async function acceptInvite(token: string): Promise<AcceptResult> {
     .maybeSingle();
 
   if (!invite) {
-    return { error: "This invite link is invalid or has already been used." };
+    return { error: t("errors.inviteInvalid") };
   }
   if (invite.email.toLowerCase() !== (user.email ?? "").toLowerCase()) {
     return {
-      error: `This invite was sent to ${invite.email}. Sign in with that address to accept it.`,
+      error: t("errors.inviteWrongEmail", { email: invite.email }),
     };
   }
 

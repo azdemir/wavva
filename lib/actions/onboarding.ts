@@ -1,6 +1,7 @@
 "use server";
 
 import { rateLimit, limits, rateLimitError } from "@/lib/rate-limit";
+import { getTranslations } from "next-intl/server";
 
 import { redirect } from "next/navigation";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
@@ -24,6 +25,7 @@ export async function saveCompanyProfile(
   formData: FormData,
 ): Promise<ActionResult> {
   const user = await requireUser();
+  const t = await getTranslations("onboarding");
   const parsed = companySchema.safeParse({
     name: formData.get("name"),
     phone: formData.get("phone") || "",
@@ -33,7 +35,7 @@ export async function saveCompanyProfile(
     // Users can change it later in Settings.
     timezone: formData.get("timezone") || "America/New_York",
   });
-  if (!parsed.success) return err(parsed.error.issues[0]?.message ?? "Invalid input");
+  if (!parsed.success) return err(parsed.error.issues[0]?.message ?? t("errors.invalidInput"));
 
   const supabase = await createClient();
   const active = await getActiveMembership();
@@ -77,7 +79,7 @@ export async function saveCompanyProfile(
         .select("id")
         .single();
       if (retry.error || !retry.data) {
-        return err(retry.error?.message ?? "Could not create company");
+        return err(retry.error?.message ?? t("errors.couldNotCreateCompany"));
       }
       db = svc;
       company = retry.data;
@@ -114,8 +116,9 @@ export async function saveServices(
     return { user, ...active };
   });
 
+  const t = await getTranslations("onboarding");
   const parsed = serviceSchema.array().min(1, "Add at least one service").safeParse(items);
-  if (!parsed.success) return err(parsed.error.issues[0]?.message ?? "Invalid services");
+  if (!parsed.success) return err(parsed.error.issues[0]?.message ?? t("errors.invalidServices"));
 
   const supabase = await createClient();
   const { error: delErr } = await supabase
@@ -146,11 +149,12 @@ export async function saveServiceAreas(items: unknown): Promise<ActionResult> {
   const active = await getActiveMembership();
   if (!active) redirect("/onboarding");
 
+  const t = await getTranslations("onboarding");
   const parsed = serviceAreaSchema
     .array()
     .min(1, "Add at least one service area")
     .safeParse(items);
-  if (!parsed.success) return err(parsed.error.issues[0]?.message ?? "Invalid areas");
+  if (!parsed.success) return err(parsed.error.issues[0]?.message ?? t("errors.invalidAreas"));
 
   const supabase = await createClient();
   const { error: delErr } = await supabase
@@ -182,10 +186,11 @@ export async function createInvites(
   if (!rl.allowed) return rateLimitError(rl.resetIn);
   const active = await getActiveMembership();
   if (!active) redirect("/onboarding");
-  if (active.membership.role !== "owner") return { error: "Only owners can invite the team." };
+  const t = await getTranslations("onboarding");
+  if (active.membership.role !== "owner") return { error: t("errors.onlyOwnersInvite") };
 
   const parsed = inviteSchema.array().safeParse(items);
-  if (!parsed.success) return { error: "One or more invites are invalid." };
+  if (!parsed.success) return { error: t("errors.invalidInvites") };
 
   const supabase = await createClient();
   const created: CreatedInvite[] = [];

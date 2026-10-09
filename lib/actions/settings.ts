@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { requireOwner } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
@@ -8,6 +9,7 @@ import { settingsSchema } from "@/lib/validation";
 
 export async function updateCompanySettings(formData: FormData) {
   const ctx = await requireOwner();
+  const t = await getTranslations("settings");
   const parsed = settingsSchema.safeParse({
     name: formData.get("name"),
     phone: formData.get("phone") || "",
@@ -23,7 +25,7 @@ export async function updateCompanySettings(formData: FormData) {
     followup_days: formData.get("followup_days"),
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return { error: parsed.error.issues[0]?.message ?? t("errors.invalidInput") };
   }
 
   const supabase = await createClient();

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Field } from "@/components/ui/input";
 import { statusLabel } from "@/components/ui/badge";
 import { DownloadIcon } from "@/components/ui/icons";
@@ -55,14 +56,15 @@ export function FilterPills({
  * Download link for the Excel export API. A plain anchor (not Next Link) so
  * the browser handles the Content-Disposition: attachment download.
  */
-export function ExportButton({ href }: { href: string }) {
+export async function ExportButton({ href }: { href: string }) {
+  const t = await getTranslations("common");
   return (
     <a
       href={href}
       className="inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
     >
       <DownloadIcon className="h-4 w-4" />
-      Export Excel
+      {t("actions.exportExcel")}
     </a>
   );
 }

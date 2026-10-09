@@ -43,17 +43,24 @@ const jobStatusLabel: Record<JobStatus, string> = {
   canceled: "Canceled",
 };
 
-/** Status pill used across scheduling, jobs, quotes, and invoices. */
+/**
+ * Status pill used across scheduling, jobs, quotes, and invoices.
+ * Pass `label` to render a translated label (dashboard); without it the
+ * English default renders (used by the customer portal, which has no
+ * intl provider).
+ */
 export function JobStatusPill({
   status,
   className,
+  label,
 }: {
   status: JobStatus;
   className?: string;
+  label?: string;
 }) {
   return (
     <Badge tone={jobStatusTone[status]} className={className}>
-      {jobStatusLabel[status]}
+      {label ?? jobStatusLabel[status]}
     </Badge>
   );
 }
@@ -83,13 +90,15 @@ const quoteStatusTone: Record<QuoteStatus, Tone> = {
 export function QuoteStatusPill({
   status,
   className,
+  label,
 }: {
   status: QuoteStatus;
   className?: string;
+  label?: string;
 }) {
   return (
     <Badge tone={quoteStatusTone[status]} className={className}>
-      {statusLabel(status)}
+      {label ?? statusLabel(status)}
     </Badge>
   );
 }
@@ -108,13 +117,15 @@ const invoiceStatusTone: Record<InvoiceStatus, Tone> = {
 export function InvoiceStatusPill({
   status,
   className,
+  label,
 }: {
   status: InvoiceStatus;
   className?: string;
+  label?: string;
 }) {
   return (
     <Badge tone={invoiceStatusTone[status]} className={className}>
-      {statusLabel(status)}
+      {label ?? statusLabel(status)}
     </Badge>
   );
 }

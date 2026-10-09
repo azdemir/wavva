@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { getStripe } from "@/lib/stripe";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { requireOwner } from "@/lib/auth";
@@ -46,13 +47,14 @@ async function getOrCreateCustomer(companyId: string, companyName: string, email
  */
 export async function createPlanCheckout(planId: string) {
   const ctx = await requireOwner();
-  if (!isPlanId(planId)) return { error: "Unknown plan." };
+  const t = await getTranslations("billing");
+  if (!isPlanId(planId)) return { error: t("errors.unknownPlan") };
 
   const stripe = getStripe();
-  if (!stripe) return { error: "Stripe is not configured." };
+  if (!stripe) return { error: t("errors.stripeNotConfigured") };
   const priceId = process.env[PRICE_ENV[planId]];
   if (!priceId) {
-    return { error: `Missing ${PRICE_ENV[planId]} — ask the platform owner to configure plan prices.` };
+    return { error: t("errors.missingPrice", { env: PRICE_ENV[planId] }) };
   }
 
   const customerId = await getOrCreateCustomer(ctx.company.id, ctx.company.name, ctx.user.email ?? null);
@@ -70,7 +72,7 @@ export async function createPlanCheckout(planId: string) {
     cancel_url: `${siteUrl()}/dashboard/settings/billing?checkout=cancelled`,
   });
 
-  if (!session.url) return { error: "Could not start checkout." };
+  if (!session.url) return { error: t("errors.checkoutFailed") };
   redirect(session.url);
 }
 
@@ -78,7 +80,8 @@ export async function createPlanCheckout(planId: string) {
 export async function createBillingPortalSession() {
   const ctx = await requireOwner();
   const stripe = getStripe();
-  if (!stripe) return { error: "Stripe is not configured." };
+  const t = await getTranslations("billing");
+  if (!stripe) return { error: t("errors.stripeNotConfigured") };
 
   const supabase = await createClient();
   const { data: company } = await supabase
@@ -87,7 +90,7 @@ export async function createBillingPortalSession() {
     .eq("id", ctx.company.id)
     .single();
   if (!company?.stripe_customer_id) {
-    return { error: "No subscription yet — pick a plan first." };
+    return { error: t("errors.noSubscription") };
   }
 
   const session = await stripe.billingPortal.sessions.create({

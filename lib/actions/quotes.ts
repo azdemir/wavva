@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { requireCompany } from "@/lib/auth";
 import { isStaff, NOT_PERMITTED } from "@/lib/permissions";
@@ -28,9 +29,10 @@ const transitions: Record<string, string[]> = {
 export async function createQuote(input: unknown): Promise<ActionResult> {
   const ctx = await requireCompany();
   if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
+  const t = await getTranslations("quotes");
   const parsed = quoteSchema.safeParse(input);
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid quote." };
+    return { error: parsed.error.issues[0]?.message ?? t("actions.invalid") };
   }
 
   const supabase = await createClient();
@@ -48,7 +50,7 @@ export async function createQuote(input: unknown): Promise<ActionResult> {
       .select("id", { count: "exact", head: true })
       .eq("company_id", ctx.company.id),
   ]);
-  if (!customer) return { error: "Customer not found." };
+  if (!customer) return { error: t("actions.customerNotFound") };
 
   const totals = computeTotals(
     parsed.data.items,
@@ -74,7 +76,7 @@ export async function createQuote(input: unknown): Promise<ActionResult> {
     .select("id")
     .single();
   if (qErr || !quote) {
-    return { error: qErr?.message ?? "Could not create quote." };
+    return { error: qErr?.message ?? t("actions.createFailed") };
   }
 
   const { error: iErr } = await supabase.from("quote_line_items").insert(
@@ -109,6 +111,7 @@ export async function createQuote(input: unknown): Promise<ActionResult> {
 export async function setQuoteStatus(id: string, status: string): Promise<ActionResult> {
   const ctx = await requireCompany();
   if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
+  const t = await getTranslations("quotes");
   const supabase = await createClient();
 
   const { data: quote } = await supabase
@@ -117,11 +120,16 @@ export async function setQuoteStatus(id: string, status: string): Promise<Action
     .eq("id", id)
     .eq("company_id", ctx.company.id)
     .single();
-  if (!quote) return { error: "Quote not found." };
+  if (!quote) return { error: t("actions.notFound") };
 
   const allowed = transitions[quote.status] ?? [];
   if (!allowed.includes(status)) {
-    return { error: `Can't move a ${quote.status} quote to ${status}.` };
+    return {
+      error: t("actions.invalidTransition", {
+        from: t(`status.${quote.status}`),
+        to: t(`status.${status}`),
+      }),
+    };
   }
 
   const { error } = await supabase
@@ -180,6 +188,7 @@ export async function setQuoteStatus(id: string, status: string): Promise<Action
 export async function deleteQuote(id: string): Promise<ActionResult> {
   const ctx = await requireCompany();
   if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
+  const t = await getTranslations("quotes");
   const supabase = await createClient();
 
   const { data: quote } = await supabase
@@ -188,9 +197,9 @@ export async function deleteQuote(id: string): Promise<ActionResult> {
     .eq("id", id)
     .eq("company_id", ctx.company.id)
     .single();
-  if (!quote) return { error: "Quote not found." };
+  if (!quote) return { error: t("actions.notFound") };
   if (quote.status !== "draft") {
-    return { error: "Only draft quotes can be deleted." };
+    return { error: t("actions.onlyDraftDeletable") };
   }
 
   const { error } = await supabase

@@ -13,6 +13,7 @@ import {
   getPhotoUploadUrl,
   deletePhotoObject,
 } from "@/lib/storage";
+import { getTranslations } from "next-intl/server";
 
 export type ActionResult = { error?: string; ok?: boolean };
 
@@ -34,12 +35,13 @@ async function photoContext(jobId: string): Promise<
   | { error: string }
 > {
   const ctx = await requireCompany();
+  const t = await getTranslations("jobs");
   const plan = isPlanId(ctx.company.plan) ? ctx.company.plan : "starter";
   if (!hasFeature(plan, "photos")) {
-    return { error: "Before/after photos need the Pro plan." };
+    return { error: t("actions.needPro") };
   }
   if (!isStorageConfigured()) {
-    return { error: "Photo storage isn't configured yet." };
+    return { error: t("actions.noStorage") };
   }
   const supabase = await createClient();
   const { data: job } = await supabase
@@ -48,7 +50,7 @@ async function photoContext(jobId: string): Promise<
     .eq("id", jobId)
     .eq("company_id", ctx.company.id)
     .single();
-  if (!job) return { error: "Job not found." };
+  if (!job) return { error: t("actions.jobNotFound") };
   if (!canWorkJob(ctx, job as { assigned_user_ids: string[] | null })) {
     return { error: NOT_PERMITTED };
   }
@@ -66,10 +68,11 @@ export async function requestPhotoUpload(
 ): Promise<{ error?: string; uploadUrl?: string; storageKey?: string }> {
   const gate = await photoContext(jobId);
   if ("error" in gate) return { error: gate.error };
+  const t = await getTranslations("jobs");
   const parsedKind = kindSchema.safeParse(kind);
-  if (!parsedKind.success) return { error: "Invalid photo kind." };
+  if (!parsedKind.success) return { error: t("actions.invalidKind") };
   if (!contentType.startsWith("image/")) {
-    return { error: "Only image files can be uploaded." };
+    return { error: t("actions.onlyImages") };
   }
   const ext = CONTENT_TYPE_EXT[contentType] ?? "jpg";
   const photoId = crypto.randomUUID();
@@ -81,7 +84,7 @@ export async function requestPhotoUpload(
     ext,
   );
   const uploadUrl = await getPhotoUploadUrl(key, contentType);
-  if (!uploadUrl) return { error: "Photo storage isn't configured yet." };
+  if (!uploadUrl) return { error: t("actions.noStorage") };
   return { uploadUrl, storageKey: key };
 }
 
@@ -94,12 +97,13 @@ export async function confirmPhotoUpload(
 ): Promise<{ error?: string; ok?: boolean; photoId?: string }> {
   const gate = await photoContext(jobId);
   if ("error" in gate) return { error: gate.error };
+  const t = await getTranslations("jobs");
   const parsedKind = kindSchema.safeParse(kind);
-  if (!parsedKind.success) return { error: "Invalid photo kind." };
+  if (!parsedKind.success) return { error: t("actions.invalidKind") };
   // The key must be one this company/job/kind could have minted.
   const prefix = `job-photos/${gate.ctx.company.id}/${jobId}/${parsedKind.data}/`;
   if (!storageKey.startsWith(prefix) || storageKey.length > prefix.length + 64) {
-    return { error: "Invalid storage key." };
+    return { error: t("actions.invalidKey") };
   }
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -130,6 +134,7 @@ export async function confirmPhotoUpload(
 /** Delete a photo: removes the DB row and the stored object. */
 export async function deleteJobPhoto(photoId: string): Promise<ActionResult> {
   const ctx = await requireCompany();
+  const t = await getTranslations("jobs");
   const plan = isPlanId(ctx.company.plan) ? ctx.company.plan : "starter";
   if (!hasFeature(plan, "photos")) return { error: NOT_PERMITTED };
   const supabase = await createClient();
@@ -139,7 +144,7 @@ export async function deleteJobPhoto(photoId: string): Promise<ActionResult> {
     .eq("id", photoId)
     .eq("company_id", ctx.company.id)
     .single();
-  if (!photo) return { error: "Photo not found." };
+  if (!photo) return { error: t("actions.photoNotFound") };
   const assigned = (photo.jobs as unknown as { assigned_user_ids: string[] | null })
     ?.assigned_user_ids;
   const canDelete = isStaff(ctx.membership.role)

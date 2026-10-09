@@ -2,9 +2,10 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { requireCompany } from "@/lib/auth";
-import { isStaff, NOT_PERMITTED } from "@/lib/permissions";
+import { isStaff } from "@/lib/permissions";
 import { logAudit } from "@/lib/audit";
 import { customerSchema, addressSchema } from "@/lib/validation";
 import { missingColumnName } from "@/lib/supabase/schema-fallback";
@@ -24,9 +25,10 @@ function formToCustomer(formData: FormData) {
 
 export async function createCustomer(formData: FormData): Promise<ActionResult> {
   const ctx = await requireCompany();
-  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
+  const t = await getTranslations("customers");
+  if (!isStaff(ctx.membership.role)) return { error: t("errors.notPermitted") };
   const parsed = formToCustomer(formData);
-  if (!parsed.success) return { error: "Please check the customer details." };
+  if (!parsed.success) return { error: t("errors.checkCustomer") };
 
   const supabase = await createClient();
   const row = {
@@ -50,7 +52,7 @@ export async function createCustomer(formData: FormData): Promise<ActionResult> 
       .select("id")
       .single());
   }
-  if (error || !data) return { error: error?.message ?? "Could not create customer." };
+  if (error || !data) return { error: error?.message ?? t("errors.createFailed") };
 
   await logAudit(supabase, {
     company_id: ctx.company.id,
@@ -64,9 +66,10 @@ export async function createCustomer(formData: FormData): Promise<ActionResult> 
 
 export async function updateCustomer(id: string, formData: FormData): Promise<ActionResult> {
   const ctx = await requireCompany();
-  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
+  const t = await getTranslations("customers");
+  if (!isStaff(ctx.membership.role)) return { error: t("errors.notPermitted") };
   const parsed = formToCustomer(formData);
-  if (!parsed.success) return { error: "Please check the customer details." };
+  if (!parsed.success) return { error: t("errors.checkCustomer") };
 
   const supabase = await createClient();
   const patch = {
@@ -97,7 +100,8 @@ export async function updateCustomer(id: string, formData: FormData): Promise<Ac
 
 export async function deleteCustomer(id: string): Promise<ActionResult> {
   const ctx = await requireCompany();
-  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
+  const t = await getTranslations("customers");
+  if (!isStaff(ctx.membership.role)) return { error: t("errors.notPermitted") };
   const supabase = await createClient();
 
   // Don't delete customers with live bookings — cancel those first.
@@ -108,7 +112,7 @@ export async function deleteCustomer(id: string): Promise<ActionResult> {
     .eq("company_id", ctx.company.id)
     .neq("status", "canceled");
   if ((count ?? 0) > 0) {
-    return { error: "This customer has active bookings. Cancel them first." };
+    return { error: t("errors.hasActiveBookings") };
   }
 
   const { error } = await supabase
@@ -130,10 +134,11 @@ export async function deleteCustomer(id: string): Promise<ActionResult> {
 
 export async function createAddress(formData: FormData): Promise<ActionResult> {
   const ctx = await requireCompany();
-  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
+  const t = await getTranslations("customers");
+  if (!isStaff(ctx.membership.role)) return { error: t("errors.notPermitted") };
   const parsed = addressSchema.safeParse({
     customer_id: formData.get("customer_id"),
-    label: formData.get("label") || "Home",
+    label: formData.get("label") || t("addressForm.labelDefault"),
     address_line1: formData.get("address_line1"),
     address_line2: formData.get("address_line2") || "",
     city: formData.get("city"),
@@ -142,7 +147,7 @@ export async function createAddress(formData: FormData): Promise<ActionResult> {
     access_instructions: formData.get("access_instructions") || "",
     is_default: formData.get("is_default") === "on",
   });
-  if (!parsed.success) return { error: "Please check the address details." };
+  if (!parsed.success) return { error: t("errors.checkAddress") };
 
   const supabase = await createClient();
   // Verify the customer belongs to this company (RLS would also block it).
@@ -152,7 +157,7 @@ export async function createAddress(formData: FormData): Promise<ActionResult> {
     .eq("id", parsed.data.customer_id)
     .eq("company_id", ctx.company.id)
     .maybeSingle();
-  if (!customer) return { error: "Customer not found." };
+  if (!customer) return { error: t("errors.customerNotFound") };
 
   if (parsed.data.is_default) {
     await supabase
@@ -182,7 +187,8 @@ export async function createAddress(formData: FormData): Promise<ActionResult> {
 
 export async function deleteAddress(id: string, customerId: string): Promise<ActionResult> {
   const ctx = await requireCompany();
-  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
+  const t = await getTranslations("customers");
+  if (!isStaff(ctx.membership.role)) return { error: t("errors.notPermitted") };
   const supabase = await createClient();
 
   const { count } = await supabase
@@ -192,7 +198,7 @@ export async function deleteAddress(id: string, customerId: string): Promise<Act
     .eq("company_id", ctx.company.id)
     .neq("status", "canceled");
   if ((count ?? 0) > 0) {
-    return { error: "This address has active bookings. Cancel them first." };
+    return { error: t("errors.addressHasActiveBookings") };
   }
 
   const { error } = await supabase

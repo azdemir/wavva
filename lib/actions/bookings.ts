@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { requireCompany } from "@/lib/auth";
 import { isStaff, NOT_PERMITTED } from "@/lib/permissions";
@@ -40,14 +41,15 @@ function occurrences(start: Date, end: Date, recurrence: string): Occurrence[] {
 export async function createBooking(input: unknown): Promise<ActionResult> {
   const ctx = await requireCompany();
   if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
+  const t = await getTranslations("bookings");
   const parsed = bookingSchema.safeParse(input);
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid booking." };
+    return { error: parsed.error.issues[0]?.message ?? t("actions.invalidBooking") };
   }
   const tz = ctx.company.timezone || "America/New_York";
   const start = localInputToUtc(parsed.data.scheduled_start, tz);
   const end = localInputToUtc(parsed.data.scheduled_end, tz);
-  if (!(end > start)) return { error: "End time must be after start time." };
+  if (!(end > start)) return { error: t("actions.endAfterStart") };
 
   const supabase = await createClient();
 
@@ -56,9 +58,9 @@ export async function createBooking(input: unknown): Promise<ActionResult> {
     supabase.from("customers").select("id").eq("id", parsed.data.customer_id).eq("company_id", ctx.company.id).maybeSingle(),
     supabase.from("service_addresses").select("id, customer_id").eq("id", parsed.data.service_address_id).eq("company_id", ctx.company.id).maybeSingle(),
   ]);
-  if (!customer) return { error: "Customer not found." };
+  if (!customer) return { error: t("actions.customerNotFound") };
   if (!address || address.customer_id !== customer.id) {
-    return { error: "Service address doesn't belong to this customer." };
+    return { error: t("actions.addressMismatch") };
   }
   // Independent lookups run in parallel: service/quote verification and
   // the numbering count don't depend on each other.
@@ -74,8 +76,8 @@ export async function createBooking(input: unknown): Promise<ActionResult> {
       .select("id", { count: "exact", head: true })
       .eq("company_id", ctx.company.id),
   ]);
-  if (parsed.data.service_id && !svc) return { error: "Service not found." };
-  if (parsed.data.quote_id && !q) return { error: "Quote not found." };
+  if (parsed.data.service_id && !svc) return { error: t("actions.serviceNotFound") };
+  if (parsed.data.quote_id && !q) return { error: t("actions.quoteNotFound") };
 
   const settings = ctx.company.settings as { cancellation_policy?: string | null };
   const { data: booking, error: bErr } = await supabase
@@ -95,7 +97,7 @@ export async function createBooking(input: unknown): Promise<ActionResult> {
     })
     .select("id")
     .single();
-  if (bErr || !booking) return { error: bErr?.message ?? "Could not create booking." };
+  if (bErr || !booking) return { error: bErr?.message ?? t("actions.createFailed") };
 
   const jobs = occurrences(start, end, parsed.data.recurrence).map((o) => ({
     company_id: ctx.company.id,
@@ -158,10 +160,11 @@ export async function rescheduleBooking(
 ): Promise<ActionResult> {
   const ctx = await requireCompany();
   if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
+  const t = await getTranslations("bookings");
   const tz = ctx.company.timezone || "America/New_York";
   const newStart = localInputToUtc(newStartInput, tz);
   const newEnd = localInputToUtc(newEndInput, tz);
-  if (!(newEnd > newStart)) return { error: "End time must be after start time." };
+  if (!(newEnd > newStart)) return { error: t("actions.endAfterStart") };
 
   const supabase = await createClient();
   const { data: booking } = await supabase
@@ -170,7 +173,7 @@ export async function rescheduleBooking(
     .eq("id", id)
     .eq("company_id", ctx.company.id)
     .single();
-  if (!booking) return { error: "Booking not found." };
+  if (!booking) return { error: t("actions.bookingNotFound") };
 
   const deltaMs = newStart.getTime() - new Date(booking.scheduled_start).getTime();
 

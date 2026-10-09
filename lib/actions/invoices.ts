@@ -13,6 +13,7 @@ import { baseUrl } from "@/lib/base-url";
 import { formatDate } from "@/lib/format";
 import { enqueueNotification } from "@/lib/notifications/queue";
 import { getOrCreatePortalLink } from "@/lib/actions/portal";
+import { getTranslations } from "next-intl/server";
 
 export type ActionResult = { error?: string; ok?: boolean };
 
@@ -34,9 +35,10 @@ const invoiceSchema = z.object({
 export async function createInvoice(input: unknown): Promise<ActionResult> {
   const ctx = await requireCompany();
   if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
+  const t = await getTranslations("invoices");
   const parsed = invoiceSchema.safeParse(input);
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid invoice." };
+    return { error: parsed.error.issues[0]?.message ?? t("errors.invalidInvoice") };
   }
 
   // Customer check and the numbering count are independent — run together.
@@ -53,7 +55,7 @@ export async function createInvoice(input: unknown): Promise<ActionResult> {
       .select("id", { count: "exact", head: true })
       .eq("company_id", ctx.company.id),
   ]);
-  if (!customer) return { error: "Customer not found." };
+  if (!customer) return { error: t("errors.customerNotFound") };
 
   const totals = computeTotals(parsed.data.items, 0, parsed.data.tax_rate);
 
@@ -74,7 +76,7 @@ export async function createInvoice(input: unknown): Promise<ActionResult> {
     })
     .select("id")
     .single();
-  if (iErr || !invoice) return { error: iErr?.message ?? "Could not create invoice." };
+  if (iErr || !invoice) return { error: iErr?.message ?? t("errors.couldNotCreate") };
 
   const { error: lErr } = await supabase.from("invoice_line_items").insert(
     parsed.data.items.map((item, i) => ({
@@ -114,6 +116,7 @@ const invoiceTransitions: Record<string, string[]> = {
 export async function setInvoiceStatus(id: string, status: string): Promise<ActionResult> {
   const ctx = await requireCompany();
   if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
+  const t = await getTranslations("invoices");
   const supabase = await createClient();
 
   const { data: invoice } = await supabase
@@ -122,9 +125,13 @@ export async function setInvoiceStatus(id: string, status: string): Promise<Acti
     .eq("id", id)
     .eq("company_id", ctx.company.id)
     .single();
-  if (!invoice) return { error: "Invoice not found." };
+  if (!invoice) return { error: t("errors.invoiceNotFound") };
   if (!(invoiceTransitions[invoice.status] ?? []).includes(status)) {
-    return { error: `Can't move a ${invoice.status} invoice to ${status}.` };
+    const trStatus = (s: string) =>
+      (["draft", "sent", "overdue", "paid", "void"] as readonly string[]).includes(s)
+        ? t(`list.status.${s}`)
+        : s;
+    return { error: t("errors.invalidTransition", { from: trStatus(invoice.status), to: trStatus(status) }) };
   }
 
   const { error } = await supabase
@@ -180,8 +187,9 @@ export async function setInvoiceStatus(id: string, status: string): Promise<Acti
 export async function recordPayment(id: string, formData: FormData): Promise<ActionResult> {
   const ctx = await requireCompany();
   if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
+  const t = await getTranslations("invoices");
   const amountCents = Math.round(Number(formData.get("amount") || 0) * 100);
-  if (!(amountCents > 0)) return { error: "Enter a payment amount." };
+  if (!(amountCents > 0)) return { error: t("errors.enterPaymentAmount") };
 
   const supabase = await createClient();
   const { data: invoice } = await supabase
@@ -190,9 +198,9 @@ export async function recordPayment(id: string, formData: FormData): Promise<Act
     .eq("id", id)
     .eq("company_id", ctx.company.id)
     .single();
-  if (!invoice) return { error: "Invoice not found." };
+  if (!invoice) return { error: t("errors.invoiceNotFound") };
   if (!["sent", "overdue"].includes(invoice.status)) {
-    return { error: "Payments can only be recorded on sent invoices." };
+    return { error: t("errors.paymentsOnlyOnSent") };
   }
 
   const { error: pErr } = await supabase.from("payments").insert({
@@ -238,9 +246,10 @@ export async function updateInvoiceNumber(
 ): Promise<ActionResult> {
   const ctx = await requireCompany();
   if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
+  const t = await getTranslations("invoices");
   const parsed = invoiceNumberSchema.safeParse(formData.get("invoice_number"));
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid invoice number." };
+    return { error: parsed.error.issues[0]?.message ?? t("errors.invalidInvoiceNumber") };
   }
   const supabase = await createClient();
   const { data: invoice } = await supabase
@@ -249,7 +258,7 @@ export async function updateInvoiceNumber(
     .eq("id", id)
     .eq("company_id", ctx.company.id)
     .single();
-  if (!invoice) return { error: "Invoice not found." };
+  if (!invoice) return { error: t("errors.invoiceNotFound") };
 
   const { error } = await supabase
     .from("invoices")
@@ -257,7 +266,7 @@ export async function updateInvoiceNumber(
     .eq("id", id)
     .eq("company_id", ctx.company.id);
   if (error) {
-    if (error.code === "23505") return { error: "That invoice number is already used." };
+    if (error.code === "23505") return { error: t("errors.numberAlreadyUsed") };
     return { error: error.message };
   }
 
@@ -276,6 +285,7 @@ export async function updateInvoiceNumber(
 export async function deleteInvoice(id: string): Promise<ActionResult> {
   const ctx = await requireCompany();
   if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
+  const t = await getTranslations("invoices");
   const supabase = await createClient();
 
   const { data: invoice } = await supabase
@@ -284,8 +294,8 @@ export async function deleteInvoice(id: string): Promise<ActionResult> {
     .eq("id", id)
     .eq("company_id", ctx.company.id)
     .single();
-  if (!invoice) return { error: "Invoice not found." };
-  if (invoice.status !== "draft") return { error: "Only draft invoices can be deleted." };
+  if (!invoice) return { error: t("errors.invoiceNotFound") };
+  if (invoice.status !== "draft") return { error: t("errors.onlyDraftDeletable") };
 
   const { error } = await supabase
     .from("invoices")

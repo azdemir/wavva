@@ -10,6 +10,7 @@ import { one } from "@/lib/relations";
 import { baseUrl } from "@/lib/base-url";
 import { formatDate, formatTime } from "@/lib/format";
 import { enqueueNotification } from "@/lib/notifications/queue";
+import { getTranslations } from "next-intl/server";
 
 export type ActionResult = { error?: string; ok?: boolean };
 
@@ -26,10 +27,11 @@ async function getJob(id: string, companyId: string) {
 
 export async function startJob(id: string): Promise<ActionResult> {
   const ctx = await requireCompany();
+  const t = await getTranslations("jobs");
   const { supabase, job } = await getJob(id, ctx.company.id);
-  if (!job) return { error: "Job not found." };
+  if (!job) return { error: t("actions.jobNotFound") };
   if (!canWorkJob(ctx, job)) return { error: NOT_PERMITTED };
-  if (job.status !== "scheduled") return { error: "Only scheduled jobs can be started." };
+  if (job.status !== "scheduled") return { error: t("actions.onlyScheduled") };
 
   const { error } = await supabase
     .from("jobs")
@@ -52,11 +54,12 @@ export async function startJob(id: string): Promise<ActionResult> {
 
 export async function completeJob(id: string, formData: FormData): Promise<ActionResult> {
   const ctx = await requireCompany();
+  const t = await getTranslations("jobs");
   const { supabase, job } = await getJob(id, ctx.company.id);
-  if (!job) return { error: "Job not found." };
+  if (!job) return { error: t("actions.jobNotFound") };
   if (!canWorkJob(ctx, job)) return { error: NOT_PERMITTED };
   if (!["scheduled", "in_progress"].includes(job.status)) {
-    return { error: "This job can't be completed from its current state." };
+    return { error: t("actions.cantComplete") };
   }
 
   const { error } = await supabase
@@ -85,10 +88,11 @@ export async function completeJob(id: string, formData: FormData): Promise<Actio
 
 export async function cancelJob(id: string): Promise<ActionResult> {
   const ctx = await requireCompany();
+  const t = await getTranslations("jobs");
   if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const { supabase, job } = await getJob(id, ctx.company.id);
-  if (!job) return { error: "Job not found." };
-  if (job.status === "completed") return { error: "Completed jobs can't be canceled." };
+  if (!job) return { error: t("actions.jobNotFound") };
+  if (job.status === "completed") return { error: t("actions.cantCancel") };
 
   const { error } = await supabase
     .from("jobs")
@@ -112,6 +116,7 @@ export async function cancelJob(id: string): Promise<ActionResult> {
 /** Replace the crew assigned to a job. */
 export async function assignJob(id: string, userIds: string[]): Promise<ActionResult> {
   const ctx = await requireCompany();
+  const t = await getTranslations("jobs");
   if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
   const supabase = await createClient();
 
@@ -124,7 +129,7 @@ export async function assignJob(id: string, userIds: string[]): Promise<ActionRe
       .in("user_id", userIds);
     const valid = new Set((members ?? []).map((m) => m.user_id));
     const invalid = userIds.filter((u) => !valid.has(u));
-    if (invalid.length > 0) return { error: "One or more assignees aren't on your team." };
+    if (invalid.length > 0) return { error: t("actions.badAssignees") };
   }
 
   const { error } = await supabase
@@ -189,8 +194,9 @@ const checklistItem = z.object({ label: z.string().min(1).max(200), done: z.bool
 /** Replace the job's checklist (used by the interactive checklist UI). */
 export async function saveChecklist(id: string, items: unknown): Promise<ActionResult> {
   const ctx = await requireCompany();
+  const t = await getTranslations("jobs");
   const parsed = checklistItem.array().max(100).safeParse(items);
-  if (!parsed.success) return { error: "Invalid checklist." };
+  if (!parsed.success) return { error: t("actions.invalidChecklist") };
 
   const supabase = await createClient();
   const { data: job } = await supabase
@@ -199,7 +205,7 @@ export async function saveChecklist(id: string, items: unknown): Promise<ActionR
     .eq("id", id)
     .eq("company_id", ctx.company.id)
     .single();
-  if (!job) return { error: "Job not found." };
+  if (!job) return { error: t("actions.jobNotFound") };
   if (!canWorkJob(ctx, job as { assigned_user_ids: string[] | null })) {
     return { error: NOT_PERMITTED };
   }

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 /** Join class names, skipping falsy values. */
 function cx(...parts: (string | false | undefined)[]) {
@@ -37,7 +38,7 @@ function pageHref(
 }
 
 /** Server-rendered pagination for dashboard list pages. */
-export function Pagination({
+export async function Pagination({
   page,
   totalPages,
   total,
@@ -47,6 +48,7 @@ export function Pagination({
   pageParam = "page",
 }: Props) {
   if (totalPages <= 1) return null;
+  const t = await getTranslations("common");
   const start = (page - 1) * pageSize + 1;
   const end = Math.min(page * pageSize, total);
 
@@ -73,12 +75,12 @@ export function Pagination({
       className="flex flex-col items-center justify-between gap-3 pt-4 sm:flex-row"
     >
       <p className="text-sm text-slate-500 dark:text-slate-400">
-        Showing {start}–{end} of {total}
+        {t("pagination.showing", { start, end, total })}
       </p>
       <div className="flex items-center gap-1">
         <Link
           href={pageHref(basePath, searchParams, pageParam, page - 1)}
-          aria-label="Previous page"
+          aria-label={t("pagination.previousPage")}
           aria-disabled={page <= 1}
           className={cx(
             btn,
@@ -101,7 +103,7 @@ export function Pagination({
             <Link
               key={p}
               href={pageHref(basePath, searchParams, pageParam, p)}
-              aria-label={`Page ${p}`}
+              aria-label={t("pagination.page", { page: p })}
               aria-current={p === page ? "page" : undefined}
               className={cx(
                 btn,
@@ -116,7 +118,7 @@ export function Pagination({
         )}
         <Link
           href={pageHref(basePath, searchParams, pageParam, page + 1)}
-          aria-label="Next page"
+          aria-label={t("pagination.nextPage")}
           aria-disabled={page >= totalPages}
           className={cx(
             btn,
