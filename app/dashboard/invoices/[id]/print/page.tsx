@@ -80,7 +80,8 @@ export default async function InvoicePrintPage({
         ]}
         customer={{
           name: customer?.name ?? "Customer",
-          email: customer?.email ?? null,
+          // Email is intentionally hidden on the printed invoice.
+          email: null,
           phone: customer?.phone ?? null,
         }}
         items={items}

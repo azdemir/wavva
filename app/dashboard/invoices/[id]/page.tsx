@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Badge, InvoiceStatusPill, statusLabel, type InvoiceStatus } from "@/components/ui/badge";
 import { Field } from "@/components/ui/input";
 import { PrinterIcon } from "@/components/ui/icons";
+import { InvoiceNumberEditor } from "@/components/invoices/invoice-number-editor";
 import { formatCents, formatDate } from "@/lib/format";
 
 export const instant = false;
@@ -67,10 +68,13 @@ export default async function InvoiceDetailPage({
   return (
     <div className="max-w-3xl space-y-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <Heading
-          title={`Invoice ${invoice.invoice_number}`}
-          description={`${customer?.name ?? "Customer"} · created ${formatDate(invoice.created_at)}`}
-        />
+        <div className="space-y-1">
+          <Heading
+            title={`Invoice ${invoice.invoice_number}`}
+            description={`${customer?.name ?? "Customer"} · created ${formatDate(invoice.created_at)}`}
+          />
+          <InvoiceNumberEditor invoiceId={id} current={invoice.invoice_number} />
+        </div>
         <div className="flex items-center gap-2">
           <InvoiceStatusPill status={invoice.status as InvoiceStatus} className="text-sm" />
           <Button href={`/dashboard/invoices/${id}/print`} variant="outline" size="sm">

@@ -229,6 +229,50 @@ export async function recordPayment(id: string, formData: FormData): Promise<Act
   return { ok: true };
 }
 
+const invoiceNumberSchema = z.string().trim().min(1, "Enter an invoice number.").max(50);
+
+/** Rename an invoice (the invoice_number must stay unique per company). */
+export async function updateInvoiceNumber(
+  id: string,
+  formData: FormData,
+): Promise<ActionResult> {
+  const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
+  const parsed = invoiceNumberSchema.safeParse(formData.get("invoice_number"));
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Invalid invoice number." };
+  }
+  const supabase = await createClient();
+  const { data: invoice } = await supabase
+    .from("invoices")
+    .select("id")
+    .eq("id", id)
+    .eq("company_id", ctx.company.id)
+    .single();
+  if (!invoice) return { error: "Invoice not found." };
+
+  const { error } = await supabase
+    .from("invoices")
+    .update({ invoice_number: parsed.data })
+    .eq("id", id)
+    .eq("company_id", ctx.company.id);
+  if (error) {
+    if (error.code === "23505") return { error: "That invoice number is already used." };
+    return { error: error.message };
+  }
+
+  await logAudit(supabase, {
+    company_id: ctx.company.id,
+    action: "invoice.number_changed",
+    entity_type: "invoice",
+    entity_id: id,
+    metadata: { invoice_number: parsed.data },
+  });
+  revalidatePath(`/dashboard/invoices/${id}`);
+  revalidatePath("/dashboard/invoices");
+  return { ok: true };
+}
+
 export async function deleteInvoice(id: string): Promise<ActionResult> {
   const ctx = await requireCompany();
   if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
