@@ -4,6 +4,20 @@ All notable changes to TidyPro. Dates are in America/New_York.
 
 ## 2026-10-09
 
+### Added
+
+- **Dashboard in Spanish and Ukrainian** — the entire dashboard (all 27
+  pages), onboarding, sidebar nav, status pills, pagination, upgrade prompts,
+  and user-facing action messages are now available in English (default),
+  Español, and Українська via a language switcher in the dashboard header.
+  Built on next-intl with a cookie-based locale preference
+  (`tidypro-locale`) — no URL changes, so all links and tests keep working.
+  Messages live in `messages/<locale>/<namespace>.json` (17 namespaces,
+  744 strings × 3 locales) merged by `i18n/request.ts`, which falls back to
+  English for any missing key. The marketing site stays static English.
+  Not yet translated (follow-ups): zod validation messages, auth pages,
+  email templates, date/number formatting.
+
 ### Fixed
 
 - **Customers work even when the database is behind on migrations** — if
