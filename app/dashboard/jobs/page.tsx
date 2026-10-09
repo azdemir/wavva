@@ -4,17 +4,26 @@ import { createClient } from "@/lib/supabase/server";
 import { one } from "@/lib/relations";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { JobStatusPill, type JobStatus } from "@/components/ui/badge";
+import {type JobStatus} from "@/components/ui/badge";
+import { TJobStatusPill } from "@/components/ui/translated-status-pill";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
 import { parsePageParam, PAGE_SIZE } from "@/lib/pagination";
 import { ClockIcon } from "@/components/ui/icons";
 import { formatTime, formatDate } from "@/lib/format";
 import { FilterPills, FilterSearch } from "@/components/ui/filters";
+import { getTranslations } from "next-intl/server";
 
 export const instant = false;
 
 const statuses = ["all", "scheduled", "in_progress", "completed", "canceled"] as const;
+const statusKey: Record<(typeof statuses)[number], string> = {
+  all: "all",
+  scheduled: "scheduled",
+  in_progress: "inProgress",
+  completed: "completed",
+  canceled: "canceled",
+};
 
 type JobRow = {
   id: string;
@@ -33,6 +42,7 @@ export default async function JobsPage({
 }) {
   const { company, membership } = await requirePermission("jobs.manage");
   const supabase = await createClient();
+  const t = await getTranslations("jobs");
   const tz = company.timezone || "America/New_York";
   const isStaff = membership.role === "owner" || membership.role === "manager";
 
@@ -88,43 +98,39 @@ export default async function JobsPage({
   return (
     <div className="space-y-6">
       <Heading
-        title="Jobs"
+        title={t("list.title")}
         description={
-          isStaff
-            ? "Every visit, who it's assigned to, and its status."
-            : "Visits assigned to you."
+          isStaff ? t("list.descriptionStaff") : t("list.descriptionCleaner")
         }
       />
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <FilterPills
           basePath="/dashboard/jobs"
           param="status"
-          options={statuses.map((s) => ({ value: s }))}
+          options={statuses.map((s) => ({ value: s, label: t(`status.${statusKey[s]}`) }))}
           current={status}
           preserve={{ q: q || undefined }}
         />
         <FilterSearch
           id="job-search"
-          label="Search jobs"
+          label={t("list.searchLabel")}
           defaultValue={q}
-          placeholder="Customer name…"
+          placeholder={t("list.searchPlaceholder")}
           preserve={{ status: status !== "all" ? status : undefined }}
         />
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>All jobs</CardTitle>
+          <CardTitle>{t("list.cardTitle")}</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {jobs.length === 0 ? (
             <div className="p-6">
               <EmptyState
                 icon={<ClockIcon className="h-8 w-8" />}
-                title={filtering ? "No jobs match" : "No jobs yet"}
+                title={filtering ? t("list.emptyTitleFiltered") : t("list.emptyTitle")}
                 description={
-                  filtering
-                    ? "Try a different search or status."
-                    : "Jobs are created automatically when you add a booking."
+                  filtering ? t("list.emptyDescFiltered") : t("list.emptyDesc")
                 }
                 action={
                   isStaff ? (
@@ -132,7 +138,7 @@ export default async function JobsPage({
                       href="/dashboard/bookings/new"
                       className="font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700"
                     >
-                      Create a booking →
+                      {t("list.emptyCta")}
                     </Link>
                   ) : undefined
                 }
@@ -151,7 +157,7 @@ export default async function JobsPage({
                       >
                         <div className="min-w-0">
                           <p className="truncate font-medium text-slate-900 dark:text-slate-100">
-                            {one(j.customers)?.name ?? "Job"} ·{" "}
+                            {one(j.customers)?.name ?? t("list.fallbackName")} ·{" "}
                             {formatDate(j.scheduled_start)}
                           </p>
                           <p className="truncate text-sm text-slate-500 dark:text-slate-400">
@@ -160,10 +166,10 @@ export default async function JobsPage({
                             {j.service_addresses &&
                               ` · ${j.service_addresses.address_line1}, ${j.service_addresses.city}`}
                             {isStaff &&
-                              ` · ${assignedCount === 0 ? "Unassigned" : `${assignedCount} assigned`}`}
+                              ` · ${assignedCount === 0 ? t("list.unassigned") : t("list.assignedCount", { count: assignedCount })}`}
                           </p>
                         </div>
-                        <JobStatusPill status={j.status as JobStatus} className="shrink-0" />
+                        <TJobStatusPill status={j.status as JobStatus} className="shrink-0" />
                       </Link>
                     </li>
                   );

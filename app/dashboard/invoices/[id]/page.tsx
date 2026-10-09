@@ -7,18 +7,22 @@ import { setInvoiceStatus, recordPayment, deleteInvoice } from "@/lib/actions/in
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge, InvoiceStatusPill, statusLabel, type InvoiceStatus } from "@/components/ui/badge";
+import { Badge, statusLabel, type InvoiceStatus } from "@/components/ui/badge";
+import { TInvoiceStatusPill } from "@/components/ui/translated-status-pill";
 import { Field } from "@/components/ui/input";
 import { PrinterIcon } from "@/components/ui/icons";
 import { InvoiceNumberEditor } from "@/components/invoices/invoice-number-editor";
 import { formatCents, formatDate } from "@/lib/format";
+import { getTranslations } from "next-intl/server";
 
 export const instant = false;
 
-const nextActions: Record<string, { status: string; label: string }[]> = {
-  draft: [{ status: "sent", label: "Mark as sent" }, { status: "void", label: "Void" }],
-  sent: [{ status: "paid", label: "Mark paid" }, { status: "overdue", label: "Mark overdue" }, { status: "void", label: "Void" }],
-  overdue: [{ status: "paid", label: "Mark paid" }, { status: "void", label: "Void" }],
+type DetailActionLabel = "detail.markSent" | "detail.markPaid" | "detail.markOverdue" | "detail.void";
+
+const nextActions: Record<string, { status: string; label: DetailActionLabel }[]> = {
+  draft: [{ status: "sent", label: "detail.markSent" }, { status: "void", label: "detail.void" }],
+  sent: [{ status: "paid", label: "detail.markPaid" }, { status: "overdue", label: "detail.markOverdue" }, { status: "void", label: "detail.void" }],
+  overdue: [{ status: "paid", label: "detail.markPaid" }, { status: "void", label: "detail.void" }],
   paid: [],
   void: [],
 };
@@ -31,6 +35,12 @@ export default async function InvoiceDetailPage({
   const { id } = await params;
   const { company } = await requirePermission("invoices.manage");
   const supabase = await createClient();
+  const t = await getTranslations("invoices");
+  const tc = await getTranslations("common");
+  const paymentStatusLabel = (s: string) =>
+    ["succeeded", "failed", "pending", "refunded"].includes(s)
+      ? tc(`status.payment.${s}`)
+      : statusLabel(s);
 
   // One round trip: line items and payments come embedded with the
   // parent invoice, ordered server-side via the referenced tables.
@@ -70,15 +80,18 @@ export default async function InvoiceDetailPage({
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-1">
           <Heading
-            title={`Invoice ${invoice.invoice_number}`}
-            description={`${customer?.name ?? "Customer"} · created ${formatDate(invoice.created_at)}`}
+            title={t("detail.title", { number: invoice.invoice_number })}
+            description={t("detail.subtitle", {
+              name: customer?.name ?? t("detail.unknownCustomer"),
+              date: formatDate(invoice.created_at),
+            })}
           />
           <InvoiceNumberEditor invoiceId={id} current={invoice.invoice_number} />
         </div>
         <div className="flex items-center gap-2">
-          <InvoiceStatusPill status={invoice.status as InvoiceStatus} className="text-sm" />
+          <TInvoiceStatusPill status={invoice.status as InvoiceStatus} className="text-sm" />
           <Button href={`/dashboard/invoices/${id}/print`} variant="outline" size="sm">
-            <PrinterIcon className="h-4 w-4" /> Print
+            <PrinterIcon className="h-4 w-4" /> {t("detail.print")}
           </Button>
         </div>
       </div>
@@ -89,10 +102,10 @@ export default async function InvoiceDetailPage({
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-200 dark:border-slate-800 text-left text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 dark:text-slate-500">
-                <th className="px-5 py-3 font-medium">Description</th>
-                <th className="px-5 py-3 text-right font-medium">Qty</th>
-                <th className="px-5 py-3 text-right font-medium">Unit price</th>
-                <th className="px-5 py-3 text-right font-medium">Total</th>
+                <th className="px-5 py-3 font-medium">{t("detail.description")}</th>
+                <th className="px-5 py-3 text-right font-medium">{t("detail.qty")}</th>
+                <th className="px-5 py-3 text-right font-medium">{t("detail.unitPrice")}</th>
+                <th className="px-5 py-3 text-right font-medium">{t("detail.total")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -108,11 +121,11 @@ export default async function InvoiceDetailPage({
           </table>
           </div>
           <div className="space-y-1 border-t border-slate-200 dark:border-slate-800 px-5 py-4 text-sm">
-            <div className="flex justify-between"><span className="text-slate-500 dark:text-slate-400 dark:text-slate-500">Subtotal</span><span>{formatCents(invoice.subtotal_cents)}</span></div>
-            <div className="flex justify-between"><span className="text-slate-500 dark:text-slate-400 dark:text-slate-500">Tax ({(Number(invoice.tax_rate) * 100).toFixed(2)}%)</span><span>{formatCents(invoice.tax_cents)}</span></div>
-            <div className="flex justify-between pt-1 text-base font-bold text-slate-900 dark:text-slate-100"><span>Total</span><span>{formatCents(invoice.total_cents)}</span></div>
-            <div className="flex justify-between text-accent-700"><span>Paid</span><span>{formatCents(invoice.amount_paid_cents)}</span></div>
-            {due > 0 && <div className="flex justify-between font-semibold"><span>Balance due</span><span>{formatCents(due)}</span></div>}
+            <div className="flex justify-between"><span className="text-slate-500 dark:text-slate-400 dark:text-slate-500">{t("detail.subtotal")}</span><span>{formatCents(invoice.subtotal_cents)}</span></div>
+            <div className="flex justify-between"><span className="text-slate-500 dark:text-slate-400 dark:text-slate-500">{t("detail.tax", { rate: (Number(invoice.tax_rate) * 100).toFixed(2) })}</span><span>{formatCents(invoice.tax_cents)}</span></div>
+            <div className="flex justify-between pt-1 text-base font-bold text-slate-900 dark:text-slate-100"><span>{t("detail.total")}</span><span>{formatCents(invoice.total_cents)}</span></div>
+            <div className="flex justify-between text-accent-700"><span>{t("detail.paid")}</span><span>{formatCents(invoice.amount_paid_cents)}</span></div>
+            {due > 0 && <div className="flex justify-between font-semibold"><span>{t("detail.balanceDue")}</span><span>{formatCents(due)}</span></div>}
           </div>
         </CardContent>
       </Card>
@@ -120,7 +133,7 @@ export default async function InvoiceDetailPage({
       {(payments ?? []).length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Payments</CardTitle>
+            <CardTitle>{t("detail.payments")}</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <ul className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -131,7 +144,7 @@ export default async function InvoiceDetailPage({
                     {p.provider_ref ? ` · ${p.provider_ref}` : ""}
                     <span className="text-slate-500 dark:text-slate-400 dark:text-slate-500"> · {formatDate(p.created_at)}</span>
                   </span>
-                  <Badge tone={p.status === "succeeded" ? "accent" : "slate"}>{statusLabel(p.status)}</Badge>
+                  <Badge tone={p.status === "succeeded" ? "accent" : "slate"}>{paymentStatusLabel(p.status)}</Badge>
                 </li>
               ))}
             </ul>
@@ -142,18 +155,18 @@ export default async function InvoiceDetailPage({
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Status</CardTitle>
+            <CardTitle>{t("detail.status")}</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
             {(nextActions[invoice.status] ?? []).map((a) => (
               <form key={a.status} action={async () => { "use server"; await setInvoiceStatus(id, a.status); }}>
-                <Button type="submit" variant="outline">{a.label}</Button>
+                <Button type="submit" variant="outline">{t(a.label)}</Button>
               </form>
             ))}
             {invoice.status === "draft" && (
               <form action={async () => { "use server"; await deleteInvoice(id); }}>
                 <Button type="submit" variant="outline" className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950">
-                  Delete draft
+                  {t("detail.deleteDraft")}
                 </Button>
               </form>
             )}
@@ -163,7 +176,7 @@ export default async function InvoiceDetailPage({
         {["sent", "overdue"].includes(invoice.status) && due > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle>Record offline payment</CardTitle>
+              <CardTitle>{t("detail.recordOfflinePayment")}</CardTitle>
             </CardHeader>
             <CardContent>
               <form
@@ -175,15 +188,15 @@ export default async function InvoiceDetailPage({
                 className="flex flex-wrap items-end gap-3"
               >
                 <div className="w-36">
-                  <Field id="pay-amount" name="amount" label="Amount ($)" type="number" min="0.01" step="0.01" required defaultValue={(due / 100).toFixed(2)} />
+                  <Field id="pay-amount" name="amount" label={t("detail.amount")} type="number" min="0.01" step="0.01" required defaultValue={(due / 100).toFixed(2)} />
                 </div>
                 <div className="min-w-40 flex-1">
-                  <Field id="pay-ref" name="reference" label="Reference" placeholder="Check #, cash…" />
+                  <Field id="pay-ref" name="reference" label={t("detail.reference")} placeholder={t("detail.referencePlaceholder")} />
                 </div>
-                <Button type="submit">Record</Button>
+                <Button type="submit">{t("detail.record")}</Button>
               </form>
               <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">
-                Online card payments unlock after connecting Stripe (Billing page).
+                {t("detail.onlinePaymentsNote")}
               </p>
             </CardContent>
           </Card>
@@ -192,7 +205,7 @@ export default async function InvoiceDetailPage({
 
       <p className="text-sm">
         <Link href="/dashboard/invoices" className="font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400">
-          ← All invoices
+          {t("detail.allInvoices")}
         </Link>
       </p>
     </div>

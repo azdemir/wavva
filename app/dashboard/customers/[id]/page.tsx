@@ -1,19 +1,15 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { updateCustomer, deleteCustomer, deleteAddress } from "@/lib/actions/customers";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Badge,
-  JobStatusPill,
-  QuoteStatusPill,
-  type JobStatus,
-  type QuoteStatus,
-} from "@/components/ui/badge";
+import { Badge, type JobStatus, type QuoteStatus } from "@/components/ui/badge";
+import { TJobStatusPill, TQuoteStatusPill } from "@/components/ui/translated-status-pill";
 import { CustomerForm } from "@/components/customers/customer-form";
 import { AddressForm } from "@/components/customers/address-form";
 import { PortalLinkButton } from "@/components/portal/portal-link-button";
@@ -26,6 +22,7 @@ export default async function CustomerDetailPage({
 }) {
   const { id } = await params;
   const { company } = await requirePermission("customers.manage");
+  const t = await getTranslations("customers");
   const supabase = await createClient();
 
   const { data: customer } = await supabase
@@ -64,11 +61,11 @@ export default async function CustomerDetailPage({
 
   return (
     <div className="max-w-3xl space-y-8">
-      <Heading title={customer.name} description="Customer profile and history." />
+      <Heading title={customer.name} description={t("detail.description")} />
 
       <Card>
         <CardHeader>
-          <CardTitle>Details</CardTitle>
+          <CardTitle>{t("detail.detailsTitle")}</CardTitle>
         </CardHeader>
         <CardContent>
           <CustomerForm
@@ -84,14 +81,14 @@ export default async function CustomerDetailPage({
               "use server";
               return updateCustomer(id, formData);
             }}
-            submitLabel="Save changes"
+            submitLabel={t("detail.saveChanges")}
           />
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Service addresses</CardTitle>
+          <CardTitle>{t("detail.addressesTitle")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {(addresses ?? []).map((a) => (
@@ -99,7 +96,7 @@ export default async function CustomerDetailPage({
               <div className="min-w-0">
                 <p className="font-medium text-slate-900 dark:text-slate-100">
                   {a.label}{" "}
-                  {a.is_default && <Badge tone="brand">Default</Badge>}
+                  {a.is_default && <Badge tone="brand">{t("detail.defaultBadge")}</Badge>}
                 </p>
                 <p className="text-sm text-slate-600 dark:text-slate-400 dark:text-slate-500">
                   {a.address_line1}
@@ -114,7 +111,7 @@ export default async function CustomerDetailPage({
                 }}
               >
                 <Button type="submit" variant="outline">
-                  Remove
+                  {t("detail.removeAddress")}
                 </Button>
               </form>
             </div>
@@ -125,12 +122,11 @@ export default async function CustomerDetailPage({
 
       <Card>
         <CardHeader>
-          <CardTitle>Customer portal</CardTitle>
+          <CardTitle>{t("detail.portalTitle")}</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="mb-3 text-sm text-slate-600 dark:text-slate-400 dark:text-slate-500">
-            Share a private link so this customer can approve quotes, see
-            upcoming visits, and pay invoices — no login needed.
+            {t("detail.portalDescription")}
           </p>
           <PortalLinkButton
             customerId={id}
@@ -145,11 +141,11 @@ export default async function CustomerDetailPage({
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Bookings</CardTitle>
+            <CardTitle>{t("detail.bookingsTitle")}</CardTitle>
           </CardHeader>
           <CardContent>
             {(bookings ?? []).length === 0 ? (
-              <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">No bookings yet.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">{t("detail.noBookings")}</p>
             ) : (
               <ul className="divide-y divide-slate-100 dark:divide-slate-800">
                 {(bookings ?? []).map((b) => (
@@ -158,7 +154,7 @@ export default async function CustomerDetailPage({
                       {b.booking_number}
                     </Link>{" "}
                     <span className="text-slate-500 dark:text-slate-400 dark:text-slate-500">· {formatDate(b.scheduled_start)}</span>{" "}
-                    <JobStatusPill status={b.status as JobStatus} />
+                    <TJobStatusPill status={b.status as JobStatus} />
                   </li>
                 ))}
               </ul>
@@ -167,11 +163,11 @@ export default async function CustomerDetailPage({
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Quotes</CardTitle>
+            <CardTitle>{t("detail.quotesTitle")}</CardTitle>
           </CardHeader>
           <CardContent>
             {(quotes ?? []).length === 0 ? (
-              <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">No quotes yet.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">{t("detail.noQuotes")}</p>
             ) : (
               <ul className="divide-y divide-slate-100 dark:divide-slate-800">
                 {(quotes ?? []).map((q) => (
@@ -180,7 +176,7 @@ export default async function CustomerDetailPage({
                       {q.quote_number}
                     </Link>{" "}
                     <span className="text-slate-500 dark:text-slate-400 dark:text-slate-500">· {formatCents(q.total_cents)}</span>{" "}
-                    <QuoteStatusPill status={q.status as QuoteStatus} />
+                    <TQuoteStatusPill status={q.status as QuoteStatus} />
                   </li>
                 ))}
               </ul>
@@ -198,11 +194,10 @@ export default async function CustomerDetailPage({
             }}
           >
             <Button type="submit" variant="outline" className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950">
-              Delete customer
+              {t("detail.deleteCustomer")}
             </Button>
             <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">
-              Only possible when the customer has no active bookings. Addresses
-              are removed with the customer.
+              {t("detail.deleteHint")}
             </p>
           </form>
         </CardContent>

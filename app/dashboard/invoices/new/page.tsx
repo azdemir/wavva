@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent } from "@/components/ui/card";
 import { InvoiceBuilder } from "@/components/invoices/invoice-builder";
+import { getTranslations } from "next-intl/server";
 
 export const instant = false;
 
@@ -15,6 +16,7 @@ export default async function NewInvoicePage({
   const { company } = await requirePermission("invoices.manage");
   const supabase = await createClient();
   const { bookingId } = await searchParams;
+  const t = await getTranslations("invoices");
 
   const { data: customers } = await supabase
     .from("customers")
@@ -36,7 +38,7 @@ export default async function NewInvoicePage({
       prefill = {
         customerId: booking.customer_id,
         bookingId: booking.id,
-        notes: `For booking ${booking.booking_number}.`,
+        notes: t("new.forBooking", { number: booking.booking_number }),
       };
     }
   }
@@ -44,13 +46,13 @@ export default async function NewInvoicePage({
   if ((customers ?? []).length === 0) {
     return (
       <div className="max-w-2xl space-y-6">
-        <Heading title="New invoice" description="Bill a customer." />
+        <Heading title={t("new.title")} description={t("new.emptyDescription")} />
         <Card>
           <CardContent className="pt-6">
             <p className="text-sm text-slate-600 dark:text-slate-400 dark:text-slate-500">
-              You need a customer first.{" "}
+              {t("new.needCustomer")}{" "}
               <Link href="/dashboard/customers/new" className="font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400">
-                Add a customer →
+                {t("new.addCustomer")}
               </Link>
             </p>
           </CardContent>
@@ -61,7 +63,7 @@ export default async function NewInvoicePage({
 
   return (
     <div className="max-w-3xl space-y-6">
-      <Heading title="New invoice" description="Line items and totals — due date optional." />
+      <Heading title={t("new.title")} description={t("new.description")} />
       <Card>
         <CardContent className="pt-6">
           <InvoiceBuilder

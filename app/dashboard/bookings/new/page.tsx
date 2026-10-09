@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { Heading } from "@/components/ui/heading";
@@ -12,6 +13,7 @@ export default async function NewBookingPage({
   searchParams: Promise<{ quoteId?: string }>;
 }) {
   const { company } = await requirePermission("bookings.manage");
+  const t = await getTranslations("bookings");
   const supabase = await createClient();
   const { quoteId } = await searchParams;
 
@@ -48,20 +50,20 @@ export default async function NewBookingPage({
         customerId: quote.customer_id,
         addressId: addrs.find((a) => a.is_default)?.id ?? addrs[0]?.id,
         serviceId: firstService?.ref_id ?? undefined,
-        notes: `From quote ${quote.quote_number} (${formatCents(quote.total_cents)}).`,
+        notes: t("new.prefillNotes", { number: quote.quote_number, total: formatCents(quote.total_cents) }),
       };
     }
   }
 
   if ((customers ?? []).length === 0) {    return (
       <div className="max-w-2xl space-y-6">
-        <Heading title="New booking" description="Schedule a cleaning visit." />
+        <Heading title={t("new.title")} description={t("new.description")} />
         <Card>
           <CardContent className="pt-6">
             <p className="text-sm text-slate-600 dark:text-slate-400 dark:text-slate-500">
-              You need a customer with a service address first.{" "}
+              {t("new.needCustomer")}{" "}
               <Link href="/dashboard/customers/new" className="font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400">
-                Add a customer →
+                {t("new.addCustomer")}
               </Link>
             </p>
           </CardContent>
@@ -94,11 +96,11 @@ export default async function NewBookingPage({
   return (
     <div className="max-w-3xl space-y-6">
       <Heading
-        title="New booking"
+        title={t("new.title")}
         description={
           prefill?.quoteId
-            ? "Prefilled from the approved quote. Pick a date and time."
-            : "Schedule a one-time or recurring cleaning."
+            ? t("new.descriptionPrefill")
+            : t("new.descriptionDefault")
         }
       />
       <Card>

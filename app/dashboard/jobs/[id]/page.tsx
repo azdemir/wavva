@@ -7,7 +7,8 @@ import { startJob, completeJob, cancelJob, saveJobNotes } from "@/lib/actions/jo
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { JobStatusPill, type JobStatus } from "@/components/ui/badge";
+import {type JobStatus} from "@/components/ui/badge";
+import { TJobStatusPill } from "@/components/ui/translated-status-pill";
 import { TextareaField } from "@/components/ui/input";
 import { JobChecklist, type ChecklistItem } from "@/components/jobs/job-checklist";
 import { AssignCrew } from "@/components/jobs/assign-crew";
@@ -16,6 +17,7 @@ import { UpgradePrompt } from "@/components/billing/upgrade-prompt";
 import { hasFeature, isPlanId } from "@/lib/plans";
 import { isStorageConfigured, getPhotoViewUrl, PHOTO_RETENTION_DAYS } from "@/lib/storage";
 import { formatTime, formatDate } from "@/lib/format";
+import { getTranslations } from "next-intl/server";
 
 export const instant = false;
 
@@ -26,6 +28,7 @@ export default async function JobDetailPage({
 }) {
   const { id } = await params;
   const { company, membership } = await requireCompany();
+  const t = await getTranslations("jobs");
   const plan = isPlanId(company.plan) ? company.plan : "starter";
   const canUseChecklists = hasFeature(plan, "checklists");
   const canUsePhotos = hasFeature(plan, "photos");
@@ -95,26 +98,26 @@ export default async function JobDetailPage({
     <div className="mx-auto max-w-3xl space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <Heading
-          title={customer?.name ?? "Job"}
+          title={customer?.name ?? t("list.fallbackName")}
           description={whenLabel}
         />
-        <JobStatusPill status={job.status as JobStatus} className="text-sm" />
+        <TJobStatusPill status={job.status as JobStatus} className="text-sm" />
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Visit details</CardTitle>
+          <CardTitle>{t("detail.visitTitle")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
           <p>
-            <span className="font-medium text-slate-700 dark:text-slate-300">Address: </span>
+            <span className="font-medium text-slate-700 dark:text-slate-300">{t("detail.address")}: </span>
             {address?.label}: {address?.address_line1}
             {address?.address_line2 ? `, ${address.address_line2}` : ""}, {address?.city},{" "}
             {address?.state} {address?.zip}
           </p>
           {customer?.phone && (
             <p>
-              <span className="font-medium text-slate-700 dark:text-slate-300">Customer phone: </span>
+              <span className="font-medium text-slate-700 dark:text-slate-300">{t("detail.customerPhone")}: </span>
               <a href={`tel:${customer.phone}`} className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400">
                 {customer.phone}
               </a>
@@ -122,29 +125,29 @@ export default async function JobDetailPage({
           )}
           {address?.access_instructions && (
             <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-800 dark:bg-amber-950">
-              <p className="font-medium text-amber-800">Access instructions</p>
+              <p className="font-medium text-amber-800">{t("detail.accessTitle")}</p>
               <p className="text-amber-900">{address.access_instructions}</p>
             </div>
           )}
           {booking?.notes && (
             <p>
-              <span className="font-medium text-slate-700 dark:text-slate-300">Booking notes: </span>
+              <span className="font-medium text-slate-700 dark:text-slate-300">{t("detail.bookingNotes")}: </span>
               {booking.notes}
             </p>
           )}
           {booking?.booking_number && (
             <p>
-              <span className="font-medium text-slate-700 dark:text-slate-300">Booking: </span>
+              <span className="font-medium text-slate-700 dark:text-slate-300">{t("detail.booking")}: </span>
               <Link href={`/dashboard/bookings/${job.booking_id}`} className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400">
                 {booking.booking_number}
               </Link>
             </p>
           )}
           {job.started_at && (
-            <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500">Started {formatTime(job.started_at, tz)}</p>
+            <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500">{t("detail.started", { time: formatTime(job.started_at, tz) })}</p>
           )}
           {job.completed_at && (
-            <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500">Completed {formatTime(job.completed_at, tz)}</p>
+            <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500">{t("detail.completed", { time: formatTime(job.completed_at, tz) })}</p>
           )}
         </CardContent>
       </Card>
@@ -152,19 +155,19 @@ export default async function JobDetailPage({
       {!readOnly && (
         <Card>
           <CardHeader>
-            <CardTitle>Actions</CardTitle>
+            <CardTitle>{t("detail.actionsTitle")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="flex flex-wrap items-center gap-2">
               {job.status === "scheduled" && (
                 <form action={async () => { "use server"; await startJob(id); }}>
-                  <Button type="submit">Start job</Button>
+                  <Button type="submit">{t("detail.start")}</Button>
                 </form>
               )}
               {isStaff && (
                 <form action={async () => { "use server"; await cancelJob(id); }} className="ml-auto">
                   <Button type="submit" variant="outline" className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950">
-                    Cancel job
+                    {t("detail.cancel")}
                   </Button>
                 </form>
               )}
@@ -180,13 +183,13 @@ export default async function JobDetailPage({
                 <TextareaField
                   id="job-notes"
                   name="notes"
-                  label="Completion notes (optional)"
+                  label={t("detail.notesLabel")}
                   rows={3}
                   defaultValue={job.completion_notes ?? ""}
-                  placeholder="Anything the customer should know…"
+                  placeholder={t("detail.notesPlaceholder")}
                 />
                 <Button type="submit" variant="outline" className="w-full border-accent-300 text-accent-700 hover:bg-accent-50 dark:border-accent-800 dark:text-accent-400 dark:hover:bg-accent-950 sm:w-auto">
-                  Complete job
+                  {t("detail.complete")}
                 </Button>
               </form>
             )}
@@ -196,7 +199,7 @@ export default async function JobDetailPage({
 
       <Card>
         <CardHeader>
-          <CardTitle>Checklist</CardTitle>
+          <CardTitle>{t("detail.checklistTitle")}</CardTitle>
         </CardHeader>
         <CardContent>
           {canUseChecklists ? (
@@ -209,9 +212,9 @@ export default async function JobDetailPage({
 
       <Card>
         <CardHeader>
-          <CardTitle>Before / after photos</CardTitle>
+          <CardTitle>{t("detail.photosTitle")}</CardTitle>
           <CardDescription>
-            Photos are kept for {PHOTO_RETENTION_DAYS} days, then automatically deleted.
+            {t("detail.photosRetention", { days: PHOTO_RETENTION_DAYS })}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -219,9 +222,7 @@ export default async function JobDetailPage({
             <UpgradePrompt feature="photos" />
           ) : !storageReady ? (
             <p className="text-sm text-slate-600 dark:text-slate-400">
-              {isStaff
-                ? "Photo uploads need object storage. Set STORAGE_BUCKET, STORAGE_ENDPOINT, STORAGE_ACCESS_KEY_ID, and STORAGE_SECRET_ACCESS_KEY to enable them."
-                : "Photo uploads aren't enabled yet — ask your manager."}
+              {isStaff ? t("detail.storageStaff") : t("detail.storageCleaner")}
             </p>
           ) : (
             <JobPhotos jobId={id} initial={photos} readOnly={readOnly} />
@@ -232,7 +233,7 @@ export default async function JobDetailPage({
       {isStaff && (
         <Card>
           <CardHeader>
-            <CardTitle>Assigned crew</CardTitle>
+            <CardTitle>{t("detail.crewTitle")}</CardTitle>
           </CardHeader>
           <CardContent>
             {canUseChecklists ? (
@@ -247,7 +248,7 @@ export default async function JobDetailPage({
       {isStaff && (
         <Card>
           <CardHeader>
-            <CardTitle>Internal notes</CardTitle>
+            <CardTitle>{t("detail.internalNotesTitle")}</CardTitle>
           </CardHeader>
           <CardContent>
             <form
@@ -260,14 +261,14 @@ export default async function JobDetailPage({
               <TextareaField
                 id="job-internal-notes"
                 name="notes"
-                label="Notes"
+                label={t("detail.notesFieldLabel")}
                 rows={3}
                 defaultValue={job.completion_notes ?? ""}
               />
-              <Button type="submit" variant="outline">Save notes</Button>
+              <Button type="submit" variant="outline">{t("detail.saveNotes")}</Button>
             </form>
             <p className="mt-3 text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">
-              Photo documentation unlocks once object storage is configured.
+              {t("detail.notesHint")}
             </p>
           </CardContent>
         </Card>
@@ -275,7 +276,7 @@ export default async function JobDetailPage({
 
       <p className="text-sm">
         <Link href="/dashboard/schedule" className="font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400">
-          ← Schedule
+          {t("detail.backToSchedule")}
         </Link>
       </p>
     </div>

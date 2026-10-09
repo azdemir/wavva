@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { Heading } from "@/components/ui/heading";
@@ -28,6 +29,7 @@ export default async function CustomersPage({
     ? (params.type as (typeof types)[number])
     : "all";
   const page = parsePageParam(params.page);
+  const t = await getTranslations("customers");
 
   // Fetch the list; if the DB is behind on migration 0008 (no customer_type
   // column), retry without the new column instead of failing the page.
@@ -78,11 +80,11 @@ export default async function CustomersPage({
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <Heading title="Customers" description="Everyone your business cleans for." />
+        <Heading title={t("list.title")} description={t("list.description")} />
         <div className="flex flex-wrap gap-2">
           <ExportButton href={`/api/exports/customers${exportQs ? `?${exportQs}` : ""}`} />
           <Button href="/dashboard/customers/new">
-            <PlusIcon className="h-4 w-4" /> New customer
+            <PlusIcon className="h-4 w-4" /> {t("list.newCustomer")}
           </Button>
         </div>
       </div>
@@ -92,13 +94,14 @@ export default async function CustomersPage({
           role="status"
           className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200"
         >
-          <span className="font-semibold">Database update needed.</span> Your
-          database is missing the customer-type column — run{" "}
-          <code className="rounded bg-amber-100 px-1 font-mono text-[13px] dark:bg-amber-900">
-            supabase/migrations/0008_customer_type.sql
-          </code>{" "}
-          in your Supabase project to enable Residential/Commercial types.
-          Everything else works normally.
+          <span className="font-semibold">{t("setup.title")}</span>{" "}
+          {t.rich("setup.body", {
+            path: (chunks) => (
+              <code className="rounded bg-amber-100 px-1 font-mono text-[13px] dark:bg-amber-900">
+                {chunks}
+              </code>
+            ),
+          })}
         </div>
       )}
 
@@ -107,16 +110,19 @@ export default async function CustomersPage({
           <FilterPills
             basePath="/dashboard/customers"
             param="type"
-            options={types.map((t) => ({ value: t }))}
+            options={types.map((typeValue) => ({
+              value: typeValue,
+              label: t(`list.typePills.${typeValue}`),
+            }))}
             current={type}
             preserve={{ q: q || undefined }}
           />
         )}
         <FilterSearch
           id="cust-search"
-          label="Search customers"
+          label={t("list.searchLabel")}
           defaultValue={q}
-          placeholder="Search by name, email, or phone…"
+          placeholder={t("list.searchPlaceholder")}
           preserve={{ type: type !== "all" ? type : undefined }}
         />
       </div>
@@ -125,15 +131,15 @@ export default async function CustomersPage({
         <Card>
           <CardContent>
             <EmptyState
-              title={filtering ? "No customers match" : "No customers yet"}
+              title={filtering ? t("list.emptyFilteredTitle") : t("list.emptyTitle")}
               description={
                 filtering
-                  ? "Try a different search or filter."
-                  : "Add your first customer to start quoting and booking."
+                  ? t("list.emptyFilteredDescription")
+                  : t("list.emptyDescription")
               }
               action={
                 filtering ? undefined : (
-                  <Button href="/dashboard/customers/new">New customer</Button>
+                  <Button href="/dashboard/customers/new">{t("list.newCustomer")}</Button>
                 )
               }
               icon={<UsersIcon className="h-10 w-10" />}
@@ -154,11 +160,11 @@ export default async function CustomersPage({
                       <p className="flex items-center gap-2 truncate font-medium text-slate-900 dark:text-slate-100">
                         <span className="truncate">{c.name}</span>
                         <Badge tone={typeTones[(c.customer_type as keyof typeof typeTones) ?? "residential"] ?? "slate"} className="shrink-0">
-                          {(c.customer_type as string) === "commercial" ? "Commercial" : "Residential"}
+                          {(c.customer_type as string) === "commercial" ? t("list.badgeCommercial") : t("list.badgeResidential")}
                         </Badge>
                       </p>
                       <p className="truncate text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
-                        {[c.email, c.phone].filter(Boolean).join(" · ") || "No contact info"}
+                        {[c.email, c.phone].filter(Boolean).join(" · ") || t("list.noContactInfo")}
                       </p>
                     </div>
                     <span className="shrink-0 text-sm text-slate-400 dark:text-slate-500" aria-hidden="true">→</span>

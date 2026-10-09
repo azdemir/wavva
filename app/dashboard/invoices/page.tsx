@@ -5,13 +5,15 @@ import { one } from "@/lib/relations";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { InvoiceStatusPill, type InvoiceStatus } from "@/components/ui/badge";
+import {type InvoiceStatus} from "@/components/ui/badge";
+import { TInvoiceStatusPill } from "@/components/ui/translated-status-pill";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
 import { FilterPills, FilterSearch, ExportButton } from "@/components/ui/filters";
 import { parsePageParam, PAGE_SIZE } from "@/lib/pagination";
 import { PlusIcon, CardIcon } from "@/components/ui/icons";
 import { formatCents, formatDate } from "@/lib/format";
+import { getTranslations } from "next-intl/server";
 
 export const instant = false;
 
@@ -30,6 +32,7 @@ export default async function InvoicesPage({
   const q = (params.q ?? "").trim();
   const like = `%${q.replace(/[%_]/g, "")}%`;
   const page = parsePageParam(params.page);
+  const t = await getTranslations("invoices");
 
   let customerIds: string[] | null = null;
   if (q) {
@@ -64,11 +67,11 @@ export default async function InvoicesPage({
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <Heading title="Invoices" description="Bill customers and track payments." />
+        <Heading title={t("list.title")} description={t("list.description")} />
         <div className="flex flex-wrap gap-2">
           <ExportButton href={`/api/exports/invoices${exportQs ? `?${exportQs}` : ""}`} />
           <Button href="/dashboard/invoices/new">
-            <PlusIcon className="h-4 w-4" /> New invoice
+            <PlusIcon className="h-4 w-4" /> {t("list.newInvoice")}
           </Button>
         </div>
       </div>
@@ -77,15 +80,15 @@ export default async function InvoicesPage({
         <FilterPills
           basePath="/dashboard/invoices"
           param="status"
-          options={statuses.map((s) => ({ value: s }))}
+          options={statuses.map((s) => ({ value: s, label: t(`list.status.${s}`) }))}
           current={valid}
           preserve={{ q: q || undefined }}
         />
         <FilterSearch
           id="invoice-search"
-          label="Search invoices"
+          label={t("list.searchLabel")}
           defaultValue={q}
-          placeholder="Invoice # or customer name…"
+          placeholder={t("list.searchPlaceholder")}
           preserve={{ status: valid !== "all" ? valid : undefined }}
         />
       </div>
@@ -94,13 +97,13 @@ export default async function InvoicesPage({
         <Card>
           <CardContent>
             <EmptyState
-              title={filtering ? "No invoices match" : "No invoices here"}
+              title={filtering ? t("list.emptyFilteredTitle") : t("list.emptyTitle")}
               description={
                 filtering
-                  ? "Try a different search or status."
-                  : "Create an invoice to bill a customer."
+                  ? t("list.emptyFilteredDescription")
+                  : t("list.emptyDescription")
               }
-              action={filtering ? undefined : <Button href="/dashboard/invoices/new">New invoice</Button>}
+              action={filtering ? undefined : <Button href="/dashboard/invoices/new">{t("list.newInvoice")}</Button>}
               icon={<CardIcon className="h-10 w-10" />}
             />
           </CardContent>
@@ -119,13 +122,13 @@ export default async function InvoicesPage({
                           {inv.invoice_number} · {one(inv.customers)?.name}
                         </p>
                         <p className="truncate text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
-                          {inv.due_date ? `Due ${formatDate(inv.due_date)}` : "No due date"}
-                          {due > 0 && inv.status !== "draft" && ` · ${formatCents(due)} due`}
+                          {inv.due_date ? t("list.dueOn", { date: formatDate(inv.due_date) }) : t("list.noDueDate")}
+                          {due > 0 && inv.status !== "draft" && ` · ${t("list.dueAmount", { amount: formatCents(due) })}`}
                         </p>
                       </div>
                       <div className="flex shrink-0 items-center gap-3">
                         <span className="font-semibold text-slate-900 dark:text-slate-100">{formatCents(inv.total_cents)}</span>
-                        <InvoiceStatusPill status={inv.status as InvoiceStatus} />
+                        <TInvoiceStatusPill status={inv.status as InvoiceStatus} />
                       </div>
                     </Link>
                   </li>

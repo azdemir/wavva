@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { getTranslations } from "next-intl/server";
 import { requireOwner } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { isStripeConfigured } from "@/lib/stripe";
@@ -12,6 +13,7 @@ export const instant = false;
 /** Owner-only: connect the company's Stripe account to receive payments. */
 export default async function BillingPage() {
   const { company } = await requireOwner();
+  const t = await getTranslations("billing");
   const supabase = await createClient();
 
   // Refresh onboarding state from the companies row (webhook updates it).
@@ -30,30 +32,28 @@ export default async function BillingPage() {
   return (
     <div className="max-w-2xl space-y-8">
       <Heading
-        title="Billing"
-        description="Get paid by card through Stripe. Money goes straight to your business bank account."
+        title={t("title")}
+        description={t("connect.description")}
       />
 
       <Card>
         <CardHeader>
-          <CardTitle>Stripe Connect</CardTitle>
+          <CardTitle>{t("connect.cardTitle")}</CardTitle>
           <CardDescription>
-            Connect takes a few minutes: Stripe verifies your business, then
-            customers can pay invoices by card from their portal link.
+            {t("connect.cardDescription")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center gap-2 text-sm">
-            <span className="text-slate-600 dark:text-slate-400 dark:text-slate-500">Status:</span>
-            {!connected && <Badge tone="slate">Not connected</Badge>}
-            {connected && !onboarded && <Badge tone="amber">Onboarding incomplete</Badge>}
-            {connected && onboarded && <Badge tone="accent">Ready to accept payments</Badge>}
+            <span className="text-slate-600 dark:text-slate-400 dark:text-slate-500">{t("connect.status")}</span>
+            {!connected && <Badge tone="slate">{t("connect.notConnected")}</Badge>}
+            {connected && !onboarded && <Badge tone="amber">{t("connect.incomplete")}</Badge>}
+            {connected && onboarded && <Badge tone="accent">{t("connect.ready")}</Badge>}
           </div>
 
           {!isStripeConfigured() && (
             <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
-              The platform hasn&apos;t configured Stripe yet (no STRIPE_SECRET_KEY).
-              Offline payments (cash, check) work regardless — see any invoice.
+              {t("connect.notConfigured")}
             </div>
           )}
 
@@ -63,8 +63,7 @@ export default async function BillingPage() {
 
           {connected && onboarded && (
             <p className="text-sm text-slate-600 dark:text-slate-400 dark:text-slate-500">
-              Customers with portal links can now pay invoices online. Payouts
-              land in the bank account on your Stripe Express dashboard.
+              {t("connect.readyNote")}
             </p>
           )}
         </CardContent>

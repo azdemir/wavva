@@ -1,10 +1,12 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { JobStatusPill, type JobStatus } from "@/components/ui/badge";
+import {type JobStatus} from "@/components/ui/badge";
+import { TJobStatusPill } from "@/components/ui/translated-status-pill";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
 import { FilterPills, FilterSearch, ExportButton } from "@/components/ui/filters";
@@ -23,7 +25,14 @@ type BookingRow = {
   service_addresses: { address_line1: string; city: string } | null;
 };
 
-function BookingList({ bookings, tz }: { bookings: BookingRow[]; tz: string }) {
+async function BookingList({ bookings, tz }: { bookings: BookingRow[]; tz: string }) {
+  const t = await getTranslations("bookings");
+  const recurrenceLabel = (recurrence: string) =>
+    recurrence === "weekly"
+      ? t("recurrence.weekly")
+      : recurrence === "biweekly"
+        ? t("recurrence.biweekly")
+        : t("recurrence.monthly");
   return (
     <ul className="divide-y divide-slate-100 dark:divide-slate-800">
       {bookings.map((b) => (
@@ -36,10 +45,10 @@ function BookingList({ bookings, tz }: { bookings: BookingRow[]; tz: string }) {
               <p className="truncate text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
                 {formatDate(b.scheduled_start)}, {formatTime(b.scheduled_start, tz)} – {formatTime(b.scheduled_end, tz)}
                 {" · "}{b.service_addresses?.address_line1}, {b.service_addresses?.city}
-                {b.recurrence !== "none" && ` · repeats ${b.recurrence}`}
+                {b.recurrence !== "none" && t("list.repeats", { recurrence: recurrenceLabel(b.recurrence) })}
               </p>
             </div>
-            <JobStatusPill status={b.status as JobStatus} className="shrink-0" />
+            <TJobStatusPill status={b.status as JobStatus} className="shrink-0" />
           </Link>
         </li>
       ))}
@@ -55,6 +64,7 @@ export default async function BookingsPage({
   searchParams: Promise<{ status?: string; q?: string; page?: string; pastPage?: string }>;
 }) {
   const { company } = await requirePermission("bookings.manage");
+  const t = await getTranslations("bookings");
   const supabase = await createClient();
   const tz = company.timezone || "America/New_York";
   const now = new Date().toISOString();
@@ -125,11 +135,11 @@ export default async function BookingsPage({
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <Heading title="Bookings" description="Scheduled cleanings and their visits." />
+        <Heading title={t("list.title")} description={t("list.description")} />
         <div className="flex flex-wrap gap-2">
           <ExportButton href={`/api/exports/bookings${exportQs ? `?${exportQs}` : ""}`} />
           <Button href="/dashboard/bookings/new">
-            <PlusIcon className="h-4 w-4" /> New booking
+            <PlusIcon className="h-4 w-4" /> {t("list.newBooking")}
           </Button>
         </div>
       </div>
@@ -144,9 +154,9 @@ export default async function BookingsPage({
         />
         <FilterSearch
           id="booking-search"
-          label="Search bookings"
+          label={t("list.searchLabel")}
           defaultValue={q}
-          placeholder="Booking # or customer name…"
+          placeholder={t("list.searchPlaceholder")}
           preserve={{ status: status !== "all" ? status : undefined }}
         />
       </div>
@@ -155,11 +165,11 @@ export default async function BookingsPage({
         <>
           <Card>
             <CardHeader>
-              <CardTitle>Upcoming ({upcomingTotal})</CardTitle>
+              <CardTitle>{t("list.upcoming", { count: upcomingTotal })}</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               {upcomingRows.length === 0 ? (
-                <p className="px-5 py-4 text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">Nothing upcoming.</p>
+                <p className="px-5 py-4 text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">{t("list.nothingUpcoming")}</p>
               ) : (
                 <BookingList bookings={upcomingRows} tz={tz} />
               )}
@@ -180,7 +190,7 @@ export default async function BookingsPage({
           {pastTotal > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>Past & canceled ({pastTotal})</CardTitle>
+                <CardTitle>{t("list.pastCanceled", { count: pastTotal })}</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <BookingList bookings={pastRows} tz={tz} />
@@ -205,13 +215,13 @@ export default async function BookingsPage({
         <Card>
           <CardContent>
             <EmptyState
-              title={filtering ? "No bookings match" : "No bookings yet"}
+              title={filtering ? t("list.emptyMatchTitle") : t("list.emptyNoneTitle")}
               description={
                 filtering
-                  ? "Try a different search or status."
-                  : "Book a cleaning and its job visits will be generated automatically."
+                  ? t("list.emptyMatchDescription")
+                  : t("list.emptyNoneDescription")
               }
-              action={filtering ? undefined : <Button href="/dashboard/bookings/new">New booking</Button>}
+              action={filtering ? undefined : <Button href="/dashboard/bookings/new">{t("list.newBooking")}</Button>}
               icon={<CalendarIcon className="h-10 w-10" />}
             />
           </CardContent>

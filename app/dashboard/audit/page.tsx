@@ -1,4 +1,5 @@
 import { requireOwner } from "@/lib/auth";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +16,7 @@ export default async function AuditPage({
   searchParams: Promise<{ q?: string; type?: string }>;
 }) {
   const { company } = await requireOwner();
+  const t = await getTranslations("audit");
   const supabase = await createClient();
   const q = ((await searchParams).q ?? "").trim();
   const type = ((await searchParams).type ?? "").trim();
@@ -36,38 +38,38 @@ export default async function AuditPage({
     ? await supabase.from("memberships").select("user_id, email").in("user_id", actorIds as string[])
     : { data: [] };
   const emailOf = (uid: string | null) =>
-    actors?.find((a) => a.user_id === uid)?.email ?? (uid ? `${uid.slice(0, 8)}…` : "system");
+    actors?.find((a) => a.user_id === uid)?.email ?? (uid ? `${uid.slice(0, 8)}…` : t("systemActor"));
 
   return (
     <div className="space-y-6">
       <Heading
-        title="Audit log"
-        description="Every important action in your workspace, newest first. Logs are append-only."
+        title={t("heading.title")}
+        description={t("heading.description")}
       />
 
       <form method="get" className="flex flex-wrap items-end gap-3">
         <div className="w-64">
-          <Field id="audit-q" name="q" label="Filter by action" defaultValue={q} placeholder="e.g. quote.sent" />
+          <Field id="audit-q" name="q" label={t("filters.actionLabel")} defaultValue={q} placeholder={t("filters.actionPlaceholder")} />
         </div>
         <div className="w-48">
-          <Field id="audit-type" name="type" label="Entity type" defaultValue={type} placeholder="e.g. invoice" />
+          <Field id="audit-type" name="type" label={t("filters.typeLabel")} defaultValue={type} placeholder={t("filters.typePlaceholder")} />
         </div>
-        <Button type="submit" variant="outline">Filter</Button>
+        <Button type="submit" variant="outline">{t("filters.submit")}</Button>
       </form>
 
       <Card>
         <CardHeader>
-          <CardTitle>Events ({logs?.length ?? 0})</CardTitle>
+          <CardTitle>{t("eventsTitle", { count: logs?.length ?? 0 })}</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-200 dark:border-slate-800 text-left text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 dark:text-slate-500">
-                  <th className="px-5 py-3 font-medium">When</th>
-                  <th className="px-5 py-3 font-medium">Action</th>
-                  <th className="px-5 py-3 font-medium">Entity</th>
-                  <th className="px-5 py-3 font-medium">Actor</th>
+                  <th className="px-5 py-3 font-medium">{t("columns.when")}</th>
+                  <th className="px-5 py-3 font-medium">{t("columns.action")}</th>
+                  <th className="px-5 py-3 font-medium">{t("columns.entity")}</th>
+                  <th className="px-5 py-3 font-medium">{t("columns.actor")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -89,7 +91,7 @@ export default async function AuditPage({
                 {(logs ?? []).length === 0 && (
                   <tr>
                     <td colSpan={4} className="px-5 py-8 text-center text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
-                      No events match.
+                      {t("noEvents")}
                     </td>
                   </tr>
                 )}

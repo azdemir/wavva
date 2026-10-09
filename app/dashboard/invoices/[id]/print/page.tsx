@@ -4,9 +4,10 @@ import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { one } from "@/lib/relations";
 import { formatCents, formatDate } from "@/lib/format";
-import { statusLabel } from "@/components/ui/badge";
+
 import { PrintDocument } from "@/components/documents/print-document";
 import { PrintButton } from "@/components/documents/print-button";
+import { getTranslations } from "next-intl/server";
 
 export const instant = false;
 
@@ -18,6 +19,7 @@ export default async function InvoicePrintPage({
   const { id } = await params;
   const { company } = await requirePermission("invoices.manage");
   const supabase = await createClient();
+  const t = await getTranslations("invoices");
 
   const { data: invoice } = await supabase
     .from("invoices")
@@ -48,15 +50,15 @@ export default async function InvoicePrintPage({
   const due = invoice.total_cents - invoice.amount_paid_cents;
 
   const totals = [
-    { label: "Subtotal", value: formatCents(invoice.subtotal_cents) },
+    { label: t("print.subtotal"), value: formatCents(invoice.subtotal_cents) },
     {
-      label: `Tax (${(Number(invoice.tax_rate) * 100).toFixed(2)}%)`,
+      label: t("print.tax", { rate: (Number(invoice.tax_rate) * 100).toFixed(2) }),
       value: formatCents(invoice.tax_cents),
     },
-    { label: "Total", value: formatCents(invoice.total_cents), strong: true },
-    { label: "Paid", value: formatCents(invoice.amount_paid_cents) },
+    { label: t("print.total"), value: formatCents(invoice.total_cents), strong: true },
+    { label: t("print.paid"), value: formatCents(invoice.amount_paid_cents) },
   ];
-  if (due > 0) totals.push({ label: "Balance due", value: formatCents(due), strong: true });
+  if (due > 0) totals.push({ label: t("print.balanceDue"), value: formatCents(due), strong: true });
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -65,21 +67,21 @@ export default async function InvoicePrintPage({
           href={`/dashboard/invoices/${id}`}
           className="text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400"
         >
-          ← Back to invoice
+          {t("print.backToInvoice")}
         </Link>
         <PrintButton />
       </div>
       <PrintDocument
         company={company}
-        kind="Invoice"
+        kind={t("print.documentKind") as "Invoice" | "Quote"}
         number={invoice.invoice_number}
-        status={statusLabel(invoice.status)}
+        status={t(`list.status.${invoice.status}`)}
         meta={[
-          { label: "Issue date", value: formatDate(invoice.created_at) },
-          { label: "Due date", value: invoice.due_date ? formatDate(invoice.due_date) : "—" },
+          { label: t("print.issueDate"), value: formatDate(invoice.created_at) },
+          { label: t("print.dueDate"), value: invoice.due_date ? formatDate(invoice.due_date) : "—" },
         ]}
         customer={{
-          name: customer?.name ?? "Customer",
+          name: customer?.name ?? t("print.customerFallback"),
           // Email is intentionally hidden on the printed invoice.
           email: null,
           phone: customer?.phone ?? null,
@@ -87,7 +89,7 @@ export default async function InvoicePrintPage({
         items={items}
         totals={totals}
         notes={invoice.notes}
-        footerNote={`Thank you for your business! · ${company.name}${company.phone ? ` · ${company.phone}` : ""}`}
+        footerNote={`${t("print.footerNote", { company: company.name })}${company.phone ? ` · ${company.phone}` : ""}`}
       />
     </div>
   );
