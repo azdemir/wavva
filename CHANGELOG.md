@@ -6,6 +6,22 @@ All notable changes to TidyPro. Dates are in America/New_York.
 
 ### Added
 
+- **Calendar management from the week view** — each day column on the
+  Schedule page now has an "Add booking" (+) button (staff only) that opens
+  the new-booking form with that date pre-filled.
+- **Import Data** (`/dashboard/import`, owner/manager) — migrate customers
+  and scheduling data from other platforms:
+  - 5-step CSV importer (upload → field mapping → preview → duplicate
+    detection → commit) with per-platform column presets for Jobber,
+    ZenMaid, Booking Koala, and Housecall Pro. ZenMaid and Booking Koala
+    are labeled "CSV upload" only — they have no public API.
+  - API imports reusing the same preview → dedupe → commit pipeline:
+    Jobber (OAuth2, GraphQL), Housecall Pro (pasted API key, MAX plan
+    required), Google Calendar (OAuth2, appointments only). Credentials
+    are AES-256-GCM encrypted per company; nothing is presented as
+    supported until built. Requires new env vars (`IMPORT_ENCRYPTION_KEY`,
+    `JOBBER_CLIENT_ID/SECRET`, `GOOGLE_CLIENT_ID/SECRET`) and migration
+    `0013_import_connections.sql`.
 - **Automated SMS + email communications** — a data-driven template system
   (`lib/communications/templates.ts`) with 14 templates: 10 for customers
   (quote sent/follow-up/approved, booking confirmed, day-before booking
