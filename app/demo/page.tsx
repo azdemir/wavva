@@ -9,7 +9,7 @@ import { getContent } from "@/lib/studio/content";
 export const metadata: Metadata = {
   title: "Start Your Free 14-Day Trial",
   description:
-    "Start a free 14-day trial of TidyPro cleaning business software — scheduling, quotes, crew tools, and invoicing. No credit card required. Flat pricing from $19/mo.",
+    "Start a free 14-day trial of TidyPro cleaning business software — scheduling, quotes, crew tools, and invoicing. No credit card required. Flat pricing from $15/mo.",
   alternates: { canonical: "/demo" },
 };
 

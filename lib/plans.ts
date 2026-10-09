@@ -21,7 +21,7 @@ export const PLANS: Record<PlanId, Plan> = {
   starter: {
     id: "starter",
     name: "Starter",
-    priceCents: 1900,
+    priceCents: 1500,
     seats: 1,
     blurb: "Perfect for new cleaning businesses just getting started.",
     features: [
@@ -37,7 +37,7 @@ export const PLANS: Record<PlanId, Plan> = {
   growth: {
     id: "growth",
     name: "Growth",
-    priceCents: 3900,
+    priceCents: 3500,
     seats: 5,
     blurb: "Ideal for established businesses ready to scale.",
     features: [
@@ -53,7 +53,7 @@ export const PLANS: Record<PlanId, Plan> = {
   pro: {
     id: "pro",
     name: "Pro",
-    priceCents: 4900,
+    priceCents: 4500,
     seats: null,
     blurb: "Our most comprehensive plan with full features and priority support.",
     features: [

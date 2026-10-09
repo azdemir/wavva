@@ -54,7 +54,7 @@ const ROWS: { label: string; tidy: string; tidyGood: boolean; other: string; oth
 const FAQS = [
   {
     q: "Is TidyPro cheaper than Jobber?",
-    a: "For most cleaning teams, yes — and the gap widens as you grow. TidyPro charges one flat monthly price (from $19) no matter how many cleaners you add. Per-user platforms raise your bill with every hire, which is the most common complaint we hear from owners who switch.",
+    a: "For most cleaning teams, yes — and the gap widens as you grow. TidyPro charges one flat monthly price (from $15) no matter how many cleaners you add. Per-user platforms raise your bill with every hire, which is the most common complaint we hear from owners who switch.",
   },
   {
     q: "Does TidyPro do automated quote follow-up?",

@@ -16,9 +16,9 @@ import { getContent } from "@/lib/studio/content";
 
 
 export const metadata: Metadata = {
-  title: "Flat Pricing from $19/mo — No Per-User Fees",
+  title: "Flat Pricing from $15/mo — No Per-User Fees",
   description:
-    "TidyPro pricing: flat monthly plans — Starter $19, Growth $39, Pro $49. No per-user fees, ever. 14-day free trial, no credit card required. Cancel anytime.",
+    "TidyPro pricing: flat monthly plans — Starter $15, Growth $35, Pro $45. No per-user fees, ever. 14-day free trial, no credit card required. Cancel anytime.",
   alternates: { canonical: "/pricing" },
 };
 
