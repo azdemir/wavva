@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { TemplateName } from "./templates";
+import type { TemplateKey } from "@/lib/communications/templates";
 
 export type EnqueueInput = {
   company_id: string;
@@ -7,7 +7,7 @@ export type EnqueueInput = {
   recipient_type: "customer" | "user";
   recipient_id: string;
   channel: "email" | "sms";
-  template: TemplateName;
+  template: TemplateKey;
   /** Must include `email` (for email) so the sender doesn't need extra lookups. */
   payload: Record<string, unknown>;
 };

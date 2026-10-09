@@ -89,7 +89,7 @@ export async function POST(request: Request) {
       });
       const { data: invoice } = await svc
         .from("invoices")
-        .select("invoice_number, total_cents, amount_paid_cents, customer_id, customers(name, email), companies(name)")
+        .select("invoice_number, total_cents, amount_paid_cents, customer_id, customers(name, email, phone, sms_consent), companies(name)")
         .eq("id", invoiceId)
         .single();
       if (invoice) {
@@ -104,20 +104,23 @@ export async function POST(request: Request) {
 
         const customer = Array.isArray(invoice.customers) ? invoice.customers[0] : invoice.customers;
         const company = Array.isArray(invoice.companies) ? invoice.companies[0] : invoice.companies;
-        if (customer?.email) {
-          const { enqueueNotification } = await import("@/lib/notifications/queue");
-          await enqueueNotification(svc, {
+        if (customer) {
+          const { enqueueCustomerNotification } = await import("@/lib/communications/notify");
+          await enqueueCustomerNotification(svc, {
             company_id: companyId,
             recipient_type: "customer",
             recipient_id: invoice.customer_id,
-            channel: "email",
             template: "payment_received",
             payload: {
-              email: customer.email,
               recipient_name: customer.name,
               company_name: company?.name ?? "Your cleaning company",
               amount_cents: amount,
               invoice_number: invoice.invoice_number,
+            },
+            contact: {
+              email: customer.email,
+              phone: (customer as { phone?: string | null }).phone,
+              smsConsent: (customer as { sms_consent?: boolean | null }).sms_consent ?? false,
             },
           });
         }

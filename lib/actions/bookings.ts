@@ -11,8 +11,9 @@ import { bookingSchema } from "@/lib/validation";
 import { localInputToUtc } from "@/lib/dates";
 import { nextNumber } from "@/lib/pricing";
 import { one } from "@/lib/relations";
+import { baseUrl } from "@/lib/base-url";
 import { formatDate, formatTime } from "@/lib/format";
-import { enqueueNotification } from "@/lib/notifications/queue";
+import { enqueueCustomerNotification } from "@/lib/communications/notify";
 
 export type ActionResult = { error?: string; ok?: boolean };
 
@@ -124,27 +125,35 @@ export async function createBooking(input: unknown): Promise<ActionResult> {
 
   const { data: full } = await supabase
     .from("bookings")
-    .select("scheduled_start, scheduled_end, customer_id, customers(name, email), service_addresses(address_line1, city)")
+    .select("scheduled_start, scheduled_end, customer_id, customers(name, email, phone, sms_consent), service_addresses(address_line1, city)")
     .eq("id", booking.id)
     .single();
-  const notifCustomer = one(full?.customers);
+  const notifCustomer = one(full?.customers) as {
+    name: string;
+    email: string | null;
+    phone: string | null;
+    sms_consent: boolean | null;
+  } | null;
   const addr = one(full?.service_addresses);
-  if (full && notifCustomer?.email) {
+  if (full && notifCustomer) {
     const settings2 = ctx.company.settings as { cancellation_policy?: string | null };
-    await enqueueNotification(supabase, {
+    await enqueueCustomerNotification(supabase, {
       company_id: ctx.company.id,
       recipient_type: "customer",
       recipient_id: full.customer_id,
-      channel: "email",
       template: "booking_confirmed",
       payload: {
-        email: notifCustomer.email,
         recipient_name: notifCustomer.name,
         company_name: ctx.company.name,
         date: formatDate(full.scheduled_start),
         time: `${formatTime(full.scheduled_start, tz)} – ${formatTime(full.scheduled_end, tz)}`,
         address: `${addr?.address_line1 ?? ""}, ${addr?.city ?? ""}`,
         cancellation_policy: settings2.cancellation_policy ?? undefined,
+      },
+      contact: {
+        email: notifCustomer.email,
+        phone: notifCustomer.phone,
+        smsConsent: notifCustomer.sms_consent ?? false,
       },
     });
   }
@@ -187,7 +196,7 @@ export async function rescheduleBooking(
   // Shift future scheduled jobs (not completed/canceled ones).
   const { data: jobs } = await supabase
     .from("jobs")
-    .select("id, scheduled_start, scheduled_end")
+    .select("id, scheduled_start, scheduled_end, assigned_user_ids")
     .eq("booking_id", id)
     .eq("company_id", ctx.company.id)
     .eq("status", "scheduled")
@@ -201,6 +210,68 @@ export async function rescheduleBooking(
         scheduled_end: new Date(new Date(job.scheduled_end).getTime() + deltaMs).toISOString(),
       })
       .eq("id", job.id);
+  }
+
+  // Notify the customer and assigned cleaners about the schedule change.
+  const { data: updated } = await supabase
+    .from("bookings")
+    .select("customer_id, customers(name, email, phone, sms_consent), service_addresses(address_line1, city)")
+    .eq("id", id)
+    .single();
+  const updCustomer = one(updated?.customers) as {
+    name: string;
+    email: string | null;
+    phone: string | null;
+    sms_consent: boolean | null;
+  } | null;
+  const updAddr = one(updated?.service_addresses);
+  if (updated && updCustomer) {
+    const bUrl = await baseUrl();
+    const payload = {
+      recipient_name: updCustomer.name,
+      company_name: ctx.company.name,
+      date: formatDate(newStart.toISOString()),
+      time: `${formatTime(newStart.toISOString(), tz)} – ${formatTime(newEnd.toISOString(), tz)}`,
+      customer_name: updCustomer.name,
+      address: `${updAddr?.address_line1 ?? ""}, ${updAddr?.city ?? ""}`,
+      job_link: `${bUrl}/dashboard/bookings/${id}`,
+    };
+    await enqueueCustomerNotification(supabase, {
+      company_id: ctx.company.id,
+      recipient_type: "customer",
+      recipient_id: updated.customer_id,
+      template: "job_updated",
+      payload,
+      contact: {
+        email: updCustomer.email,
+        phone: updCustomer.phone,
+        smsConsent: updCustomer.sms_consent ?? false,
+      },
+    });
+    const assigneeIds = [
+      ...new Set(
+        (jobs ?? []).flatMap((j) => (j.assigned_user_ids ?? []) as string[]),
+      ),
+    ];
+    if (assigneeIds.length > 0) {
+      const { data: assignees } = await supabase
+        .from("memberships")
+        .select("user_id, email")
+        .eq("company_id", ctx.company.id)
+        .in("user_id", assigneeIds);
+      for (const a of assignees ?? []) {
+        if (!a.email) continue;
+        await enqueueCustomerNotification(supabase, {
+          company_id: ctx.company.id,
+          recipient_type: "user",
+          recipient_id: a.user_id,
+          template: "job_updated",
+          payload,
+          contact: { email: a.email },
+          skipConsentCheck: true,
+        });
+      }
+    }
   }
 
   await logAudit(supabase, {
@@ -226,13 +297,52 @@ export async function cancelBooking(id: string): Promise<ActionResult> {
     .eq("company_id", ctx.company.id);
   if (bErr) return { error: bErr.message };
 
-  await supabase
+  const { data: canceledJobs } = await supabase
     .from("jobs")
     .update({ status: "canceled" })
     .eq("booking_id", id)
     .eq("company_id", ctx.company.id)
     .eq("status", "scheduled")
-    .gte("scheduled_start", new Date().toISOString());
+    .gte("scheduled_start", new Date().toISOString())
+    .select("id, scheduled_start, scheduled_end, assigned_user_ids, customers(name), service_addresses(address_line1, city)");
+
+  // Tell assigned cleaners their upcoming jobs were cancelled.
+  const cancelTz = ctx.company.timezone || "America/New_York";
+  const cancelAssigneeIds = [
+    ...new Set((canceledJobs ?? []).flatMap((j) => (j.assigned_user_ids ?? []) as string[])),
+  ];
+  if (cancelAssigneeIds.length > 0) {
+    const { data: cancelAssignees } = await supabase
+      .from("memberships")
+      .select("user_id, email")
+      .eq("company_id", ctx.company.id)
+      .in("user_id", cancelAssigneeIds);
+    const emailByUser = new Map((cancelAssignees ?? []).map((a) => [a.user_id, a.email]));
+    for (const j of canceledJobs ?? []) {
+      const cName = one(j.customers)?.name ?? "";
+      const cAddr = one(j.service_addresses);
+      const payload = {
+        company_name: ctx.company.name,
+        date: formatDate(j.scheduled_start),
+        time: `${formatTime(j.scheduled_start, cancelTz)} – ${formatTime(j.scheduled_end, cancelTz)}`,
+        customer_name: cName,
+        address: `${cAddr?.address_line1 ?? ""}, ${cAddr?.city ?? ""}`,
+      };
+      for (const uid of (j.assigned_user_ids ?? []) as string[]) {
+        const email = emailByUser.get(uid);
+        if (!email) continue;
+        await enqueueCustomerNotification(supabase, {
+          company_id: ctx.company.id,
+          recipient_type: "user",
+          recipient_id: uid,
+          template: "job_cancelled",
+          payload,
+          contact: { email },
+          skipConsentCheck: true,
+        });
+      }
+    }
+  }
 
   await logAudit(supabase, {
     company_id: ctx.company.id,
