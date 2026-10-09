@@ -7,6 +7,7 @@ site and the founder's sales pipeline. Two tools in one place:
 | ---- | ----- | ------------ |
 | Website editor | `/studio/website` | Edit every word on the marketing site — no code, no redeploy |
 | CRM | `/studio/crm` | Track leads from first touch to paying customer |
+| Analytics | `/studio/analytics` | Growth, MRR, plan mix, and pipeline analytics |
 
 Both live under `/studio`, which also shows an overview dashboard (companies,
 users, MRR estimate, pipeline value, latest leads).
@@ -73,7 +74,6 @@ revalidates the affected routes (`updateTag` + `revalidatePath`).
 > enforces — so the website and the product can never drift apart.
 
 ## CRM (`/studio/crm`)
-
 ### Pipeline stages
 
 `New → Contacted → On trial → Customer` (or `Lost`).
@@ -99,6 +99,23 @@ revalidates the affected routes (`updateTag` + `revalidatePath`).
 
 You can set any `source` string when creating leads manually (e.g. `referral`,
 `cold-call`).
+
+## Analytics (`/studio/analytics`)
+
+The founder's growth and revenue view for the SaaS itself:
+
+- **KPI cards** — MRR (with paying/trialing split), companies + users,
+  lead→customer conversion rate, open pipeline value.
+- **Signups chart** — companies vs leads per week for the last 12 weeks.
+- **Plan mix donut** — Starter/Growth/Pro breakdown with MRR per plan.
+- **Lead funnel** — counts per pipeline stage with stage-to-stage conversion
+  rates.
+- **Lead sources** — where leads come from, ranked.
+- **Newest companies** — latest signups with plan and subscription status.
+
+Data comes from `getAnalytics()` in `lib/studio/analytics.ts` (service-role
+client, admin-gated). Charts are hand-rolled SVG in
+`components/studio/charts.tsx` — no chart library needed.
 
 ## Database
 
@@ -138,6 +155,7 @@ from the registry defaults; Studio routes redirect to the homepage.
 app/studio/
   layout.tsx            Platform-admin gate for all of /studio
   page.tsx              HQ overview dashboard
+  analytics/page.tsx    Growth, MRR, funnel + plan-mix analytics
   website/page.tsx      No-code website editor
   crm/page.tsx          Pipeline board
   crm/new/page.tsx      Manual lead entry

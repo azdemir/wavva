@@ -7,6 +7,7 @@ export const instant = false;
 
 const NAV = [
   { href: "/studio", label: "Overview" },
+  { href: "/studio/analytics", label: "Analytics" },
   { href: "/studio/website", label: "Website" },
   { href: "/studio/crm", label: "CRM" },
 ];
