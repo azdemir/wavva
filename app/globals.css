@@ -36,6 +36,7 @@
   --animate-fade-up: fade-up 0.7s ease-out both;
   --animate-fade-in: fade-in 0.9s ease-out both;
   --animate-shimmer: shimmer 1.4s ease-in-out infinite;
+  --animate-hero-badge-float: hero-badge-float 7s ease-in-out infinite;
 }
 
 @keyframes fade-up {
@@ -55,6 +56,16 @@
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes hero-badge-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-9px) rotate(2deg);
   }
 }
 

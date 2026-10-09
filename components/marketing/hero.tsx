@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { ArrowRightIcon } from "@/components/ui/icons";
 import { DashboardTour } from "@/components/marketing/dashboard-tour";
+import { HeroBadge } from "@/components/marketing/hero-badge";
 import { HeroHeadlines } from "@/components/marketing/hero-headlines";
 import { getSessionUser } from "@/lib/auth";
 import { getContent } from "@/lib/studio/content";
@@ -64,8 +65,9 @@ export async function Hero() {
 
           {/* Auto-playing dashboard tour — sample data, not a screenshot */}
           {showTour && (
-            <div className="animate-fade-in min-w-0">
+            <div className="animate-fade-in relative min-w-0">
               <DashboardTour />
+              <HeroBadge className="absolute -top-8 -right-3 z-10 h-24 w-24 sm:-top-10 sm:-right-5 sm:h-32 sm:w-32" />
             </div>
           )}
         </div>
