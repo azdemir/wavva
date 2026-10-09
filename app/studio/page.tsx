@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatCents, formatDate } from "@/lib/format";
+import { CrmSetupNotice } from "@/components/studio/crm-setup-notice";
 import { PLANS, isPlanId, subscriptionInGoodStanding } from "@/lib/plans";
 import {
   CRM_STAGES,
@@ -88,6 +89,7 @@ export default async function StudioPage() {
 
   return (
     <div className="space-y-8">
+      <CrmSetupNotice />
       <Heading
         title="Studio overview"
         description="The health of the TidyPro business itself — revenue, companies, and your sales pipeline."

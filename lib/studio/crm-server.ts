@@ -12,6 +12,18 @@ async function guardedService() {
   return createServiceClient();
 }
 
+export const CRM_SETUP_HINT =
+  "The CRM database tables aren't set up yet. Run supabase/migrations/0009_studio.sql in your Supabase SQL editor, then try again.";
+
+/** True when the crm_contacts table exists (i.e. migration 0009 was run). */
+export async function crmTablesReady(): Promise<boolean> {
+  const svc = await guardedService();
+  const { error } = await svc.from("crm_contacts").select("id", { head: true, count: "exact" }).limit(1);
+  // 42P01 = undefined_table → migration not run yet.
+  if (error && (error as { code?: string }).code === "42P01") return false;
+  return !error;
+}
+
 /** All contacts with activity counts, newest first. */
 export async function listCrmContacts(): Promise<CrmContact[]> {
   const svc = await guardedService();

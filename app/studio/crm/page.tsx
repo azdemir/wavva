@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/format";
+import { CrmSetupNotice } from "@/components/studio/crm-setup-notice";
 
 export const instant = false;
 
@@ -37,6 +38,7 @@ export default async function CrmPage() {
 
   return (
     <div className="space-y-6">
+      <CrmSetupNotice />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Heading
           title="CRM"

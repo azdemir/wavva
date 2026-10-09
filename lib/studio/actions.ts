@@ -122,7 +122,16 @@ export async function createCrmContact(
     })
     .select("id")
     .single();
-  if (error || !data) return { error: "Couldn't create the contact." };
+  if (error || !data) {
+    // 42P01 = undefined_table: migration 0009_studio.sql was never run.
+    if (error && (error as { code?: string }).code === "42P01") {
+      return {
+        error:
+          "The CRM database tables aren't set up yet. Run supabase/migrations/0009_studio.sql in your Supabase SQL editor, then try again.",
+      };
+    }
+    return { error: "Couldn't create the contact." };
+  }
   revalidatePath("/studio/crm");
   revalidatePath("/studio");
   return { ok: true, id: data.id };
