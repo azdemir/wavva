@@ -60,17 +60,18 @@ test.describe("Marketing site end-to-end", () => {
     page,
   }) => {
     await page.goto("/");
-    // Tour frame renders with scene content.
-    await expect(
-      page.getByText(/good morning, sarah/i).first(),
-    ).toBeVisible({ timeout: 15000 });
-    // Play/pause control exists and toggles.
+    // Tour frame renders with scene content — scroll it into view first
+    // (it now sits below the headlines; the observer pauses it off-screen).
+    const tour = page.getByText(/good morning, sarah/i).first();
+    await tour.scrollIntoViewIfNeeded();
+    await expect(tour).toBeVisible({ timeout: 15000 });
+    // Play/pause control exists and toggles the label.
     const toggle = page.getByRole("button", { name: /pause tour|play tour/i });
     await expect(toggle).toBeVisible();
+    const before = await toggle.getAttribute("aria-label");
     await toggle.click();
-    await expect(
-      page.getByRole("button", { name: /play tour/i }),
-    ).toBeVisible();
+    const after = before === "Pause tour" ? "Play tour" : "Pause tour";
+    await expect(page.getByRole("button", { name: after })).toBeVisible();
   });
 
   test("navbar mobile menu opens and links work", async ({ page }) => {

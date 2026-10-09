@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { ArrowRightIcon } from "@/components/ui/icons";
 import { DashboardTour } from "@/components/marketing/dashboard-tour";
+import { HeroHeadlines } from "@/components/marketing/hero-headlines";
 import { getSessionUser } from "@/lib/auth";
 
 /** Session-aware hero CTA. Streams in after the static shell. */
@@ -28,79 +29,41 @@ export function Hero() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-brand-50/60 to-white dark:from-brand-950/50 dark:to-slate-950">
       <Container>
-        <div className="grid items-center gap-12 py-16 lg:grid-cols-2 lg:py-24">
-          <div className="animate-fade-up">
-            <h1 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-5xl lg:text-6xl">
-              Run your cleaning business from{" "}
-              <span className="text-brand-600 dark:text-brand-400">one tidy place</span>
-            </h1>
-            <p className="mt-6 max-w-xl text-lg text-slate-600 dark:text-slate-400">
-              {site.name} handles your quotes, schedule, crew, invoices, and
-              customer messages — so you spend less time on paperwork and more
-              time on jobs. Made for residential and commercial cleaners, from
-              solo operators to growing teams.
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Suspense
-                fallback={
-                  <span className="inline-flex h-12 w-40 animate-pulse rounded-lg bg-slate-100 dark:bg-slate-800" aria-hidden="true" />
-                }
-              >
-                <HeroCta />
-              </Suspense>
-              <Button href="#how-it-works" variant="outline" size="lg">
-                See how it works
-              </Button>
-            </div>
-            <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
-              Free 14-day trial · No credit card required · Cancel anytime
-            </p>
+        <div className="mx-auto max-w-4xl pt-16 pb-12 text-center lg:pt-24">
+          <p className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-4 py-1.5 text-sm font-medium text-brand-700 dark:border-brand-800 dark:bg-brand-950 dark:text-brand-300">
+            <span className="inline-block h-2 w-2 rounded-full bg-brand-500" aria-hidden="true" />
+            Proudly locally owned in Upstate New York
+          </p>
 
-            {/* Where the big platforms fall short — and TidyPro doesn't */}
-            <ul className="mt-8 grid max-w-xl gap-3 sm:grid-cols-2">
-              {[
-                {
-                  title: "Flat pricing, no per-user fees",
-                  body: "Jobber and Housecall Pro charge per seat as you grow. TidyPro plans include your whole crew.",
-                },
-                {
-                  title: "Quote follow-up built in",
-                  body: "Most platforms make you chase quotes by hand or pay for add-ons. TidyPro follows up automatically.",
-                },
-                {
-                  title: "Made for cleaners, not plumbers",
-                  body: "Generalist tools force per-job workflows onto recurring maid routes. TidyPro is cleaning-first.",
-                },
-                {
-                  title: "Everything included",
-                  body: "No $79/mo marketing add-ons or gated essentials. Every plan gets the full toolkit.",
-                },
-              ].map((item) => (
-                <li
-                  key={item.title}
-                  className="rounded-xl border border-slate-200 bg-white/70 p-4 dark:border-slate-800 dark:bg-slate-900/70"
-                >
-                  <p className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
-                    <span
-                      className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400"
-                      aria-hidden="true"
-                    >
-                      ✓
-                    </span>
-                    {item.title}
-                  </p>
-                  <p className="mt-1.5 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
-                    {item.body}
-                  </p>
-                </li>
-              ))}
-            </ul>
+          <div className="mt-6 animate-fade-up">
+            <HeroHeadlines />
           </div>
 
-          {/* Auto-playing dashboard tour — sample data, not a screenshot */}
-          <div className="animate-fade-in min-w-0">
-            <DashboardTour />
+          <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-600 dark:text-slate-400">
+            Quotes, scheduling, crew, invoices, and customer messages — in one
+            simple workspace for every cleaning company.
+          </p>
+
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Suspense
+              fallback={
+                <span className="inline-flex h-12 w-40 animate-pulse rounded-lg bg-slate-100 dark:bg-slate-800" aria-hidden="true" />
+              }
+            >
+              <HeroCta />
+            </Suspense>
+            <Button href="#how-it-works" variant="outline" size="lg">
+              See how it works
+            </Button>
           </div>
+          <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
+            Free 14-day trial · No credit card required · Cancel anytime
+          </p>
+        </div>
+
+        {/* Auto-playing dashboard tour — sample data, not a screenshot */}
+        <div className="mx-auto max-w-5xl pb-16 animate-fade-in">
+          <DashboardTour />
         </div>
 
         <div className="border-t border-slate-200 dark:border-slate-800 py-8">
