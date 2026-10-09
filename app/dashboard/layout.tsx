@@ -17,15 +17,19 @@ import {
   CardIcon,
   GearIcon,
   BellIcon,
+  ChartIcon,
 } from "@/components/ui/icons";
 import { Logo, LogoMark } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { hasFeature, type PlanFeature } from "@/lib/plans";
 
 type NavItem = {
   href: string;
   label: string;
   icon: (props: React.SVGProps<SVGSVGElement>) => React.ReactNode;
   soon?: boolean;
+  /** If set, only shown to plans that include this feature. */
+  feature?: PlanFeature;
 };
 
 const nav: NavItem[] = [
@@ -34,19 +38,23 @@ const nav: NavItem[] = [
   { href: "/dashboard/services", label: "Services & Pricing", icon: TagIcon },
   { href: "/dashboard/quotes", label: "Quotes", icon: QuoteIcon },
   { href: "/dashboard/bookings", label: "Bookings", icon: CalendarIcon },
-  { href: "/dashboard/schedule", label: "Schedule", icon: CalendarIcon },
+  { href: "/dashboard/schedule", label: "Schedule", icon: CalendarIcon, feature: "schedule" },
   { href: "/dashboard/my-jobs", label: "My jobs", icon: ClockIcon },
   { href: "/dashboard/invoices", label: "Invoices", icon: CardIcon },
+  { href: "/dashboard/reports", label: "Reports", icon: ChartIcon, feature: "reports" },
   { href: "/dashboard/billing", label: "Billing", icon: CardIcon },
   { href: "/dashboard/team", label: "Team", icon: UsersIcon },
   { href: "/dashboard/settings", label: "Settings", icon: GearIcon },
   { href: "/dashboard/audit", label: "Audit log", icon: BellIcon },
 ];
 
-function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
+function NavLinks({ onNavigate, plan }: { onNavigate?: () => void; plan: "starter" | "growth" | "pro" }) {
+  const visible = nav.filter(
+    (item) => !item.feature || hasFeature(plan, item.feature),
+  );
   return (
     <nav className="space-y-1" aria-label="Workspace">
-      {nav.map((item) => {
+      {visible.map((item) => {
         const Icon = item.icon;
         const content = (
           <>
@@ -98,6 +106,7 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const { user, membership, company } = await requireCompany();
+  const plan = isPlanId(company.plan) ? company.plan : "starter";
 
   return (
     <div className="min-h-screen bg-slate-50 md:flex dark:bg-slate-950">
@@ -108,7 +117,7 @@ export default async function DashboardLayout({
 <LogoMark className="h-9 w-9" />
           </Link>
           <div className="flex-1 overflow-y-auto px-3">
-            <NavLinks />
+            <NavLinks plan={plan} />
           </div>
           <div className="border-t border-slate-200 p-4 dark:border-slate-800">
             <p className="truncate text-sm font-semibold text-slate-900">
@@ -160,7 +169,7 @@ export default async function DashboardLayout({
               ⌂ Home
             </Link>
             {nav
-              .filter((n) => !n.soon)
+              .filter((n) => !n.soon && (!n.feature || hasFeature(plan, n.feature)))
               .map((item) => (
                 <Link
                   key={item.href}
@@ -177,14 +186,8 @@ export default async function DashboardLayout({
       <main className="min-w-0 flex-1">
         <div className="mx-auto max-w-6xl px-4 py-6 md:px-8 md:py-8">
           <SubscriptionBanner
-            status={(company as unknown as { subscription_status?: string }).subscription_status ?? "none"}
-            planName={
-              PLANS[
-                isPlanId((company as unknown as { plan?: string }).plan)
-                  ? (company as unknown as { plan: "starter" | "growth" | "pro" }).plan
-                  : "starter"
-              ].name
-            }
+            status={company.subscription_status ?? "none"}
+            planName={PLANS[plan].name}
           />
           {children}
         </div>

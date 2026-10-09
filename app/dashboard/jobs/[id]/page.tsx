@@ -11,6 +11,8 @@ import { JobStatusPill, type JobStatus } from "@/components/ui/badge";
 import { TextareaField } from "@/components/ui/input";
 import { JobChecklist, type ChecklistItem } from "@/components/jobs/job-checklist";
 import { AssignCrew } from "@/components/jobs/assign-crew";
+import { UpgradePrompt } from "@/components/billing/upgrade-prompt";
+import { hasFeature, isPlanId } from "@/lib/plans";
 import { formatTime, formatDate } from "@/lib/format";
 
 export const instant = false;
@@ -22,6 +24,8 @@ export default async function JobDetailPage({
 }) {
   const { id } = await params;
   const { company, membership } = await requireCompany();
+  const plan = isPlanId(company.plan) ? company.plan : "starter";
+  const canUseChecklists = hasFeature(plan, "checklists");
   const supabase = await createClient();
   const tz = company.timezone || "America/New_York";
   const isStaff = membership.role === "owner" || membership.role === "manager";
@@ -161,7 +165,11 @@ export default async function JobDetailPage({
           <CardTitle>Checklist</CardTitle>
         </CardHeader>
         <CardContent>
-          <JobChecklist jobId={id} initial={checklist} readOnly={readOnly} />
+          {canUseChecklists ? (
+            <JobChecklist jobId={id} initial={checklist} readOnly={readOnly} />
+          ) : (
+            <UpgradePrompt feature="checklists" />
+          )}
         </CardContent>
       </Card>
 
@@ -171,7 +179,11 @@ export default async function JobDetailPage({
             <CardTitle>Assigned crew</CardTitle>
           </CardHeader>
           <CardContent>
-            <AssignCrew jobId={id} crew={members ?? []} assigned={assigned} />
+            {canUseChecklists ? (
+              <AssignCrew jobId={id} crew={members ?? []} assigned={assigned} />
+            ) : (
+              <UpgradePrompt feature="checklists" />
+            )}
           </CardContent>
         </Card>
       )}

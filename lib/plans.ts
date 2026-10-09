@@ -84,3 +84,26 @@ export function seatLimitLabel(plan: PlanId): string {
   const limit = PLANS[plan].seats;
   return limit === null ? "Unlimited" : `${limit} seats`;
 }
+
+/**
+ * Feature gating by plan. Tiers are cumulative: Growth includes everything
+ * in Starter, Pro includes everything in Growth.
+ */
+export type PlanFeature = "schedule" | "checklists" | "reports";
+
+const FEATURE_MIN_PLAN: Record<PlanFeature, PlanId> = {
+  schedule: "growth", // Week schedule view
+  checklists: "growth", // Job checklists & crew assignment
+  reports: "pro", // Company reporting dashboard
+};
+
+const PLAN_RANK: Record<PlanId, number> = { starter: 0, growth: 1, pro: 2 };
+
+export function hasFeature(plan: PlanId, feature: PlanFeature): boolean {
+  return PLAN_RANK[plan] >= PLAN_RANK[FEATURE_MIN_PLAN[feature]];
+}
+
+/** Human-readable plan name required for a feature (for upgrade prompts). */
+export function requiredPlanFor(feature: PlanFeature): string {
+  return PLANS[FEATURE_MIN_PLAN[feature]].name;
+}

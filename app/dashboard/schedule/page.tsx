@@ -6,6 +6,8 @@ import { Heading } from "@/components/ui/heading";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { JobStatusPill, type JobStatus } from "@/components/ui/badge";
+import { UpgradePrompt } from "@/components/billing/upgrade-prompt";
+import { hasFeature, isPlanId } from "@/lib/plans";
 import { formatTime } from "@/lib/format";
 
 function weekStart(date: Date): Date {
@@ -22,6 +24,15 @@ export default async function SchedulePage({
   searchParams: Promise<{ week?: string }>;
 }) {
   const { company, membership } = await requireCompany();
+  const plan = isPlanId(company.plan) ? company.plan : "starter";
+  if (!hasFeature(plan, "schedule")) {
+    return (
+      <div className="space-y-6">
+        <Heading title="Schedule" description="Your crew's week at a glance." />
+        <UpgradePrompt feature="schedule" />
+      </div>
+    );
+  }
   const supabase = await createClient();
   const tz = company.timezone || "America/New_York";
 

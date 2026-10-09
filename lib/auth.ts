@@ -23,6 +23,8 @@ export type Company = {
   currency: string;
   settings: Record<string, unknown>;
   onboarding_completed: boolean;
+  plan: string | null;
+  subscription_status: string | null;
 };
 
 /**
@@ -61,7 +63,7 @@ export const getActiveMembership = cache(async function getActiveMembership(): P
   const { data: membership } = await supabase
     .from("memberships")
     .select(
-      "id, user_id, company_id, email, role, companies(id, name, logo_url, phone, email, website, timezone, currency, settings, onboarding_completed)",
+      "id, user_id, company_id, email, role, companies(id, name, logo_url, phone, email, website, timezone, currency, settings, onboarding_completed, plan, subscription_status)",
     )
     .eq("user_id", user.id)
     .order("created_at", { ascending: true })
