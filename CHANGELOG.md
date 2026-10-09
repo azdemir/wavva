@@ -91,11 +91,23 @@ All notable changes to TidyPro. Dates are in America/New_York.
   The form now validates end > start instantly client-side, and a
   try/finally guarantees the button resets while surfacing failures as an
   error banner (successful creates still redirect via `redirect()`).
+- **Job photo 1-week retention** — photos are now kept for 7 days, then
+  automatically deleted. New `PHOTO_RETENTION_DAYS` constant in
+  `lib/storage.ts`; new `/api/cron/photo-cleanup` endpoint (protected by the
+  `CRON_SECRET` bearer token) deletes expired photos' storage objects and
+  database rows, 500 per run. The Before/after photos card tells the team:
+  "Photos are kept for 7 days, then automatically deleted." Photos also shrink
+  on-device before upload (max 1600px, JPEG ~82%), and they upload straight
+  from the phone to object storage — never touching the git repo.
 
 ### Operations notes
 
 - **Run these migrations** on the Supabase project (in order):
   `0007_job_photos.sql`, `0008_customer_type.sql`.
+- **Schedule the photo cleanup cron** daily: hit
+  `GET /api/cron/photo-cleanup` with `Authorization: Bearer <CRON_SECRET>`
+  (Vercel Cron or any external scheduler). Until scheduled, expired photos
+  are not deleted.
 - `package-lock.json` is intentionally not committed (too large for the push
   tooling); run `npm install` after cloning to regenerate it.
 - Vercel auto-deploys from `main`.
