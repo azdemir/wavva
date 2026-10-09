@@ -8,7 +8,9 @@ import { getContent } from "@/lib/studio/content";
 
 export const metadata: Metadata = {
   title: "Start your free trial",
-  description: "Start a free 14-day trial of TidyPro.",
+  description:
+    "Start a free 14-day trial of TidyPro — quotes, scheduling, teams, and invoicing for your cleaning business. No credit card required.",
+  alternates: { canonical: "/demo" },
 };
 
 /**
@@ -29,6 +31,9 @@ export default async function DemoPage() {
           <Link href="/" className="mb-8 flex items-center gap-2.5">
             <Logo wordmark={siteName} />
           </Link>
+
+          {/* SEO: the card title is not an h1, so expose one for crawlers */}
+          <h1 className="sr-only">{title}</h1>
 
           <Card className="w-full max-w-md">
             <CardHeader>

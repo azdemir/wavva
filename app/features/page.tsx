@@ -22,6 +22,7 @@ export const metadata: Metadata = {
   title: "Features",
   description:
     "Scheduling, quotes and bookings, crew tools, invoicing and payments, customer portal, and reminders — everything TidyPro does for cleaning businesses.",
+  alternates: { canonical: "/features" },
 };
 
 type DeepDive = {

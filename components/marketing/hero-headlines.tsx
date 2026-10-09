@@ -53,43 +53,53 @@ export function HeroHeadlines({
     </span>
   );
 
+  // SEO: crawlers and screen readers get ONE clean headline. The rotating
+  // animation is purely visual (aria-hidden) so the H1 is never a jumble
+  // of concatenated variants.
+  const cleanHeadline = `${staticText} ${lines[0]}`;
+
   if (reduced) {
     return (
-      <h1 className="font-serif text-4xl font-medium tracking-tight sm:text-5xl">
-        {staticLine}
-        <span className="block text-brand-600 dark:text-brand-400">
-          {lines[0]}
-        </span>
-      </h1>
+      <>
+        <h1 className="sr-only">{cleanHeadline}</h1>
+        <div
+          aria-hidden="true"
+          className="font-serif text-4xl font-medium tracking-tight sm:text-5xl"
+        >
+          {staticLine}
+          <span className="block text-brand-600 dark:text-brand-400">
+            {lines[0]}
+          </span>
+        </div>
+      </>
     );
   }
 
   return (
-    <h1 className="font-serif text-4xl font-medium tracking-tight sm:text-5xl">
-      {staticLine}
-      <span
-        className="relative block text-brand-600 dark:text-brand-400"
-        aria-live="polite"
+    <>
+      <h1 className="sr-only">{cleanHeadline}</h1>
+      <div
+        aria-hidden="true"
+        className="font-serif text-4xl font-medium tracking-tight sm:text-5xl"
       >
-        {/* Reserve height for the tallest phrase to avoid layout shift */}
-        <span className="invisible block" aria-hidden="true">
-          {tallest}
+        {staticLine}
+        <span className="relative block text-brand-600 dark:text-brand-400">
+          {/* Reserve height for the tallest phrase to avoid layout shift */}
+          <span className="invisible block">{tallest}</span>
+          {lines.map((line, i) => (
+            <span
+              key={line}
+              className={`absolute inset-0 transition-all duration-700 ease-out ${
+                i === index
+                  ? "translate-y-0 opacity-100"
+                  : "pointer-events-none translate-y-4 opacity-0"
+              }`}
+            >
+              {line}
+            </span>
+          ))}
         </span>
-        {lines.map((line, i) => (
-          <span
-            key={line}
-            aria-hidden={i !== index}
-            className={`absolute inset-0 transition-all duration-700 ease-out ${
-              i === index
-                ? "translate-y-0 opacity-100"
-                : "pointer-events-none translate-y-4 opacity-0"
-            }`}
-          >
-            {line}
-          </span>
-        ))}
-        <span className="sr-only">{lines[index]}</span>
-      </span>
-    </h1>
+      </div>
+    </>
   );
 }

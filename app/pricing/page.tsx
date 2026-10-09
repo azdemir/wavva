@@ -19,6 +19,7 @@ export const metadata: Metadata = {
   title: "Pricing",
   description:
     "Simple monthly plans for cleaning businesses: Starter $49, Growth $99, Pro $199. Start free for 14 days, no credit card required.",
+  alternates: { canonical: "/pricing" },
 };
 
 const comparisonRows: { label: string; values: (string | boolean)[] }[] = [

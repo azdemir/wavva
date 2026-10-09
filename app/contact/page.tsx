@@ -13,6 +13,7 @@ import { getContent } from "@/lib/studio/content";
 export const metadata: Metadata = {
   title: "Contact",
   description: `Contact the ${site.name} team about plans, the pilot program, or whether TidyPro fits your cleaning business.`,
+  alternates: { canonical: "/contact" },
 };
 
 export default async function ContactPage() {

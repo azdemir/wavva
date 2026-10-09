@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   title: "FAQ",
   description:
     "Answers about getting started with TidyPro, the product, billing, and how your business data stays private.",
+  alternates: { canonical: "/faq" },
 };
 
 type FaqEntry = { group: string; q: string; a: string };
@@ -31,8 +32,22 @@ export default async function FaqPage() {
   }
   const groups = [...grouped.entries()].map(([gtitle, items]) => ({ title: gtitle, items }));
 
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: entries.map((e) => ({
+      "@type": "Question",
+      name: e.q,
+      acceptedAnswer: { "@type": "Answer", text: e.a },
+    })),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <Navbar />
       <main>
         <PageHero

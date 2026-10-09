@@ -247,8 +247,9 @@ test.describe("Studio (founder HQ) end-to-end", () => {
   test("trial request page renders a working form", async ({ page }) => {
     const errors = await watchErrors(page);
     await page.goto("/demo");
+    // h1 is sr-only (SEO); the visible card title is the h3
     await expect(
-      page.getByRole("heading", { name: /free 14-day trial/i }),
+      page.getByRole("heading", { name: /free 14-day trial/i }).last(),
     ).toBeVisible();
     await expect(page.getByLabel(/your name/i)).toBeVisible();
     await expect(page.getByLabel(/company name/i)).toBeVisible();
