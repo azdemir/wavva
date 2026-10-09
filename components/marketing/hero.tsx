@@ -67,7 +67,7 @@ export async function Hero() {
           {showTour && (
             <div className="animate-fade-in relative min-w-0">
               <DashboardTour />
-              <HeroBadge className="absolute -top-8 -right-3 z-10 h-24 w-24 sm:-top-10 sm:-right-5 sm:h-32 sm:w-32" />
+              <HeroBadge className="absolute bottom-10 -left-2 z-10 sm:bottom-12 sm:-left-5" />
             </div>
           )}
         </div>
