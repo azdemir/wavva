@@ -4,9 +4,11 @@ import { createClient } from "@/lib/supabase/server";
 import { one } from "@/lib/relations";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent } from "@/components/ui/card";
-import { JobStatusPill, type JobStatus } from "@/components/ui/badge";
+import {type JobStatus} from "@/components/ui/badge";
+import { TJobStatusPill } from "@/components/ui/translated-status-pill";
 import { EmptyState } from "@/components/ui/empty-state";
 import { formatTime, formatDate } from "@/lib/format";
+import { getTranslations } from "next-intl/server";
 
 export const instant = false;
 
@@ -17,6 +19,7 @@ export const instant = false;
 export default async function MyJobsPage() {
   const { user, company, membership } = await requireCompany();
   const supabase = await createClient();
+  const t = await getTranslations("myjobs");
   const tz = company.timezone || "America/New_York";
   const isStaff = membership.role === "owner" || membership.role === "manager";
 
@@ -34,26 +37,22 @@ export default async function MyJobsPage() {
   const upcoming = (jobs ?? []).filter((j) => j.status !== "completed");
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <Heading title="My jobs" description="Visits assigned to you." />
+    <div className="space-y-6">
+      <Heading title={t("title")} description={t("description")} />
 
       {upcoming.length === 0 ? (
         <Card>
           <CardContent>
             <EmptyState
-              title="No jobs assigned"
-              description={
-                isStaff
-                  ? "Open the Jobs page and tap any visit to assign it to your crew."
-                  : "When your manager assigns you visits, they'll show up here."
-              }
+              title={t("emptyTitle")}
+              description={isStaff ? t("emptyDescStaff") : t("emptyDescCleaner")}
               action={
                 isStaff ? (
                   <Link
                     href="/dashboard/jobs"
                     className="font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700"
                   >
-                    Go to Jobs →
+                    {t("emptyCta")}
                   </Link>
                 ) : undefined
               }
@@ -80,11 +79,11 @@ export default async function MyJobsPage() {
                     </p>
                   </div>
                   <span className="shrink-0">
-                    <JobStatusPill status={job.status as JobStatus} />
+                    <TJobStatusPill status={job.status as JobStatus} />
                   </span>
                 </div>
                 <span className="mt-3 inline-block rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white">
-                  {job.status === "in_progress" ? "Continue job →" : "Open job →"}
+                  {job.status === "in_progress" ? t("continueJob") : t("openJob")}
                 </span>
               </Link>
             </li>

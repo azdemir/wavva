@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { one } from "@/lib/relations";
 import { formatCents, formatDate } from "@/lib/format";
-import { statusLabel } from "@/components/ui/badge";
 import { PrintDocument } from "@/components/documents/print-document";
 import { PrintButton } from "@/components/documents/print-button";
 
@@ -17,6 +17,7 @@ export default async function QuotePrintPage({
 }) {
   const { id } = await params;
   const { company } = await requirePermission("quotes.manage");
+  const t = await getTranslations("quotes");
   const supabase = await createClient();
 
   const { data: quote } = await supabase
@@ -36,7 +37,7 @@ export default async function QuotePrintPage({
     line_total_cents: number;
   }[]).map((it) => ({
     label: it.label,
-    sub: statusLabel(it.kind),
+    sub: t(`kinds.${it.kind}`),
     qty: String(Number(it.qty)),
     unitPrice: formatCents(it.unit_price_cents),
     total: formatCents(it.line_total_cents),
@@ -49,15 +50,15 @@ export default async function QuotePrintPage({
   } | null;
 
   const totals = [
-    { label: "Subtotal", value: formatCents(quote.subtotal_cents) },
+    { label: t("detail.subtotal"), value: formatCents(quote.subtotal_cents) },
     ...(quote.discount_cents > 0
-      ? [{ label: "Discount", value: `−${formatCents(quote.discount_cents)}` }]
+      ? [{ label: t("detail.discount"), value: `−${formatCents(quote.discount_cents)}` }]
       : []),
     {
-      label: `Tax (${(Number(quote.tax_rate) * 100).toFixed(2)}%)`,
+      label: t("detail.tax", { rate: (Number(quote.tax_rate) * 100).toFixed(2) }),
       value: formatCents(quote.tax_cents),
     },
-    { label: "Total", value: formatCents(quote.total_cents), strong: true },
+    { label: t("detail.total"), value: formatCents(quote.total_cents), strong: true },
   ];
 
   return (
@@ -67,7 +68,7 @@ export default async function QuotePrintPage({
           href={`/dashboard/quotes/${id}`}
           className="text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400"
         >
-          ← Back to quote
+          {t("print.backToQuote")}
         </Link>
         <PrintButton />
       </div>
@@ -75,13 +76,13 @@ export default async function QuotePrintPage({
         company={company}
         kind="Quote"
         number={quote.quote_number}
-        status={statusLabel(quote.status)}
+        status={t(`status.${quote.status}`)}
         meta={[
-          { label: "Issue date", value: formatDate(quote.created_at) },
-          { label: "Valid until", value: quote.valid_until ? formatDate(quote.valid_until) : "—" },
+          { label: t("print.issueDate"), value: formatDate(quote.created_at) },
+          { label: t("print.validUntil"), value: quote.valid_until ? formatDate(quote.valid_until) : "—" },
         ]}
         customer={{
-          name: customer?.name ?? "Customer",
+          name: customer?.name ?? t("detail.unknownCustomer"),
           email: customer?.email ?? null,
           phone: customer?.phone ?? null,
         }}

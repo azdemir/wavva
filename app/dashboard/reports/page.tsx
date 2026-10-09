@@ -1,4 +1,5 @@
 import { requirePermission } from "@/lib/permissions";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { one } from "@/lib/relations";
 import { Heading } from "@/components/ui/heading";
@@ -37,14 +38,15 @@ function monthLabel(key: string) {
 
 export default async function ReportsPage() {
   const { company } = await requirePermission("reports.view");
+  const t = await getTranslations("reports");
   const plan = isPlanId(company.plan) ? company.plan : "starter";
 
   if (!hasFeature(plan, "reports")) {
     return (
       <div className="space-y-6">
         <Heading
-          title="Reports"
-          description="Revenue, jobs, and customer insights."
+          title={t("heading.title")}
+          description={t("heading.description")}
         />
         <UpgradePrompt feature="reports" />
       </div>
@@ -82,7 +84,7 @@ export default async function ReportsPage() {
     const key = monthKey(inv.created_at);
     if (inv.status === "paid") {
       revenueByMonth.set(key, (revenueByMonth.get(key) ?? 0) + inv.total_cents);
-      const name = one(inv.customers)?.name ?? "Unknown";
+      const name = one(inv.customers)?.name ?? t("unknownCustomer");
       revenueByCustomer.set(name, (revenueByCustomer.get(name) ?? 0) + inv.total_cents);
     } else if (inv.status === "sent" || inv.status === "overdue") {
       outstanding += inv.total_cents - inv.amount_paid_cents;
@@ -110,14 +112,14 @@ export default async function ReportsPage() {
   return (
     <div className="space-y-6">
       <Heading
-        title="Reports"
-        description="Revenue, jobs, and customer insights."
+        title={t("heading.title")}
+        description={t("heading.description")}
       />
 
       <div className="grid gap-4 sm:grid-cols-3">
         <Card>
           <CardContent className="pt-6">
-            <p className="text-sm text-slate-500 dark:text-slate-400">Total revenue (paid)</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{t("kpis.totalRevenue")}</p>
             <p className="mt-1 text-3xl font-bold text-slate-900 dark:text-white">
               {formatCents(totalRevenue)}
             </p>
@@ -125,7 +127,7 @@ export default async function ReportsPage() {
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <p className="text-sm text-slate-500 dark:text-slate-400">Jobs completed</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{t("kpis.jobsCompleted")}</p>
             <p className="mt-1 text-3xl font-bold text-slate-900 dark:text-white">
               {totalJobs}
             </p>
@@ -133,7 +135,7 @@ export default async function ReportsPage() {
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <p className="text-sm text-slate-500 dark:text-slate-400">Outstanding</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{t("kpis.outstanding")}</p>
             <p className="mt-1 text-3xl font-bold text-slate-900 dark:text-white">
               {formatCents(outstanding)}
             </p>
@@ -143,11 +145,11 @@ export default async function ReportsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Revenue by month</CardTitle>
+          <CardTitle>{t("revenueByMonth")}</CardTitle>
         </CardHeader>
         <CardContent>
           {months.length === 0 ? (
-            <p className="text-sm text-slate-500 dark:text-slate-400">No paid invoices yet.</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{t("noPaidInvoices")}</p>
           ) : (
             <div className="space-y-3">
               {months.map((m) => {
@@ -180,18 +182,18 @@ export default async function ReportsPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Jobs completed by month</CardTitle>
+            <CardTitle>{t("jobsByMonth")}</CardTitle>
           </CardHeader>
           <CardContent>
             {months.length === 0 ? (
-              <p className="text-sm text-slate-500 dark:text-slate-400">No completed jobs yet.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">{t("noCompletedJobs")}</p>
             ) : (
               <ul className="divide-y divide-slate-100 dark:divide-slate-800">
                 {months.map((m) => (
                   <li key={m} className="flex items-center justify-between py-2.5 text-sm">
                     <span className="text-slate-600 dark:text-slate-400">{monthLabel(m)}</span>
                     <span className="font-semibold text-slate-900 dark:text-white">
-                      {jobsByMonth.get(m) ?? 0} jobs
+                      {t("jobsCount", { count: jobsByMonth.get(m) ?? 0 })}
                     </span>
                   </li>
                 ))}
@@ -202,11 +204,11 @@ export default async function ReportsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Top customers by revenue</CardTitle>
+            <CardTitle>{t("topCustomers")}</CardTitle>
           </CardHeader>
           <CardContent>
             {topCustomers.length === 0 ? (
-              <p className="text-sm text-slate-500 dark:text-slate-400">No paid invoices yet.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">{t("noPaidInvoices")}</p>
             ) : (
               <ul className="divide-y divide-slate-100 dark:divide-slate-800">
                 {topCustomers.map(([name, cents]) => (

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { createPlanCheckout, createBillingPortalSession } from "@/lib/actions/platform-billing";
 import type { PlanId } from "@/lib/plans";
@@ -15,6 +16,7 @@ export function PlanButton({
   label: string;
   outline?: boolean;
 }) {
+  const t = useTranslations("billing");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -42,7 +44,7 @@ export function PlanButton({
         }}
       >
         <span className="whitespace-normal text-center leading-snug">
-          {pending ? "Starting checkout…" : label}
+          {pending ? t("buttons.startingCheckout") : label}
         </span>
       </Button>
     </div>
@@ -51,6 +53,7 @@ export function PlanButton({
 
 /** "Manage subscription" — opens the Stripe customer portal. */
 export function ManageSubscriptionButton() {
+  const t = useTranslations("billing");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -75,7 +78,7 @@ export function ManageSubscriptionButton() {
           }
         }}
       >
-        {pending ? "Opening…" : "Manage subscription"}
+        {pending ? t("buttons.opening") : t("buttons.manageSubscription")}
       </Button>
     </div>
   );

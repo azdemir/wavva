@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 export const instant = false;
 import { headers } from "next/headers";
@@ -13,18 +14,14 @@ import { ServicesStep } from "@/components/onboarding/services-step";
 import { AreasStep } from "@/components/onboarding/areas-step";
 import { TeamStep } from "@/components/onboarding/team-step";
 
-export const metadata: Metadata = {
-  title: "Set up your business",
-  description: "Set up your cleaning business workspace in a few steps.",
-  robots: { index: false, follow: false },
-};
-
-const stepMeta = [
-  { title: "Your business", description: "Tell us about your cleaning company." },
-  { title: "Your services", description: "What do you clean, and what do you charge?" },
-  { title: "Your service area", description: "Where do your crews work?" },
-  { title: "Your team", description: "Invite the people who'll use TidyPro with you." },
-];
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("onboarding");
+  return {
+    title: t("meta.title"),
+    description: t("meta.description"),
+    robots: { index: false, follow: false },
+  };
+}
 
 export default async function OnboardingPage({
   searchParams,
@@ -34,6 +31,8 @@ export default async function OnboardingPage({
   await requireUser();
   const active = await getActiveMembership();
   if (active?.company.onboarding_completed) redirect("/dashboard");
+  const t = await getTranslations("onboarding");
+  const stepMeta = t.raw("steps") as { title: string; description: string }[];
 
   const rawStep = parseInt((await searchParams).step ?? "1", 10);
   const step = Number.isFinite(rawStep) ? Math.min(Math.max(rawStep, 1), 4) : 1;

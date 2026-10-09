@@ -5,6 +5,9 @@ import { signOut } from "@/lib/actions/auth";
 import { Badge } from "@/components/ui/badge";
 import { SubscriptionBanner } from "@/components/billing/subscription-banner";
 import { PLANS, isPlanId, type PlanId } from "@/lib/plans";
+import { getTranslations } from "next-intl/server";
+import { DashboardIntlProvider } from "@/components/i18n/dashboard-intl-provider";
+import { LocaleSwitcher } from "@/components/i18n/locale-switcher";
 
 // Workspace routes render per request (auth session) — never prerendered.
 export const instant = false;
@@ -32,7 +35,8 @@ import { type Role } from "@/lib/permissions";
 
 type NavItem = {
   href: string;
-  label: string;
+  /** Key into the "nav" messages namespace. */
+  labelKey: string;
   icon: (props: React.SVGProps<SVGSVGElement>) => React.ReactNode;
   soon?: boolean;
   /** If set, only shown to plans that include this feature. */
@@ -44,23 +48,24 @@ type NavItem = {
 const STAFF: Role[] = ["owner", "manager"];
 
 const nav: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard", icon: HomeIcon, roles: STAFF },
-  { href: "/dashboard/customers", label: "Customers", icon: UsersIcon, roles: STAFF },
-  { href: "/dashboard/services", label: "Services & Pricing", icon: TagIcon, roles: STAFF },
-  { href: "/dashboard/quotes", label: "Quotes", icon: QuoteIcon, roles: STAFF },
-  { href: "/dashboard/bookings", label: "Bookings", icon: CalendarIcon, roles: STAFF },
-  { href: "/dashboard/jobs", label: "Jobs", icon: ClockIcon, roles: STAFF },
-  { href: "/dashboard/schedule", label: "Schedule", icon: CalendarIcon, feature: "schedule", roles: STAFF },
-  { href: "/dashboard/my-jobs", label: "My jobs", icon: ClockIcon },
-  { href: "/dashboard/invoices", label: "Invoices", icon: CardIcon, roles: STAFF },
-  { href: "/dashboard/reports", label: "Reports", icon: ChartIcon, feature: "reports", roles: ["owner"] },
-  { href: "/dashboard/billing", label: "Billing", icon: CardIcon, roles: ["owner"] },
-  { href: "/dashboard/team", label: "Team", icon: UsersIcon, roles: ["owner"] },
-  { href: "/dashboard/settings", label: "Settings", icon: GearIcon, roles: ["owner"] },
-  { href: "/dashboard/audit", label: "Audit log", icon: BellIcon, roles: ["owner"] },
+  { href: "/dashboard", labelKey: "dashboard", icon: HomeIcon, roles: STAFF },
+  { href: "/dashboard/customers", labelKey: "customers", icon: UsersIcon, roles: STAFF },
+  { href: "/dashboard/services", labelKey: "services", icon: TagIcon, roles: STAFF },
+  { href: "/dashboard/quotes", labelKey: "quotes", icon: QuoteIcon, roles: STAFF },
+  { href: "/dashboard/bookings", labelKey: "bookings", icon: CalendarIcon, roles: STAFF },
+  { href: "/dashboard/jobs", labelKey: "jobs", icon: ClockIcon, roles: STAFF },
+  { href: "/dashboard/schedule", labelKey: "schedule", icon: CalendarIcon, feature: "schedule", roles: STAFF },
+  { href: "/dashboard/my-jobs", labelKey: "myJobs", icon: ClockIcon },
+  { href: "/dashboard/invoices", labelKey: "invoices", icon: CardIcon, roles: STAFF },
+  { href: "/dashboard/reports", labelKey: "reports", icon: ChartIcon, feature: "reports", roles: ["owner"] },
+  { href: "/dashboard/billing", labelKey: "billing", icon: CardIcon, roles: ["owner"] },
+  { href: "/dashboard/team", labelKey: "team", icon: UsersIcon, roles: ["owner"] },
+  { href: "/dashboard/settings", labelKey: "settings", icon: GearIcon, roles: ["owner"] },
+  { href: "/dashboard/audit", labelKey: "audit", icon: BellIcon, roles: ["owner"] },
 ];
 
-function NavLinks({ onNavigate, plan, role }: { onNavigate?: () => void; plan: PlanId; role: Role }) {
+async function NavLinks({ onNavigate, plan, role }: { onNavigate?: () => void; plan: PlanId; role: Role }) {
+  const t = await getTranslations("nav");
   const visible = nav.filter(
     (item) =>
       (!item.feature || hasFeature(plan, item.feature)) &&
@@ -73,10 +78,10 @@ function NavLinks({ onNavigate, plan, role }: { onNavigate?: () => void; plan: P
         const content = (
           <>
             <Icon className="h-5 w-5 shrink-0" />
-            <span className="flex-1">{item.label}</span>
+            <span className="flex-1">{t(item.labelKey)}</span>
             {item.soon && (
               <Badge tone="slate" className="text-[10px]">
-                Soon
+                {t("soon")}
               </Badge>
             )}
           </>
@@ -87,7 +92,7 @@ function NavLinks({ onNavigate, plan, role }: { onNavigate?: () => void; plan: P
           <span
             key={item.href}
             className={`${cls} cursor-not-allowed opacity-60`}
-            title="Coming in a later stage"
+            title={t("comingSoon")}
           >
             {content}
           </span>
@@ -102,12 +107,12 @@ function NavLinks({ onNavigate, plan, role }: { onNavigate?: () => void; plan: P
           href="/"
           className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-slate-200"
           onClick={onNavigate}
-          aria-label="Back to website home"
+          aria-label={t("backHomeLabel")}
         >
           <svg className="h-5 w-5 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" d="M10 3 3 10h3v7h4v-5h4v5h4v-7h3L10 3z" />
           </svg>
-          <span className="flex-1">Website home</span>
+          <span className="flex-1">{t("websiteHome")}</span>
         </Link>
       </div>
     </nav>
@@ -121,8 +126,10 @@ export default async function DashboardLayout({
 }) {
   const { user, membership, company } = await requireCompany();
   const plan = isPlanId(company.plan) ? company.plan : "starter";
+  const t = await getTranslations("nav");
 
   return (
+    <DashboardIntlProvider>
     <div className="min-h-screen bg-slate-50 md:flex dark:bg-slate-950">
       {/* Desktop sidebar */}
       <aside className="hidden w-64 shrink-0 border-r border-slate-200 bg-white md:block dark:border-slate-800 dark:bg-slate-900">
@@ -138,18 +145,26 @@ export default async function DashboardLayout({
               {company.name}
             </p>
             <p className="truncate text-xs text-slate-500">
-              {user.email} · {membership.role}
+              {user.email} ·{" "}
+              {membership.role === "owner"
+                ? t("roleOwner")
+                : membership.role === "manager"
+                  ? t("roleManager")
+                  : t("roleCleaner")}
             </p>
-            <div className="mt-3 flex items-center justify-between">
+            <div className="mt-3 flex items-center justify-between gap-2">
               <form action={signOut}>
                 <button
                   type="submit"
                   className="text-sm font-medium text-slate-500 hover:text-slate-800"
                 >
-                  Sign out
+                  {t("signOut")}
                 </button>
               </form>
-              <ThemeToggle className="h-8 w-8" />
+              <div className="flex items-center gap-2">
+                <LocaleSwitcher />
+                <ThemeToggle className="h-8 w-8" />
+              </div>
             </div>
           </div>
         </div>
@@ -162,13 +177,14 @@ export default async function DashboardLayout({
 <Logo />
           </Link>
           <div className="flex items-center gap-2">
+            <LocaleSwitcher />
             <ThemeToggle className="h-8 w-8" />
             <form action={signOut}>
               <button
                 type="submit"
                 className="text-sm font-medium text-slate-500 hover:text-slate-800"
               >
-                Sign out
+                {t("signOut")}
               </button>
             </form>
           </div>
@@ -177,10 +193,10 @@ export default async function DashboardLayout({
           <div className="flex gap-1">
             <Link
               href="/"
-              aria-label="Back to website home"
+              aria-label={t("backHomeLabel")}
               className="whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-500 hover:bg-slate-100 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-slate-200"
             >
-              ⌂ Home
+              ⌂ {t("backHome")}
             </Link>
             {nav
               .filter((n) => !n.soon && (!n.feature || hasFeature(plan, n.feature)) && (!n.roles || n.roles.includes(membership.role)))
@@ -190,7 +206,7 @@ export default async function DashboardLayout({
                   href={item.href}
                   className="whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
                 >
-                  {item.label}
+                  {t(item.labelKey)}
                 </Link>
               ))}
           </div>
@@ -207,5 +223,6 @@ export default async function DashboardLayout({
         </div>
       </main>
     </div>
+    </DashboardIntlProvider>
   );
 }

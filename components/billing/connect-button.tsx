@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { startConnectOnboarding } from "@/lib/actions/billing";
 
 export function ConnectButton({ baseUrl }: { baseUrl: string }) {
+  const t = useTranslations("billing");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -28,7 +30,7 @@ export function ConnectButton({ baseUrl }: { baseUrl: string }) {
         </div>
       )}
       <Button onClick={start} disabled={pending}>
-        {pending ? "Connecting…" : "Connect with Stripe"}
+        {pending ? t("buttons.connecting") : t("buttons.connect")}
       </Button>
     </div>
   );

@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { getTranslations } from "next-intl/server";
 import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { createInvite, deleteInvite } from "@/lib/actions/team";
@@ -6,7 +7,7 @@ import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Field, SelectField } from "@/components/ui/input";
-import { Badge, statusLabel } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { FilterPills } from "@/components/ui/filters";
 
 const roleTones = { owner: "brand", manager: "accent", cleaner: "slate" } as const;
@@ -18,6 +19,7 @@ export default async function TeamPage({
   searchParams: Promise<{ role?: string }>;
 }) {
   const { company } = await requirePermission("team.manage");
+  const t = await getTranslations("team");
   const supabase = await createClient();
   const params = await searchParams;
   const role = (roles as readonly string[]).includes(params.role ?? "")
@@ -44,23 +46,34 @@ export default async function TeamPage({
   const h = await headers();
   const baseUrl = `${h.get("x-forwarded-proto") ?? "http"}://${h.get("host")}`;
 
+  const roleLabels = {
+    owner: t("roles.owner"),
+    manager: t("roles.manager"),
+    cleaner: t("roles.cleaner"),
+  } as const;
+  const roleLabel = (role: string) =>
+    roleLabels[role as keyof typeof roleLabels] ?? role;
+
   return (
     <div className="space-y-8">
       <Heading
-        title="Team"
-        description="Everyone who can access your company's workspace."
+        title={t("heading.title")}
+        description={t("heading.description")}
       />
 
       <Card>
         <CardHeader>
-          <CardTitle>Members ({members?.length ?? 0})</CardTitle>
+          <CardTitle>{t("members.title", { count: members?.length ?? 0 })}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="mb-4">
             <FilterPills
               basePath="/dashboard/team"
               param="role"
-              options={roles.map((r) => ({ value: r }))}
+              options={roles.map((r) => ({
+                value: r,
+                label: r === "all" ? t("roles.all") : roleLabel(r),
+              }))}
               current={role}
             />
           </div>
@@ -70,11 +83,11 @@ export default async function TeamPage({
                 <div className="min-w-0">
                   <p className="truncate font-medium text-slate-900 dark:text-slate-100">{m.email}</p>
                   <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
-                    Joined {new Date(m.created_at).toLocaleDateString("en-US")}
+                    {t("members.joinedOn", { date: new Date(m.created_at).toLocaleDateString("en-US") })}
                   </p>
                 </div>
                 <Badge tone={roleTones[m.role as keyof typeof roleTones] ?? "slate"} className="shrink-0">
-                  {statusLabel(m.role)}
+                  {roleLabel(m.role)}
                 </Badge>
               </li>
             ))}
@@ -84,7 +97,7 @@ export default async function TeamPage({
 
       <Card>
         <CardHeader>
-          <CardTitle>Invite a teammate</CardTitle>
+          <CardTitle>{t("invite.title")}</CardTitle>
           </CardHeader>
           <CardContent>
             <form
@@ -99,24 +112,23 @@ export default async function TeamPage({
                 <Field
                   id="team-email"
                   name="email"
-                  label="Email"
+                  label={t("invite.emailLabel")}
                   type="email"
                   required
-                  placeholder="teammate@example.com"
+                  placeholder={t("invite.emailPlaceholder")}
                 />
               </div>
               <div className="w-36">
-                <SelectField id="team-role" name="role" label="Role">
-                  <option value="cleaner">Cleaner</option>
-                  <option value="manager">Manager</option>
-                  <option value="owner">Owner</option>
+                <SelectField id="team-role" name="role" label={t("invite.roleLabel")}>
+                  <option value="cleaner">{t("roles.cleaner")}</option>
+                  <option value="manager">{t("roles.manager")}</option>
+                  <option value="owner">{t("roles.owner")}</option>
                 </SelectField>
               </div>
-              <Button type="submit">Send invite</Button>
+              <Button type="submit">{t("invite.submit")}</Button>
             </form>
             <p className="mt-3 text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">
-              Email delivery arrives in a later stage — for now, share the
-              invite link below directly.
+              {t("invite.note")}
             </p>
           </CardContent>
         </Card>
@@ -124,7 +136,7 @@ export default async function TeamPage({
       {(invites ?? []).length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Pending invites</CardTitle>
+            <CardTitle>{t("pending.title")}</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -134,7 +146,7 @@ export default async function TeamPage({
                     <p className="font-medium text-slate-900 dark:text-slate-100">
                       {inv.email}{" "}
                       <Badge tone={roleTones[inv.role as keyof typeof roleTones] ?? "slate"}>
-                        {statusLabel(inv.role)}
+                        {roleLabel(inv.role)}
                       </Badge>
                     </p>
                     <code className="mt-1 block truncate rounded bg-slate-100 dark:bg-slate-800 px-2 py-1 text-xs text-slate-600 dark:text-slate-400 dark:text-slate-500">
@@ -148,7 +160,7 @@ export default async function TeamPage({
                     }}
                   >
                     <Button type="submit" variant="outline">
-                      Revoke
+                      {t("pending.revoke")}
                     </Button>
                   </form>
                 </li>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requireCompany } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { dayBoundsUtc } from "@/lib/dates";
@@ -8,12 +9,8 @@ import { one } from "@/lib/relations";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  JobStatusPill,
-  QuoteStatusPill,
-  type JobStatus,
-  type QuoteStatus,
-} from "@/components/ui/badge";
+import { type JobStatus, type QuoteStatus } from "@/components/ui/badge";
+import { TJobStatusPill, TQuoteStatusPill } from "@/components/ui/translated-status-pill";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PlusIcon, CalendarIcon, QuoteIcon, UsersIcon, CardIcon } from "@/components/ui/icons";
 
@@ -21,6 +18,7 @@ export default async function DashboardPage() {
   const { membership, company } = await requireCompany();
   // Cleaners work from My jobs — the stats dashboard is staff-only.
   if (membership.role === "cleaner") redirect("/dashboard/my-jobs");
+  const t = await getTranslations("dashboard");
   const supabase = await createClient();
   const tz = company.timezone || "America/New_York";
   const { start, end } = dayBoundsUtc(tz);
@@ -60,25 +58,32 @@ export default async function DashboardPage() {
   }[] | null)?.[0];
 
   const statsCards = [
-    { label: "Jobs today", value: String(stat?.jobs_today ?? todaysJobs.length), icon: CalendarIcon },
-    { label: "Open quotes", value: String(stat?.open_quotes ?? openQuotes.length), icon: QuoteIcon },
-    { label: "Outstanding", value: formatCents(stat?.outstanding_cents ?? 0), icon: CardIcon },
-    { label: "Customers", value: String(stat?.customer_count ?? 0), icon: UsersIcon },
+    { key: "jobsToday", label: t("stats.jobsToday"), value: String(stat?.jobs_today ?? todaysJobs.length), icon: CalendarIcon },
+    { key: "openQuotes", label: t("stats.openQuotes"), value: String(stat?.open_quotes ?? openQuotes.length), icon: QuoteIcon },
+    { key: "outstanding", label: t("stats.outstanding"), value: formatCents(stat?.outstanding_cents ?? 0), icon: CardIcon },
+    { key: "customers", label: t("stats.customers"), value: String(stat?.customer_count ?? 0), icon: UsersIcon },
   ];
+
+  const daypartKey = daypart(tz);
+  const daypartLabel = {
+    morning: t("greeting.morning"),
+    afternoon: t("greeting.afternoon"),
+    evening: t("greeting.evening"),
+  }[daypartKey];
 
   return (
     <div className="space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <Heading
-          title={`Good ${daypart(tz)}, ${company.name}`}
-          description="Here's what's happening in your business today."
+          title={t("greeting.title", { part: daypartLabel, company: company.name })}
+          description={t("description")}
         />
         <div className="flex gap-2">
           <Button href="/dashboard/quotes/new" variant="outline">
-            <PlusIcon className="h-4 w-4" /> New quote
+            <PlusIcon className="h-4 w-4" /> {t("actions.newQuote")}
           </Button>
           <Button href="/dashboard/bookings/new">
-            <PlusIcon className="h-4 w-4" /> New booking
+            <PlusIcon className="h-4 w-4" /> {t("actions.newBooking")}
           </Button>
         </div>
       </div>
@@ -87,7 +92,7 @@ export default async function DashboardPage() {
         {statsCards.map((s) => {
           const Icon = s.icon;
           return (
-            <Card key={s.label}>
+            <Card key={s.key}>
               <CardContent className="flex items-center gap-4 pt-6">
                 <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 dark:text-brand-400">
                   <Icon className="h-6 w-6" />
@@ -105,14 +110,14 @@ export default async function DashboardPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Today&apos;s schedule</CardTitle>
+            <CardTitle>{t("schedule.title")}</CardTitle>
           </CardHeader>
           <CardContent>
             {todaysJobs.length === 0 ? (
               <EmptyState
-                title="Nothing scheduled today"
-                description="Create a booking and its jobs will appear here."
-                action={<Button href="/dashboard/bookings/new">New booking</Button>}
+                title={t("schedule.empty.title")}
+                description={t("schedule.empty.description")}
+                action={<Button href="/dashboard/bookings/new">{t("actions.newBooking")}</Button>}
                 icon={<CalendarIcon className="h-10 w-10" />}
               />
             ) : (
@@ -121,7 +126,7 @@ export default async function DashboardPage() {
                   <li key={job.id} className="flex items-center justify-between gap-3 py-3">
                     <div className="min-w-0">
                       <p className="truncate font-medium text-slate-900 dark:text-slate-100 dark:text-slate-100">
-                        {one(job.customers)?.name ?? "Customer"}
+                        {one(job.customers)?.name ?? t("quotes.unknownCustomer")}
                       </p>
                       <p className="truncate text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-500">
                         {formatTime(job.scheduled_start, tz)} – {formatTime(job.scheduled_end, tz)}
@@ -129,7 +134,7 @@ export default async function DashboardPage() {
                         {one(job.service_addresses)?.address_line1}
                       </p>
                     </div>
-                    <JobStatusPill status={job.status as JobStatus} className="shrink-0" />
+                    <TJobStatusPill status={job.status as JobStatus} className="shrink-0" />
                   </li>
                 ))}
               </ul>
@@ -140,18 +145,18 @@ export default async function DashboardPage() {
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle>Open quotes</CardTitle>
+              <CardTitle>{t("quotes.title")}</CardTitle>
               <Link href="/dashboard/quotes" className="text-sm font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400">
-                View all
+                {t("actions.viewAll")}
               </Link>
             </div>
           </CardHeader>
           <CardContent>
             {openQuotes.length === 0 ? (
               <EmptyState
-                title="No open quotes"
-                description="Build a quote in under a minute and send it to a customer."
-                action={<Button href="/dashboard/quotes/new">New quote</Button>}
+                title={t("quotes.empty.title")}
+                description={t("quotes.empty.description")}
+                action={<Button href="/dashboard/quotes/new">{t("actions.newQuote")}</Button>}
                 icon={<QuoteIcon className="h-10 w-10" />}
               />
             ) : (
@@ -164,12 +169,12 @@ export default async function DashboardPage() {
                           {q.quote_number} · {one(q.customers)?.name}
                         </p>
                         <p className="truncate text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-500">
-                          Valid until {formatDate(q.valid_until)}
+                          {t("quotes.validUntil", { date: formatDate(q.valid_until) })}
                         </p>
                       </div>
                       <div className="shrink-0 text-right">
                         <p className="font-semibold text-slate-900 dark:text-slate-100 dark:text-slate-100">{formatCents(q.total_cents)}</p>
-                        <QuoteStatusPill status={q.status as QuoteStatus} />
+                        <TQuoteStatusPill status={q.status as QuoteStatus} />
                       </div>
                     </Link>
                   </li>
@@ -183,7 +188,7 @@ export default async function DashboardPage() {
   );
 }
 
-function daypart(timezone: string): string {
+function daypart(timezone: string): "morning" | "afternoon" | "evening" {
   const hour = Number(
     new Intl.DateTimeFormat("en-US", { hour: "numeric", hour12: false, timeZone: timezone }).format(new Date()),
   );

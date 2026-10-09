@@ -1,4 +1,5 @@
 import { requirePermission } from "@/lib/permissions";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -6,6 +7,7 @@ import { ServiceManager, AddonManager } from "@/components/services/catalog";
 
 export default async function ServicesPage() {
   const { company } = await requirePermission("services.manage");
+  const t = await getTranslations("services");
   const supabase = await createClient();
 
   const [{ data: services }, { data: addons }] = await Promise.all([
@@ -24,15 +26,15 @@ export default async function ServicesPage() {
   return (
     <div className="max-w-4xl space-y-8">
       <Heading
-        title="Services & pricing"
-        description="The catalog your quotes and bookings are built from."
+        title={t("heading.title")}
+        description={t("heading.description")}
       />
 
       <Card>
         <CardHeader>
-          <CardTitle>Services</CardTitle>
+          <CardTitle>{t("servicesCard.title")}</CardTitle>
           <CardDescription>
-            Deactivate instead of deleting anything that appears on past quotes.
+            {t("servicesCard.description")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -42,10 +44,9 @@ export default async function ServicesPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Add-ons</CardTitle>
+          <CardTitle>{t("addonsCard.title")}</CardTitle>
           <CardDescription>
-            Optional extras customers can add to any quote, like inside-fridge
-            or laundry.
+            {t("addonsCard.description")}
           </CardDescription>
         </CardHeader>
         <CardContent>

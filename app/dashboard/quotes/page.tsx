@@ -1,10 +1,12 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { QuoteStatusPill, type QuoteStatus } from "@/components/ui/badge";
+import {type QuoteStatus} from "@/components/ui/badge";
+import { TQuoteStatusPill } from "@/components/ui/translated-status-pill";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
 import { parsePageParam, PAGE_SIZE } from "@/lib/pagination";
@@ -21,6 +23,7 @@ export default async function QuotesPage({
   searchParams: Promise<{ status?: string; q?: string; page?: string }>;
 }) {
   const { company } = await requirePermission("quotes.manage");
+  const t = await getTranslations("quotes");
   const supabase = await createClient();
   const params = await searchParams;
   const status = params.status ?? "all";
@@ -60,9 +63,9 @@ export default async function QuotesPage({
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <Heading title="Quotes" description="Build, send, and track customer quotes." />
+        <Heading title={t("list.title")} description={t("list.description")} />
         <Button href="/dashboard/quotes/new">
-          <PlusIcon className="h-4 w-4" /> New quote
+          <PlusIcon className="h-4 w-4" /> {t("list.newQuote")}
         </Button>
       </div>
 
@@ -70,15 +73,18 @@ export default async function QuotesPage({
         <FilterPills
           basePath="/dashboard/quotes"
           param="status"
-          options={statuses.map((s) => ({ value: s }))}
+          options={statuses.map((s) => ({
+            value: s,
+            label: s === "all" ? t("list.filterAll") : t(`status.${s}`),
+          }))}
           current={valid}
           preserve={{ q: q || undefined }}
         />
         <FilterSearch
           id="quote-search"
-          label="Search quotes"
+          label={t("list.searchLabel")}
           defaultValue={q}
-          placeholder="Quote # or customer name…"
+          placeholder={t("list.searchPlaceholder")}
           preserve={{ status: valid !== "all" ? valid : undefined }}
         />
       </div>
@@ -87,13 +93,13 @@ export default async function QuotesPage({
         <Card>
           <CardContent>
             <EmptyState
-              title={filtering ? "No quotes match" : "No quotes here"}
+              title={filtering ? t("list.emptyFilteredTitle") : t("list.emptyTitle")}
               description={
                 filtering
-                  ? "Try a different search or status."
-                  : "Create your first quote — it takes about a minute."
+                  ? t("list.emptyFilteredDescription")
+                  : t("list.emptyDescription")
               }
-              action={filtering ? undefined : <Button href="/dashboard/quotes/new">New quote</Button>}
+              action={filtering ? undefined : <Button href="/dashboard/quotes/new">{t("list.newQuote")}</Button>}
               icon={<QuoteIcon className="h-10 w-10" />}
             />
           </CardContent>
@@ -110,12 +116,12 @@ export default async function QuotesPage({
                         {q.quote_number} · {one(q.customers)?.name}
                       </p>
                       <p className="truncate text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
-                        {q.valid_until ? `Valid until ${formatDate(q.valid_until)}` : "No expiry set"}
+                        {q.valid_until ? t("list.validUntil", { date: formatDate(q.valid_until) }) : t("list.noExpiry")}
                       </p>
                     </div>
                     <div className="flex shrink-0 items-center gap-3">
                       <span className="font-semibold text-slate-900 dark:text-slate-100">{formatCents(q.total_cents)}</span>
-                      <QuoteStatusPill status={q.status as QuoteStatus} />
+                      <TQuoteStatusPill status={q.status as QuoteStatus} />
                     </div>
                   </Link>
                 </li>

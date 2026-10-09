@@ -6,11 +6,13 @@ import { one } from "@/lib/relations";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { JobStatusPill, type JobStatus } from "@/components/ui/badge";
+import {type JobStatus} from "@/components/ui/badge";
+import { TJobStatusPill } from "@/components/ui/translated-status-pill";
 import { UpgradePrompt } from "@/components/billing/upgrade-prompt";
 import { CrewFilter } from "@/components/schedule/crew-filter";
 import { hasFeature, isPlanId } from "@/lib/plans";
 import { formatTime } from "@/lib/format";
+import { getTranslations } from "next-intl/server";
 
 function weekStart(date: Date): Date {
   const d = new Date(date);
@@ -26,11 +28,12 @@ export default async function SchedulePage({
   searchParams: Promise<{ week?: string; crew?: string }>;
 }) {
   const { company, membership } = await requirePermission("schedule.view");
+  const t = await getTranslations("schedule");
   const plan = isPlanId(company.plan) ? company.plan : "starter";
   if (!hasFeature(plan, "schedule")) {
     return (
       <div className="space-y-6">
-        <Heading title="Schedule" description="Your crew's week at a glance." />
+        <Heading title={t("heading.title")} description={t("heading.description")} />
         <UpgradePrompt feature="schedule" />
       </div>
     );
@@ -64,7 +67,7 @@ export default async function SchedulePage({
       .eq("company_id", company.id),
   ]);
   const emailByUserId = new Map((members ?? []).map((m) => [m.user_id, m.email]));
-  const emailOf = (uid: string) => emailByUserId.get(uid) ?? "Unknown";
+  const emailOf = (uid: string) => emailByUserId.get(uid) ?? t("unknownMember");
   // Crew filter: only show jobs assigned to the selected member (validated).
   const crew = (members ?? []).some((m) => m.user_id === crewParam) ? crewParam : "all";
   const crewJobs = (jobs ?? []).filter(
@@ -102,7 +105,7 @@ export default async function SchedulePage({
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <Heading title="Schedule" description={monthLabel} />
+        <Heading title={t("heading.title")} description={monthLabel} />
         <div className="flex flex-wrap items-center gap-2">
           <Suspense>
             <CrewFilter members={(members ?? []) as { user_id: string; email: string }[]} />
@@ -112,13 +115,13 @@ export default async function SchedulePage({
             variant="outline"
             size="sm"
           >
-            ← Prev
+            {t("weekNav.prev")}
           </Button>
           <Button href={weekHref(0)} variant="outline" size="sm">
-            Today
+            {t("weekNav.today")}
           </Button>
           <Button href={weekHref(offset + 1)} variant="outline" size="sm">
-            Next →
+            {t("weekNav.next")}
           </Button>
         </div>
       </div>
@@ -132,7 +135,7 @@ export default async function SchedulePage({
               </p>
               <ul className="divide-y divide-slate-100 dark:divide-slate-800">
                 {dayJobs.length === 0 && (
-                  <li className="px-4 py-3 text-xs text-slate-400 dark:text-slate-500">No visits</li>
+                  <li className="px-4 py-3 text-xs text-slate-400 dark:text-slate-500">{t("noVisits")}</li>
                 )}
                 {dayJobs.map((job) => {
                   const assigned: string[] = job.assigned_user_ids ?? [];
@@ -147,7 +150,7 @@ export default async function SchedulePage({
                           {one(job.service_addresses)?.address_line1}, {one(job.service_addresses)?.city}
                         </p>
                         <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                          <JobStatusPill status={job.status as JobStatus} />
+                          <TJobStatusPill status={job.status as JobStatus} />
                           {assigned.slice(0, 2).map((uid) => (
                             <span key={uid} className="text-[11px] text-slate-500 dark:text-slate-400 dark:text-slate-500">
                               {emailOf(uid).split("@")[0]}
