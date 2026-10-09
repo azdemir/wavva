@@ -1,0 +1,52 @@
+{
+  "actions": {
+    "exportExcel": "Exportar Excel"
+  },
+  "pagination": {
+    "nextPage": "Página siguiente",
+    "page": "Página {page}",
+    "previousPage": "Página anterior",
+    "showing": "Mostrando {start}–{end} de {total}"
+  },
+  "status": {
+    "invoice": {
+      "draft": "Borrador",
+      "overdue": "Vencida",
+      "paid": "Pagada",
+      "sent": "Enviada",
+      "void": "Anulada"
+    },
+    "job": {
+      "canceled": "Cancelado",
+      "completed": "Completado",
+      "in_progress": "En curso",
+      "scheduled": "Programado"
+    },
+    "payment": {
+      "failed": "Fallido",
+      "pending": "Pendiente",
+      "refunded": "Reembolsado",
+      "succeeded": "Exitoso"
+    },
+    "quote": {
+      "approved": "Aprobada",
+      "declined": "Rechazada",
+      "draft": "Borrador",
+      "expired": "Vencida",
+      "sent": "Enviada"
+    }
+  },
+  "subscriptionBanner": {
+    "canceledBody": "Ahora estás en los límites del plan {plan}.",
+    "canceledTitle": "Tu suscripción fue cancelada.",
+    "goToBilling": "Ir a facturación",
+    "pastDueBody": "Actualiza tu método de pago para mantener tu suscripción activa.",
+    "pastDueTitle": "Problema de pago en tu plan {plan}.",
+    "resubscribe": "Volver a suscribirse"
+  },
+  "upgrade": {
+    "cta": "Ver planes",
+    "description": "Esta función está incluida en el plan {plan} y superiores. Mejora tu plan para desbloquearla para todo tu equipo.",
+    "title": "Disponible en {plan}"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "actions": {
+    "exportExcel": "Export Excel"
+  },
+  "pagination": {
+    "nextPage": "Next page",
+    "page": "Page {page}",
+    "previousPage": "Previous page",
+    "showing": "Showing {start}–{end} of {total}"
+  },
+  "status": {
+    "invoice": {
+      "draft": "Draft",
+      "overdue": "Overdue",
+      "paid": "Paid",
+      "sent": "Sent",
+      "void": "Void"
+    },
+    "job": {
+      "canceled": "Canceled",
+      "completed": "Completed",
+      "in_progress": "In progress",
+      "scheduled": "Scheduled"
+    },
+    "payment": {
+      "failed": "Failed",
+      "pending": "Pending",
+      "refunded": "Refunded",
+      "succeeded": "Succeeded"
+    },
+    "quote": {
+      "approved": "Approved",
+      "declined": "Declined",
+      "draft": "Draft",
+      "expired": "Expired",
+      "sent": "Sent"
+    }
+  },
+  "subscriptionBanner": {
+    "canceledBody": "You're on the {plan} plan limits now.",
+    "canceledTitle": "Your subscription was canceled.",
+    "goToBilling": "Go to billing",
+    "pastDueBody": "Update your payment method to keep your subscription active.",
+    "pastDueTitle": "Payment issue on your {plan} plan.",
+    "resubscribe": "Resubscribe"
+  },
+  "upgrade": {
+    "cta": "View plans",
+    "description": "This feature is included in the {plan} plan and above. Upgrade to unlock it for your whole team.",
+    "title": "Available on {plan}"
+  }
+}

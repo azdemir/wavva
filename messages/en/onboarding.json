@@ -1,0 +1,112 @@
+{
+  "areas": {
+    "addAnother": "+ Add another area",
+    "hints": {
+      "city": "e.g. Albany",
+      "county": "e.g. Albany County",
+      "radius": "e.g. 25 miles around Saratoga Springs",
+      "zip": "e.g. 12203"
+    },
+    "intro": "Where does your business work? Define it by city, county, ZIP code, or radius — add as many as you serve.",
+    "remove": "Remove",
+    "type": "Type",
+    "types": {
+      "city": "City",
+      "county": "County",
+      "radius": "Radius",
+      "zip": "ZIP code"
+    },
+    "value": "Value"
+  },
+  "common": {
+    "continue": "Continue",
+    "saving": "Saving…"
+  },
+  "company": {
+    "businessName": "Business name",
+    "businessNamePlaceholder": "Capital Region Clean Co.",
+    "email": "Business email",
+    "emailPlaceholder": "hello@company.com",
+    "phone": "Business phone",
+    "phonePlaceholder": "(518) 555-0100",
+    "website": "Website (optional)",
+    "websitePlaceholder": "www.company.com"
+  },
+  "errors": {
+    "couldNotCreateCompany": "Could not create company",
+    "invalidAreas": "Invalid areas",
+    "invalidInput": "Invalid input",
+    "invalidInvites": "One or more invites are invalid.",
+    "invalidServices": "Invalid services",
+    "onlyOwnersInvite": "Only owners can invite the team."
+  },
+  "progress": {
+    "label": "Onboarding progress",
+    "steps": [
+      "Company",
+      "Services",
+      "Service area",
+      "Team"
+    ]
+  },
+  "services": {
+    "addAnother": "+ Add another service",
+    "basePrice": "Base price ($)",
+    "basePricePlaceholder": "129.00",
+    "commercial": "Commercial",
+    "intro": "Add the cleaning services you sell. You can change these anytime later.",
+    "name": "Service name",
+    "namePlaceholder": "Standard home cleaning",
+    "priced": "Priced",
+    "remove": "Remove",
+    "residential": "Residential",
+    "serviceNumber": "Service {n}",
+    "type": "Type",
+    "units": {
+      "per_hour": "per hour",
+      "per_sqft": "per sq ft",
+      "per_visit": "per visit"
+    }
+  },
+  "steps": [
+    {
+      "description": "Tell us about your cleaning company.",
+      "title": "Your business"
+    },
+    {
+      "description": "What do you clean, and what do you charge?",
+      "title": "Your services"
+    },
+    {
+      "description": "Where do your crews work?",
+      "title": "Your service area"
+    },
+    {
+      "description": "Invite the people who'll use TidyPro with you.",
+      "title": "Your team"
+    }
+  ],
+  "team": {
+    "addInvite": "+ Add invite",
+    "createInvites": "Create invites",
+    "creating": "Creating…",
+    "email": "Email",
+    "emailPlaceholder": "teammate@example.com",
+    "finish": "Finish setup →",
+    "finishing": "Finishing…",
+    "intro": "Invite managers and cleaners. They'll get a private link to join your workspace — share it with them directly for now.",
+    "inviteLater": "You can invite your team later from the Team page too.",
+    "invitesCreated": "Invites created — share these links:",
+    "remove": "Remove",
+    "role": "Role",
+    "roles": {
+      "cleaner": "Cleaner",
+      "manager": "Manager",
+      "owner": "Owner"
+    }
+  },
+  "meta": {
+    "title": "Set up your business",
+    "description": "Set up your cleaning business workspace in a few steps."
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "actions": {
+    "exportExcel": "Експорт Excel"
+  },
+  "pagination": {
+    "nextPage": "Наступна сторінка",
+    "page": "Сторінка {page}",
+    "previousPage": "Попередня сторінка",
+    "showing": "Показано {start}–{end} з {total}"
+  },
+  "status": {
+    "invoice": {
+      "draft": "Чернетка",
+      "overdue": "Прострочено",
+      "paid": "Оплачено",
+      "sent": "Надіслано",
+      "void": "Анульовано"
+    },
+    "job": {
+      "canceled": "Скасовано",
+      "completed": "Завершено",
+      "in_progress": "Виконується",
+      "scheduled": "Заплановано"
+    },
+    "payment": {
+      "failed": "Невдало",
+      "pending": "Очікується",
+      "refunded": "Повернено",
+      "succeeded": "Успішно"
+    },
+    "quote": {
+      "approved": "Прийнято",
+      "declined": "Відхилено",
+      "draft": "Чернетка",
+      "expired": "Прострочено",
+      "sent": "Надіслано"
+    }
+  },
+  "subscriptionBanner": {
+    "canceledBody": "Тепер ви на лімітах тарифу {plan}.",
+    "canceledTitle": "Вашу підписку скасовано.",
+    "goToBilling": "До оплати",
+    "pastDueBody": "Оновіть спосіб оплати, щоб підписка залишалася активною.",
+    "pastDueTitle": "Проблема з оплатою на тарифі {plan}.",
+    "resubscribe": "Поновити підписку"
+  },
+  "upgrade": {
+    "cta": "Переглянути тарифи",
+    "description": "Ця функція входить до тарифу {plan} і вище. Оновіть тариф, щоб розблокувати її для всієї команди.",
+    "title": "Доступно на тарифі {plan}"
+  }
+}
