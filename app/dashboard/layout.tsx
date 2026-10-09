@@ -38,6 +38,7 @@ const nav: NavItem[] = [
   { href: "/dashboard/services", label: "Services & Pricing", icon: TagIcon },
   { href: "/dashboard/quotes", label: "Quotes", icon: QuoteIcon },
   { href: "/dashboard/bookings", label: "Bookings", icon: CalendarIcon },
+  { href: "/dashboard/jobs", label: "Jobs", icon: ClockIcon },
   { href: "/dashboard/schedule", label: "Schedule", icon: CalendarIcon, feature: "schedule" },
   { href: "/dashboard/my-jobs", label: "My jobs", icon: ClockIcon },
   { href: "/dashboard/invoices", label: "Invoices", icon: CardIcon },

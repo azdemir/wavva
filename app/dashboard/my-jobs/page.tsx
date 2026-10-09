@@ -15,9 +15,10 @@ export const instant = false;
  * mobile-first cards with big touch targets.
  */
 export default async function MyJobsPage() {
-  const { user, company } = await requireCompany();
+  const { user, company, membership } = await requireCompany();
   const supabase = await createClient();
   const tz = company.timezone || "America/New_York";
+  const isStaff = membership.role === "owner" || membership.role === "manager";
 
   const { data: jobs } = await supabase
     .from("jobs")
@@ -41,7 +42,21 @@ export default async function MyJobsPage() {
           <CardContent>
             <EmptyState
               title="No jobs assigned"
-              description="When your manager assigns you visits, they'll show up here."
+              description={
+                isStaff
+                  ? "Open the Jobs page and tap any visit to assign it to your crew."
+                  : "When your manager assigns you visits, they'll show up here."
+              }
+              action={
+                isStaff ? (
+                  <Link
+                    href="/dashboard/jobs"
+                    className="font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700"
+                  >
+                    Go to Jobs →
+                  </Link>
+                ) : undefined
+              }
             />
           </CardContent>
         </Card>
