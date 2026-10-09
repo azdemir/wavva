@@ -12,6 +12,7 @@ export type RecentCompany = {
   plan: string;
   status: string | null;
   createdAt: string;
+  customers: number;
 };
 
 export type AnalyticsData = {
@@ -29,6 +30,7 @@ export type AnalyticsData = {
   funnel: FunnelStep[];
   sources: SourceSlice[];
   recent: RecentCompany[];
+  topByCustomers: RecentCompany[];
 };
 
 const WEEKS = 12;
@@ -75,6 +77,13 @@ export async function getAnalytics(): Promise<AnalyticsData> {
         .select("id, stage, source, value_cents, created_at")
         .gte("created_at", since.toISOString()),
     ]);
+
+  // Customers per company (for the "customers per business" column).
+  const { data: customerRows } = await svc.from("customers").select("company_id");
+  const customersByCompany = new Map<string, number>();
+  for (const r of (customerRows ?? []) as { company_id: string }[]) {
+    customersByCompany.set(r.company_id, (customersByCompany.get(r.company_id) ?? 0) + 1);
+  }
 
   const companyRows = (companies ?? []) as {
     id: string;
@@ -168,6 +177,15 @@ export async function getAnalytics(): Promise<AnalyticsData> {
     if (i >= 0) weeks[i].leads += 1;
   }
 
+  const toRecent = (c: (typeof companyRows)[number]): RecentCompany => ({
+    id: c.id,
+    name: c.name,
+    plan: c.plan,
+    status: c.subscription_status,
+    createdAt: c.created_at,
+    customers: customersByCompany.get(c.id) ?? 0,
+  });
+
   return {
     companies: companyRows.length,
     users: userCount ?? 0,
@@ -176,7 +194,7 @@ export async function getAnalytics(): Promise<AnalyticsData> {
     trialingCompanies: trialing,
     leads: totalLeads,
     pipelineCents,
-    customers,
+    customers: customers,
     leadToCustomerPct: totalLeads === 0 ? 0 : customers / totalLeads,
     weeks,
     planMix: (Object.keys(planCounts) as PlanId[]).map((plan) => ({
@@ -188,12 +206,13 @@ export async function getAnalytics(): Promise<AnalyticsData> {
       .map(([source, count]) => ({ source, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 6),
-    recent: companyRows.slice(0, 8).map((c) => ({
-      id: c.id,
-      name: c.name,
-      plan: c.plan,
-      status: c.subscription_status,
-      createdAt: c.created_at,
-    })),
+    recent: companyRows.slice(0, 8).map(toRecent),
+    topByCustomers: [...companyRows]
+      .sort(
+        (a, b) =>
+          (customersByCompany.get(b.id) ?? 0) - (customersByCompany.get(a.id) ?? 0),
+      )
+      .slice(0, 8)
+      .map(toRecent),
   };
 }

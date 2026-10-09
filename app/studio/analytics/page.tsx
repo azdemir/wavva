@@ -145,60 +145,103 @@ export default async function StudioAnalyticsPage() {
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Newest companies</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {data.recent.length === 0 ? (
-            <p className="text-sm text-slate-500 dark:text-slate-400">No companies yet.</p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[560px] text-left text-sm">
-                <thead>
-                  <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500 dark:border-slate-700 dark:text-slate-400">
-                    <th className="py-2 pr-4 font-medium">Company</th>
-                    <th className="py-2 pr-4 font-medium">Plan</th>
-                    <th className="py-2 pr-4 font-medium">Status</th>
-                    <th className="py-2 font-medium">Joined</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.recent.map((c) => (
-                    <tr
-                      key={c.id}
-                      className="border-b border-slate-100 last:border-0 dark:border-slate-800"
-                    >
-                      <td className="py-2.5 pr-4 font-medium text-slate-900 dark:text-slate-100">
-                        {c.name}
-                      </td>
-                      <td className="py-2.5 pr-4">
-                        <Badge tone="brand">
-                          {PLANS[c.plan as keyof typeof PLANS]?.name ?? c.plan}
-                        </Badge>
-                      </td>
-                      <td className="py-2.5 pr-4 text-slate-600 dark:text-slate-300">
-                        {c.status ?? "—"}
-                      </td>
-                      <td className="py-2.5 text-slate-600 dark:text-slate-300">
-                        {formatDate(c.createdAt)}
-                      </td>
+      <div className="grid gap-4 lg:grid-cols-5">
+        <Card className="lg:col-span-3">
+          <CardHeader>
+            <CardTitle>Newest companies</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {data.recent.length === 0 ? (
+              <p className="text-sm text-slate-500 dark:text-slate-400">No companies yet.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[560px] text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                      <th className="py-2 pr-4 font-medium">Company</th>
+                      <th className="py-2 pr-4 font-medium">Plan</th>
+                      <th className="py-2 pr-4 font-medium">Customers</th>
+                      <th className="py-2 pr-4 font-medium">Status</th>
+                      <th className="py-2 font-medium">Joined</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {data.recent.map((c) => (
+                      <tr
+                        key={c.id}
+                        className="border-b border-slate-100 last:border-0 dark:border-slate-800"
+                      >
+                        <td className="py-2.5 pr-4 font-medium text-slate-900 dark:text-slate-100">
+                          {c.name}
+                        </td>
+                        <td className="py-2.5 pr-4">
+                          <Badge tone="brand">
+                            {PLANS[c.plan as keyof typeof PLANS]?.name ?? c.plan}
+                          </Badge>
+                        </td>
+                        <td className="py-2.5 pr-4 font-semibold text-slate-900 dark:text-slate-100">
+                          {c.customers}
+                        </td>
+                        <td className="py-2.5 pr-4 text-slate-600 dark:text-slate-300">
+                          {c.status ?? "—"}
+                        </td>
+                        <td className="py-2.5 text-slate-600 dark:text-slate-300">
+                          {formatDate(c.createdAt)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Top companies by customers</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {data.topByCustomers.length === 0 ? (
+              <p className="text-sm text-slate-500 dark:text-slate-400">No companies yet.</p>
+            ) : (
+              (() => {
+                const max = Math.max(1, ...data.topByCustomers.map((c) => c.customers));
+                return (
+                  <ol className="space-y-3">
+                    {data.topByCustomers.map((c, i) => (
+                      <li key={c.id}>
+                        <div className="mb-1 flex items-baseline justify-between gap-2 text-sm">
+                          <span className="truncate font-medium text-slate-700 dark:text-slate-200">
+                            <span className="mr-2 text-xs text-slate-400">{i + 1}</span>
+                            {c.name}
+                          </span>
+                          <span className="shrink-0 font-semibold text-slate-900 dark:text-slate-100">
+                            {c.customers}
+                          </span>
+                        </div>
+                        <div className="h-2.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                          <div
+                            className="h-full rounded-full bg-brand-500"
+                            style={{ width: `${Math.max(3, (c.customers / max) * 100)}%` }}
+                          />
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                );
+              })()
+            )}
+            <div className="mt-4">
+              <Link
+                href="/studio/crm"
+                className="text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400"
+              >
+                Open the CRM →
+              </Link>
             </div>
-          )}
-          <div className="mt-4">
-            <Link
-              href="/studio/crm"
-              className="text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400"
-            >
-              Open the CRM →
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

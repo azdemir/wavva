@@ -358,3 +358,75 @@ export async function recordContactFormLead(input: {
     // CRM capture must never break the contact form.
   }
 }
+
+// ---------------------------------------------------------------------------
+// Studio user management (platform admin only)
+// ---------------------------------------------------------------------------
+
+const studioEmailSchema = z.string().trim().email("Enter a valid email").max(200);
+const studioRoleSchema = z.enum(["owner", "manager", "cleaner"]);
+const studioIdSchema = z.string().uuid("Invalid id");
+
+/** Change a member's role within their company. */
+export async function studioUpdateUserRole(
+  membershipId: string,
+  role: string,
+): Promise<ActionResult> {
+  const admin = await requirePlatformAdmin();
+  const rl = await rateLimit(
+    `studio-users:${admin.id}`,
+    limits.mutation.max,
+    limits.mutation.windowMs,
+  );
+  if (!rl.allowed) return rateLimitError(rl.resetIn);
+  if (!studioIdSchema.safeParse(membershipId).success) return { error: "Invalid user." };
+  const parsedRole = studioRoleSchema.safeParse(role);
+  if (!parsedRole.success) return { error: "Invalid role." };
+  const { setStudioUserRole } = await import("./users");
+  const res = await setStudioUserRole(membershipId, parsedRole.data);
+  if ("error" in res) return { error: res.error };
+  revalidatePath("/studio/users");
+  return { ok: true };
+}
+
+/** Change a user's login email (auth account + memberships). */
+export async function studioUpdateUserEmail(
+  userId: string,
+  email: string,
+): Promise<ActionResult> {
+  const admin = await requirePlatformAdmin();
+  const rl = await rateLimit(
+    `studio-users:${admin.id}`,
+    limits.mutation.max,
+    limits.mutation.windowMs,
+  );
+  if (!rl.allowed) return rateLimitError(rl.resetIn);
+  if (!studioIdSchema.safeParse(userId).success) return { error: "Invalid user." };
+  const parsedEmail = studioEmailSchema.safeParse(email);
+  if (!parsedEmail.success) {
+    return { error: parsedEmail.error.issues[0]?.message ?? "Invalid email." };
+  }
+  const { setStudioUserEmail } = await import("./users");
+  const res = await setStudioUserEmail(userId, parsedEmail.data);
+  if ("error" in res) return { error: res.error };
+  revalidatePath("/studio/users");
+  return { ok: true };
+}
+
+/** Delete a user entirely (memberships + login). Cannot delete yourself. */
+export async function studioDeleteUser(userId: string): Promise<ActionResult> {
+  const admin = await requirePlatformAdmin();
+  const rl = await rateLimit(
+    `studio-users:${admin.id}`,
+    limits.mutation.max,
+    limits.mutation.windowMs,
+  );
+  if (!rl.allowed) return rateLimitError(rl.resetIn);
+  if (!studioIdSchema.safeParse(userId).success) return { error: "Invalid user." };
+  const { deleteStudioUser } = await import("./users");
+  const res = await deleteStudioUser(userId);
+  if ("error" in res) return { error: res.error };
+  revalidatePath("/studio/users");
+  revalidatePath("/studio");
+  return { ok: true };
+}

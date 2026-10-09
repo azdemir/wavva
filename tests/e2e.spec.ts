@@ -230,7 +230,7 @@ test.describe("Mobile viewport (390px)", () => {
 });
 
 test.describe("Studio (founder HQ) end-to-end", () => {
-  const studioRoutes = ["/studio", "/studio/analytics", "/studio/website", "/studio/crm", "/studio/crm/new"];
+  const studioRoutes = ["/studio", "/studio/analytics", "/studio/website", "/studio/crm", "/studio/crm/new", "/studio/users"];
 
   for (const route of studioRoutes) {
     test(`${route} redirects anonymous visitors to the homepage`, async ({

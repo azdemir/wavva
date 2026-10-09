@@ -8,6 +8,7 @@ site and the founder's sales pipeline. Two tools in one place:
 | Website editor | `/studio/website` | Edit every word on the marketing site — no code, no redeploy |
 | CRM | `/studio/crm` | Track leads from first touch to paying customer |
 | Analytics | `/studio/analytics` | Growth, MRR, plan mix, and pipeline analytics |
+| Users | `/studio/users` | Edit or delete any SaaS user's email, role, or account |
 
 Both live under `/studio`, which also shows an overview dashboard (companies,
 users, MRR estimate, pipeline value, latest leads).
@@ -115,7 +116,26 @@ The founder's growth and revenue view for the SaaS itself:
 
 Data comes from `getAnalytics()` in `lib/studio/analytics.ts` (service-role
 client, admin-gated). Charts are hand-rolled SVG in
-`components/studio/charts.tsx` — no chart library needed.
+`components/studio/charts.tsx` — no chart library needed. The companies table
+includes each business's customer count, plus a "Top companies by customers"
+ranking.
+
+## Users (`/studio/users`)
+
+Platform-admin management of every SaaS login across all companies:
+
+- **List** — email, company, role, and join date for every member, with
+  search across emails and company names.
+- **Edit** — change a user's email (updates their login and memberships;
+  they may need to confirm the new address) or their role
+  (owner / manager / cleaner) within their company.
+- **Delete** — removes the user's memberships and their login entirely,
+  with a two-step confirm. You can't delete your own account.
+
+Backed by `lib/studio/users.ts` (service-role client + `auth.admin`,
+admin-gated) with server actions `studioUpdateUserRole`,
+`studioUpdateUserEmail`, and `studioDeleteUser` in `lib/studio/actions.ts`
+(validated, rate-limited).
 
 ## Database
 
