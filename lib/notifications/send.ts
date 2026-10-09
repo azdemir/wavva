@@ -1,7 +1,18 @@
 import { Resend } from "resend";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { renderTemplate, type TemplateName } from "./templates";
+import {
+  renderCommunicationTemplate,
+  renderSmsTemplate,
+  type TemplateKey,
+} from "@/lib/communications/templates";
+import {
+  getTemplateOverrides,
+  resolveTemplate,
+  rowKey,
+  type TemplateOverrideRow,
+} from "@/lib/communications/overrides";
 import { senderFor } from "./sender";
+import { isSmsConfigured, sendSms } from "./sms";
 
 let resend: Resend | null = null;
 
@@ -30,8 +41,12 @@ type QueuedNotification = {
 };
 
 /**
- * Send up to `limit` queued notifications. Email only for now —
- * SMS rows stay queued until an SMS provider is configured.
+ * Send up to `limit` queued notifications, email and SMS.
+ *
+ * Per-company template overrides (Settings → Communications) are respected:
+ * a disabled template marks its rows "skipped". SMS rows stay queued
+ * (counted as skipped) until Twilio is configured, so enabling the provider
+ * later delivers the backlog.
  */
 export async function processNotificationQueue(
   supabase: SupabaseClient,
@@ -43,41 +58,91 @@ export async function processNotificationQueue(
     .from("notifications")
     .select("id, company_id, channel, template, payload, companies(name, email)")
     .eq("status", "queued")
-    .eq("channel", "email")
+    .in("channel", ["email", "sms"])
     .order("created_at", { ascending: true })
     .limit(limit);
+
+  // One override lookup per company per run.
+  const overridesCache = new Map<string, Map<string, TemplateOverrideRow>>();
+  async function overridesFor(companyId: string) {
+    let m = overridesCache.get(companyId);
+    if (!m) {
+      m = await getTemplateOverrides(supabase, companyId);
+      overridesCache.set(companyId, m);
+    }
+    return m;
+  }
 
   let sent = 0;
   let failed = 0;
   let skipped = 0;
   for (const n of (data ?? []) as QueuedNotification[]) {
-    if (!resendClient) {
+    const key = n.template as TemplateKey;
+    const channel = n.channel as "email" | "sms";
+    const overrides = await overridesFor(n.company_id);
+    const resolved = resolveTemplate(key, channel, overrides.get(rowKey(key, channel)));
+    const override = resolved.customized
+      ? { subject: resolved.subject || null, body: resolved.body || null }
+      : null;
+
+    if (!resolved.enabled) {
+      await supabase.from("notifications").update({ status: "skipped" }).eq("id", n.id);
       skipped++;
       continue;
     }
-    const email = String(n.payload.email ?? "");
-    if (!email) {
+
+    if (channel === "email") {
+      if (!resendClient) {
+        skipped++;
+        continue;
+      }
+      const email = String(n.payload.email ?? "");
+      if (!email) {
+        await supabase.from("notifications").update({ status: "failed" }).eq("id", n.id);
+        failed++;
+        continue;
+      }
+      // From the business's email so the customer sees the company, not the platform.
+      const joined = n.companies;
+      const company = Array.isArray(joined) ? joined[0] : joined;
+      const from = senderFor(company ?? { name: "", email: null });
+      try {
+        const { subject, html, text } = renderCommunicationTemplate(key, n.payload, override);
+        const { error } = await resendClient.emails.send({
+          from,
+          to: email,
+          subject,
+          html,
+          text,
+        });
+        if (error) throw new Error(error.message);
+        await supabase
+          .from("notifications")
+          .update({ status: "sent", sent_at: new Date().toISOString() })
+          .eq("id", n.id);
+        sent++;
+      } catch {
+        await supabase.from("notifications").update({ status: "failed" }).eq("id", n.id);
+        failed++;
+      }
+      continue;
+    }
+
+    // channel === "sms"
+    if (!isSmsConfigured()) {
+      // No provider yet — stay queued so they send once Twilio is configured.
+      skipped++;
+      continue;
+    }
+    const phone = String(n.payload.phone ?? "");
+    if (!phone) {
       await supabase.from("notifications").update({ status: "failed" }).eq("id", n.id);
       failed++;
       continue;
     }
-    // From the business's email so the customer sees the company, not the platform.
-    const joined = n.companies;
-    const company = Array.isArray(joined) ? joined[0] : joined;
-    const from = senderFor(company ?? { name: "", email: null });
     try {
-      const { subject, html, text } = renderTemplate(
-        n.template as TemplateName,
-        n.payload as Record<string, string | number | undefined>,
-      );
-      const { error } = await resendClient.emails.send({
-        from,
-        to: email,
-        subject,
-        html,
-        text,
-      });
-      if (error) throw new Error(error.message);
+      const text = renderSmsTemplate(key, n.payload, override ? { body: override.body } : null);
+      await sendSms(phone, text);
       await supabase
         .from("notifications")
         .update({ status: "sent", sent_at: new Date().toISOString() })
