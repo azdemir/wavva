@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import { connection } from "next/server";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { one } from "@/lib/relations";
 
@@ -30,11 +31,20 @@ export type Company = {
 /**
  * The signed-in user, or null (also null when Supabase isn't configured).
  *
+ * `await connection()` is deliberate and load-bearing. Under Cache
+ * Components the prerenderer otherwise tries to evaluate this function while
+ * building the static shell, which runs supabase-js — and its GoTrueClient
+ * stamps `Date.now()` into its refresh-timer setup, an unstable value Next
+ * refuses to prerender. connection() declares this branch request-time
+ * before any of that runs, so the caller's Suspense boundary streams as a
+ * dynamic hole instead.
+ *
  * Cached per request: the dashboard layout and the page under it both call
  * requireCompany(), and each auth check would otherwise cost a separate
  * `auth.getUser()` round trip to the Supabase auth server.
  */
 export const getSessionUser = cache(async function getSessionUser() {
+  await connection();
   if (!isSupabaseConfigured()) return null;
   const supabase = await createClient();
   const {

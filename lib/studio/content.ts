@@ -1,12 +1,19 @@
 import { cacheTag } from "next/cache";
-import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { CONTENT_DEFAULTS } from "./registry";
 
 /**
  * Reads the site_content overrides and merges them over the registry
- * defaults. Deliberately cookie-free (plain anon client, no @supabase/ssr):
- * marketing pages stay statically prerendered, and Studio saves go live via
- * updateTag("site-content") + revalidatePath in the save action.
+ * defaults. Deliberately cookie-free so marketing pages stay statically
+ * prerendered, and Studio saves go live via updateTag("site-content") +
+ * revalidatePath in the save action.
+ *
+ * Uses the PostgREST endpoint with a plain fetch rather than
+ * `createClient` from @supabase/supabase-js. The SDK constructor builds a
+ * GoTrueClient, which stamps `Date.now()` into its refresh-timer setup —
+ * an unstable value Next's Cache Components refuses to prerender. It also
+ * pulls the entire auth stack into the marketing render path for what is
+ * a single public, RLS-readable table select. A fetch has neither problem
+ * and keeps this function deterministic inside "use cache".
  *
  * The fetch is wrapped in "use cache" so prerendering never trips over
  * uncached runtime data; the tag lets Studio purge it on save.
@@ -21,13 +28,17 @@ async function fetchOverrides(): Promise<Record<string, unknown>> {
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !anonKey) return {};
   try {
-    const sb = createSupabaseClient(url, anonKey, {
-      auth: { persistSession: false, autoRefreshToken: false },
+    const res = await fetch(`${url}/rest/v1/site_content?select=key,value`, {
+      headers: {
+        apikey: anonKey,
+        Authorization: `Bearer ${anonKey}`,
+      },
     });
-    const { data, error } = await sb.from("site_content").select("key, value");
-    if (error || !data) return {};
+    if (!res.ok) return {};
+    const rows: unknown = await res.json();
+    if (!Array.isArray(rows)) return {};
     return Object.fromEntries(
-      (data as { key: string; value: unknown }[])
+      (rows as { key: string; value: unknown }[])
         .filter((r) => typeof r.key === "string")
         .map((r) => [r.key, r.value]),
     );
@@ -47,12 +58,19 @@ export async function getContent<T>(key: string): Promise<T> {
 /**
  * Raw DB overrides only — used by the Studio editor for "customized" badges.
  * Uncached on purpose: the editor must always show the latest saved state.
+ *
+ * Keeps the Supabase client here rather than fetch: this path is dynamic
+ * (behind auth) and never part of a prerendered shell, so the SDK's
+ * Date.now() is harmless.
  */
 export async function getContentOverrides(): Promise<Record<string, unknown>> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !anonKey) return {};
   try {
+    const { createClient: createSupabaseClient } = await import(
+      "@supabase/supabase-js"
+    );
     const sb = createSupabaseClient(url, anonKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
