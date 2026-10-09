@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { one } from "@/lib/relations";
 import { startJob, completeJob, cancelJob, saveJobNotes } from "@/lib/actions/jobs";
 import { Heading } from "@/components/ui/heading";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { JobStatusPill, type JobStatus } from "@/components/ui/badge";
 import { TextareaField } from "@/components/ui/input";
@@ -14,7 +14,7 @@ import { AssignCrew } from "@/components/jobs/assign-crew";
 import { JobPhotos, type JobPhoto } from "@/components/jobs/job-photos";
 import { UpgradePrompt } from "@/components/billing/upgrade-prompt";
 import { hasFeature, isPlanId } from "@/lib/plans";
-import { isStorageConfigured, getPhotoViewUrl } from "@/lib/storage";
+import { isStorageConfigured, getPhotoViewUrl, PHOTO_RETENTION_DAYS } from "@/lib/storage";
 import { formatTime, formatDate } from "@/lib/format";
 
 export const instant = false;
@@ -210,6 +210,9 @@ export default async function JobDetailPage({
       <Card>
         <CardHeader>
           <CardTitle>Before / after photos</CardTitle>
+          <CardDescription>
+            Photos are kept for {PHOTO_RETENTION_DAYS} days, then automatically deleted.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {!canUsePhotos ? (

@@ -15,6 +15,9 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
  * server-side — credentials never reach the client.
  */
 
+/** Job photos are automatically deleted this many days after upload. */
+export const PHOTO_RETENTION_DAYS = 7;
+
 type StorageConfig = {
   bucket: string;
   endpoint: string;
