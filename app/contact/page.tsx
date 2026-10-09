@@ -58,7 +58,7 @@ export default async function ContactPage() {
                     </p>
                     <a
                       href={`mailto:${siteEmail}`}
-                      className="mt-3 inline-block text-base font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400"
+                      className="mt-2 inline-flex min-h-11 items-center text-base font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
                     >
                       {siteEmail}
                     </a>
@@ -86,11 +86,21 @@ export default async function ContactPage() {
                       Browse the feature tour and pricing — most questions are
                       answered there.
                     </p>
-                    <div className="mt-4 flex gap-3">
-                      <Button href="/features" variant="outline" size="sm">
+                    <div className="mt-4 flex flex-wrap gap-3">
+                      <Button
+                        href="/features"
+                        variant="outline"
+                        size="sm"
+                        className="h-10"
+                      >
                         Features
                       </Button>
-                      <Button href="/pricing" variant="outline" size="sm">
+                      <Button
+                        href="/pricing"
+                        variant="outline"
+                        size="sm"
+                        className="h-10"
+                      >
                         Pricing
                       </Button>
                     </div>

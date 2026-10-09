@@ -82,6 +82,13 @@ const ICON_OPTIONS = [
   { value: "bell", label: "Bell" },
 ];
 
+/** yes / partial / no — rendered as the glyphs in the comparison table. */
+const VERDICT_OPTIONS = [
+  { value: "yes", label: "Yes" },
+  { value: "partial", label: "Partial" },
+  { value: "no", label: "No" },
+];
+
 export const CONTENT_REGISTRY: ContentDef[] = [
   // ------------------------------------------------------------------ Global
   {
@@ -231,6 +238,29 @@ export const CONTENT_REGISTRY: ContentDef[] = [
     paths: HOME,
   },
   {
+    key: "home.stats.items",
+    page: "home",
+    section: "Proof points",
+    label: "Headline stats",
+    help: "The four big numbers directly under the hero.",
+    field: {
+      kind: "list",
+      maxItems: 4,
+      minItems: 1,
+      item: [
+        { key: "value", label: "Value", kind: "text", max: 12 },
+        { key: "label", label: "Label", kind: "text", max: 60 },
+      ],
+    },
+    default: [
+      { value: "$10", label: "Flat monthly starting price" },
+      { value: "0", label: "Per-user fees, ever" },
+      { value: "14", label: "Day free trial, no card needed" },
+      { value: "30m", label: "To finish your whole setup" },
+    ],
+    paths: HOME,
+  },
+  {
     key: "home.features.eyebrow",
     page: "home",
     section: "Features",
@@ -316,6 +346,67 @@ export const CONTENT_REGISTRY: ContentDef[] = [
         description:
           "Automatic booking confirmations, reminders, and staff assignment notifications by email, with consent controls and notification preferences.",
       },
+    ],
+    paths: HOME,
+  },
+  {
+    key: "home.compare.eyebrow",
+    page: "home",
+    section: "Comparison",
+    label: "Section eyebrow",
+    field: { kind: "text", max: 40 },
+    default: "Why TidyPro",
+    paths: HOME,
+  },
+  {
+    key: "home.compare.title",
+    page: "home",
+    section: "Comparison",
+    label: "Section title",
+    field: { kind: "text", max: 120 },
+    default: "Built for cleaning, not repackaged for plumbing",
+    paths: HOME,
+  },
+  {
+    key: "home.compare.description",
+    page: "home",
+    section: "Comparison",
+    label: "Section description",
+    field: { kind: "textarea", rows: 2, max: 300 },
+    default:
+      "Generalist field-service software makes you pay per seat and bolt on the essentials. Here's the honest side-by-side.",
+    paths: HOME,
+  },
+  {
+    key: "home.compare.rows",
+    page: "home",
+    section: "Comparison",
+    label: "Comparison rows",
+    field: {
+      kind: "list",
+      maxItems: 12,
+      minItems: 1,
+      item: [
+        { key: "feature", label: "Feature", kind: "text", max: 80 },
+        { key: "us", label: "TidyPro", kind: "select", options: VERDICT_OPTIONS },
+        {
+          key: "them",
+          label: "Big platforms",
+          kind: "select",
+          options: VERDICT_OPTIONS,
+        },
+      ],
+    },
+    default: [
+      { feature: "Flat price as you grow", us: "yes", them: "no" },
+      { feature: "Crew seats included in the plan", us: "yes", them: "no" },
+      { feature: "Quotes that follow up automatically", us: "yes", them: "no" },
+      { feature: "Recurring cleaning routes built in", us: "yes", them: "partial" },
+      { feature: "Mobile checklists and job photos", us: "yes", them: "partial" },
+      { feature: "Customer portal with online payment", us: "yes", them: "partial" },
+      { feature: "Every essential included in the base price", us: "yes", them: "no" },
+      { feature: "Gates essentials behind paid add-ons", us: "no", them: "yes" },
+      { feature: "Steep learning curve for the owner", us: "no", them: "yes" },
     ],
     paths: HOME,
   },

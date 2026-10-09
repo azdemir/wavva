@@ -2,61 +2,108 @@ import { plans } from "@/lib/site";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckIcon } from "@/components/ui/icons";
+import { Reveal } from "@/components/marketing/reveal";
+import { Ambient } from "@/components/marketing/ambient";
+import { ArrowRightIcon, CheckIcon } from "@/components/ui/icons";
 import { getContent } from "@/lib/studio/content";
 
-/** The three plan cards without any surrounding heading — reusable on the
- * dedicated pricing page where the page hero already introduces them. */
+/** The four plan cards without any surrounding heading — reusable on the
+ *  dedicated pricing page where the page hero already introduces them. */
 export function PlanCards() {
   return (
-    <div className="grid items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-4">
-      {plans.map((plan) => (
-        <Card
-          key={plan.name}
-          className={
-            plan.featured ? "relative border-2 border-brand-600 shadow-lg" : ""
-          }
-        >
-          {plan.featured && (
-            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-              <Badge tone="brand" className="px-3 py-1 text-xs">
-                Most popular
-              </Badge>
+    <div className="grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {plans.map((plan, i) => (
+        <Reveal key={plan.name} delay={i * 80} className="h-full min-w-0">
+          <div
+            className={`group/plan relative flex h-full flex-col overflow-hidden rounded-2xl p-7 transition-all duration-300 ${
+              plan.featured
+                ? "bg-night text-white shadow-[0_28px_70px_-30px_rgba(7,8,12,0.9)] ring-1 ring-white/10"
+                : "border border-line bg-surface hover:-translate-y-0.5 hover:border-line-strong hover:shadow-[0_20px_50px_-30px_rgba(15,23,42,0.4)]"
+            }`}
+          >
+            {plan.featured && (
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -top-20 -right-20 h-56 w-56 rounded-full bg-brand-500/25 blur-3xl"
+              />
+            )}
+
+            {/* Fixed-height badge slot so the featured card's name and price
+                line up with the other three instead of being pushed down. */}
+            <div className="relative mb-4 h-6">
+              {plan.featured && (
+                <Badge
+                  tone="brand"
+                  className="bg-brand-500/15 px-2.5 py-1 text-[11px] ring-brand-400/30 dark:text-brand-200"
+                >
+                  Most popular
+                </Badge>
+              )}
             </div>
-          )}
-          <CardContent className="flex h-full flex-col">
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+
+            <h3
+              className={`text-lg font-semibold ${
+                plan.featured ? "text-white" : "text-ink"
+              }`}
+            >
               {plan.name}
             </h3>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{plan.blurb}</p>
-            <p className="mt-4">
-              <span className="text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+            <p
+              className={`mt-1.5 min-h-10 text-sm leading-relaxed ${
+                plan.featured ? "text-white/55" : "text-ink-3"
+              }`}
+            >
+              {plan.blurb}
+            </p>
+
+            <p className="mt-6 flex items-baseline gap-1.5">
+              <span
+                className={`font-display text-5xl leading-none tracking-[-0.02em] ${
+                  plan.featured ? "text-white" : "text-ink"
+                }`}
+              >
                 ${plan.price}
               </span>
-              <span className="text-sm text-slate-500 dark:text-slate-400"> /month</span>
+              <span
+                className={`text-sm ${
+                  plan.featured ? "text-white/50" : "text-ink-3"
+                }`}
+              >
+                /month
+              </span>
             </p>
-            <ul className="mt-6 flex-1 space-y-3">
+
+            <ul className="mt-7 flex-1 space-y-3">
               {plan.features.map((f) => (
                 <li
                   key={f}
-                  className="flex items-start gap-2.5 text-sm text-slate-600 dark:text-slate-400"
+                  className={`flex items-start gap-2.5 text-sm leading-snug ${
+                    plan.featured ? "text-white/75" : "text-ink-2"
+                  }`}
                 >
-                  <CheckIcon className="mt-0.5 h-5 w-5 shrink-0 text-accent-600" />
+                  <CheckIcon
+                    className={`mt-0.5 h-4 w-4 shrink-0 ${
+                      plan.featured ? "text-accent-400" : "text-accent-600"
+                    }`}
+                  />
                   {f}
                 </li>
               ))}
             </ul>
+
             <Button
               href="/demo"
               variant={plan.featured ? "primary" : "outline"}
-              className="mt-8 w-full"
+              className={`mt-8 w-full rounded-full ${
+                plan.featured ? "" : "bg-surface text-ink hover:bg-surface-2"
+              }`}
             >
               {plan.cta}
+              <ArrowRightIcon className="h-4 w-4 transition-transform duration-300 group-hover/plan:translate-x-0.5" />
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </Reveal>
       ))}
     </div>
   );
@@ -68,11 +115,7 @@ export function PricingDisclaimer({ className = "" }: { className?: string }) {
 
 async function PricingDisclaimerText({ className = "" }: { className?: string }) {
   const text = await getContent<string>("home.pricing.disclaimer");
-  return (
-    <p className={`text-center text-sm text-slate-500 ${className}`}>
-      {text}
-    </p>
-  );
+  return <p className={`text-center text-sm text-ink-3 ${className}`}>{text}</p>;
 }
 
 export async function Pricing() {
@@ -82,17 +125,23 @@ export async function Pricing() {
     getContent<string>("home.pricing.description"),
   ]);
   return (
-    <section id="pricing" className="scroll-mt-20 bg-white py-20 sm:py-24 dark:bg-slate-950">
-      <Container>
-        <SectionHeading
-          eyebrow={eyebrow}
-          title={title}
-          description={description}
-        />
-        <div className="mt-12">
+    <section
+      id="pricing"
+      className="relative scroll-mt-24 overflow-hidden bg-surface-2 py-24 sm:py-28 lg:py-32"
+    >
+      <Ambient tone="dark" className="opacity-60" />
+      <Container className="relative">
+        <Reveal>
+          <SectionHeading
+            eyebrow={eyebrow}
+            title={title}
+            description={description}
+          />
+        </Reveal>
+        <div className="mt-14">
           <PlanCards />
         </div>
-        <PricingDisclaimer className="mt-8" />
+        <PricingDisclaimer className="mt-10" />
       </Container>
     </section>
   );

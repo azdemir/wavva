@@ -1,5 +1,6 @@
-import { Container } from "@/components/ui/container";
+import { NarrowContainer } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
+import { Reveal } from "@/components/marketing/reveal";
 import { getContent } from "@/lib/studio/content";
 
 export type FaqItem = { q: string; a: string };
@@ -12,37 +13,57 @@ export async function Faq() {
     getContent<FaqItem[]>("site.faqs"),
   ]);
   return (
-    <section id="faq" className="scroll-mt-20 bg-white py-20 sm:py-24 dark:bg-slate-950">
-      <Container>
-        <SectionHeading
-          eyebrow={eyebrow}
-          title={title}
-          description={description}
-        />
-        <div className="mx-auto mt-12 max-w-3xl space-y-4">
-          {faqs.map((f) => (
+    <section
+      id="faq"
+      className="scroll-mt-24 bg-surface-2 py-24 sm:py-28 lg:py-32"
+    >
+      <NarrowContainer>
+        <Reveal>
+          <SectionHeading
+            eyebrow={eyebrow}
+            title={title}
+            description={description}
+          />
+        </Reveal>
+
+        <Reveal
+          delay={80}
+          className="mt-14 overflow-hidden rounded-2xl border border-line bg-surface"
+        >
+          {faqs.map((f, i) => (
             <details
               key={f.q}
-              className="group rounded-xl border border-slate-200 bg-white px-6 py-4 open:shadow-sm dark:border-slate-800 dark:bg-slate-900"
+              name="faq"
+              className={`group px-6 open:bg-surface-2/70 sm:px-7 ${
+                i > 0 ? "border-t border-line" : ""
+              }`}
             >
-              <summary className="cursor-pointer list-none text-base font-semibold text-slate-900 dark:text-slate-100 [&::-webkit-details-marker]:hidden">
-                <span className="flex items-center justify-between gap-4">
-                  {f.q}
-                  <span
-                    aria-hidden="true"
-                    className="text-xl font-normal text-brand-600 dark:text-brand-400 transition-transform group-open:rotate-45"
+              {/* min-h-12 keeps the whole row tappable, not just the text. */}
+              <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-6 py-3 text-left text-[0.9375rem] font-semibold text-ink [&::-webkit-details-marker]:hidden">
+                {f.q}
+                <span
+                  aria-hidden="true"
+                  className="relative flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-line text-ink-3 transition-all duration-300 group-open:rotate-45 group-open:border-brand-300 group-open:bg-brand-50 group-open:text-brand-700 dark:group-open:border-brand-700 dark:group-open:bg-brand-950 dark:group-open:text-brand-300"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="h-3.5 w-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
                   >
-                    +
-                  </span>
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
                 </span>
               </summary>
-              <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+              <p className="max-w-2xl pb-5 text-sm leading-relaxed text-pretty text-ink-2">
                 {f.a}
               </p>
             </details>
           ))}
-        </div>
-      </Container>
+        </Reveal>
+      </NarrowContainer>
     </section>
   );
 }

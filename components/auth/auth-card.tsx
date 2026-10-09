@@ -26,7 +26,7 @@ export function AuthCard({
     <div className="bg-slate-50 dark:bg-slate-900">
       <Container>
         <div className="flex min-h-screen flex-col items-center justify-center py-16">
-          <Link href="/" className="mb-8 flex items-center gap-2.5">
+          <Link href="/" className="mb-8 flex min-h-11 items-center gap-2.5">
 <Logo />
           </Link>
           <Card className="w-full max-w-md">

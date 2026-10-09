@@ -69,20 +69,20 @@ export default async function FaqPage() {
                     {g.items.map((f) => (
                       <details
                         key={f.q}
-                        className="group rounded-xl border border-slate-200 bg-white px-6 py-4 open:shadow-sm dark:border-slate-800 dark:bg-slate-900"
+                        className="group rounded-xl border border-slate-200 bg-white px-6 open:shadow-sm dark:border-slate-800 dark:bg-slate-900"
                       >
-                        <summary className="cursor-pointer list-none text-base font-semibold text-slate-900 dark:text-slate-100 [&::-webkit-details-marker]:hidden">
-                          <span className="flex items-center justify-between gap-4">
+                        <summary className="flex min-h-12 cursor-pointer list-none items-center py-3 text-base font-semibold text-slate-900 dark:text-slate-100 [&::-webkit-details-marker]:hidden">
+                          <span className="flex w-full items-center justify-between gap-4">
                             {f.q}
                             <span
                               aria-hidden="true"
-                              className="text-xl font-normal text-brand-600 dark:text-brand-400 transition-transform group-open:rotate-45"
+                              className="text-xl font-normal text-brand-600 transition-transform group-open:rotate-45 dark:text-brand-400"
                             >
                               +
                             </span>
                           </span>
                         </summary>
-                        <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                        <p className="pb-4 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                           {f.a}
                         </p>
                       </details>
