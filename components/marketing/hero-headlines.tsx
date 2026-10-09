@@ -28,7 +28,7 @@ export function HeroHeadlines() {
 
   if (reduced) {
     return (
-      <h1 className="font-serif text-4xl font-medium tracking-tight text-slate-900 dark:text-slate-100 sm:text-5xl lg:text-6xl">
+      <h1 className="font-serif text-4xl font-medium tracking-tight text-slate-900 dark:text-slate-100 sm:text-5xl">
         {HEADLINES[0]}
       </h1>
     );
@@ -36,7 +36,7 @@ export function HeroHeadlines() {
 
   return (
     <h1
-      className="relative font-serif text-4xl font-medium tracking-tight text-slate-900 dark:text-slate-100 sm:text-5xl lg:text-6xl"
+      className="relative font-serif text-4xl font-medium tracking-tight text-slate-900 dark:text-slate-100 sm:text-5xl"
       aria-live="polite"
     >
       {/* Reserve height for the tallest headline to avoid layout shift */}
