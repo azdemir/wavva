@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { assignJob } from "@/lib/actions/jobs";
 
@@ -16,6 +17,7 @@ export function AssignCrew({
   crew: CrewMember[];
   assigned: string[];
 }) {
+  const t = useTranslations("jobs");
   const [selected, setSelected] = useState<string[]>(assigned);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -40,7 +42,7 @@ export function AssignCrew({
   if (crew.length === 0) {
     return (
       <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
-        No team members yet. Invite your crew from the Team page first.
+        {t("crew.empty")}
       </p>
     );
   }
@@ -54,7 +56,7 @@ export function AssignCrew({
       )}
       {saved && (
         <div role="status" className="rounded-lg border border-accent-200 bg-accent-50 px-4 py-2 text-sm text-accent-800">
-          Crew updated.
+          {t("crew.saved")}
         </div>
       )}
       <ul className="space-y-2">
@@ -74,7 +76,7 @@ export function AssignCrew({
         ))}
       </ul>
       <Button onClick={save} disabled={pending}>
-        {pending ? "Saving…" : "Save assignment"}
+        {pending ? t("crew.saving") : t("crew.save")}
       </Button>
     </div>
   );

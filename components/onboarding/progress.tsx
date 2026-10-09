@@ -1,8 +1,10 @@
-const steps = ["Company", "Services", "Service area", "Team"];
+import { getTranslations } from "next-intl/server";
 
-export function OnboardingProgress({ current }: { current: number }) {
+export async function OnboardingProgress({ current }: { current: number }) {
+  const t = await getTranslations("onboarding");
+  const steps = t.raw("progress.steps") as string[];
   return (
-    <ol className="flex items-center gap-2" aria-label="Onboarding progress">
+    <ol className="flex items-center gap-2" aria-label={t("progress.label")}>
       {steps.map((label, i) => {
         const n = i + 1;
         const done = n < current;

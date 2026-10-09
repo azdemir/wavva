@@ -5,6 +5,8 @@
  * `@media print` rules in globals.css.
  */
 
+import { getTranslations } from "next-intl/server";
+
 export type PrintCompany = {
   name: string;
   phone: string | null;
@@ -32,7 +34,7 @@ export type PrintTotal = {
   strong?: boolean;
 };
 
-export function PrintDocument({
+export async function PrintDocument({
   company,
   kind,
   number,
@@ -55,6 +57,7 @@ export function PrintDocument({
   notes?: string | null;
   footerNote: string;
 }) {
+  const t = await getTranslations("quotes");
   const contact = [company.phone, company.email, company.website].filter(Boolean).join(" · ");
   return (
     <div className="mx-auto max-w-3xl bg-white px-8 py-10 text-slate-900 print:max-w-none print:px-0 print:py-0">
@@ -65,16 +68,16 @@ export function PrintDocument({
           {contact && <p className="mt-1 text-sm text-slate-600">{contact}</p>}
         </div>
         <div className="text-right">
-          <p className="text-2xl font-bold uppercase tracking-wide">{kind}</p>
+          <p className="text-2xl font-bold uppercase tracking-wide">{kind === "Invoice" ? t("document.invoice") : t("document.quote")}</p>
           <p className="mt-1 text-lg font-semibold text-slate-700">{number}</p>
-          <p className="mt-1 text-sm text-slate-600">Status: {status}</p>
+          <p className="mt-1 text-sm text-slate-600">{t("document.status", { status })}</p>
         </div>
       </div>
 
       {/* Meta + bill-to */}
       <div className="flex flex-wrap justify-between gap-6 py-6">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Bill to</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t("document.billTo")}</p>
           <p className="mt-1 font-semibold">{customer.name}</p>
           {customer.email && <p className="text-sm text-slate-600">{customer.email}</p>}
           {customer.phone && <p className="text-sm text-slate-600">{customer.phone}</p>}
@@ -93,10 +96,10 @@ export function PrintDocument({
       <table className="w-full text-sm">
         <thead>
           <tr className="border-y border-slate-300 text-left text-xs uppercase tracking-wide text-slate-500">
-            <th className="py-2.5 pr-4 font-semibold">Description</th>
-            <th className="py-2.5 pr-4 text-right font-semibold">Qty</th>
-            <th className="py-2.5 pr-4 text-right font-semibold">Unit price</th>
-            <th className="py-2.5 text-right font-semibold">Total</th>
+            <th className="py-2.5 pr-4 font-semibold">{t("document.descriptionCol")}</th>
+            <th className="py-2.5 pr-4 text-right font-semibold">{t("document.qtyCol")}</th>
+            <th className="py-2.5 pr-4 text-right font-semibold">{t("document.unitPriceCol")}</th>
+            <th className="py-2.5 text-right font-semibold">{t("document.totalCol")}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-200">
@@ -131,7 +134,7 @@ export function PrintDocument({
 
       {notes && (
         <div className="mt-4 border-t border-slate-200 pt-4 text-sm">
-          <p className="font-semibold">Notes</p>
+          <p className="font-semibold">{t("document.notesTitle")}</p>
           <p className="mt-1 whitespace-pre-wrap text-slate-700">{notes}</p>
         </div>
       )}

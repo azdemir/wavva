@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { setOptions, importLibrary } from "@googlemaps/js-api-loader";
 
 export type ParsedAddress = {
@@ -65,6 +66,7 @@ export function AddressAutocomplete({
 }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [ready, setReady] = useState(false);
+  const t = useTranslations("customers");
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
   useEffect(() => {
@@ -120,7 +122,7 @@ export function AddressAutocomplete({
       />
       {apiKey && !ready && (
         <p className="mt-1.5 text-xs text-slate-400 dark:text-slate-500">
-          Loading address suggestions…
+          {t("autocomplete.loadingSuggestions")}
         </p>
       )}
     </div>

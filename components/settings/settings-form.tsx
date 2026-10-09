@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Field, SelectField, TextareaField } from "@/components/ui/input";
 import { updateCompanySettings } from "@/lib/actions/settings";
@@ -16,6 +17,7 @@ const timezones = [
 ];
 
 export function SettingsForm({ company }: { company: Company }) {
+  const t = useTranslations("settings");
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [pending, setPending] = useState(false);
@@ -48,23 +50,23 @@ export function SettingsForm({ company }: { company: Company }) {
       )}
       {saved && (
         <div role="status" className="rounded-lg border border-accent-200 bg-accent-50 px-4 py-3 text-sm text-accent-800">
-          Settings saved.
+          {t("form.saved")}
         </div>
       )}
 
       <section className="space-y-4">
-        <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">Company profile</h3>
-        <Field id="set-name" name="name" label="Business name" defaultValue={company.name} required />
+        <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">{t("form.profile")}</h3>
+        <Field id="set-name" name="name" label={t("fields.businessName")} defaultValue={company.name} required />
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field id="set-phone" name="phone" label="Phone" type="tel" defaultValue={company.phone ?? ""} />
-          <Field id="set-email" name="email" label="Email" type="email" defaultValue={company.email ?? ""} hint="Used as the sender for emails to your customers (portal links, quote follow-ups). Its domain must be verified in Resend." />
+          <Field id="set-phone" name="phone" label={t("fields.phone")} type="tel" defaultValue={company.phone ?? ""} />
+          <Field id="set-email" name="email" label={t("fields.email")} type="email" defaultValue={company.email ?? ""} hint={t("fields.emailHint")} />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field id="set-website" name="website" label="Website" defaultValue={company.website ?? ""} />
+          <Field id="set-website" name="website" label={t("fields.website")} defaultValue={company.website ?? ""} />
           <SelectField
             id="set-timezone"
             name="timezone"
-            label="Time zone"
+            label={t("fields.timezone")}
             defaultValue={company.timezone}
           >
             {timezones.map((tz) => (
@@ -75,12 +77,12 @@ export function SettingsForm({ company }: { company: Company }) {
       </section>
 
       <section className="space-y-4">
-        <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">Pricing & policies</h3>
+        <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">{t("form.pricing")}</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field
             id="set-tax"
             name="default_tax_rate"
-            label="Default tax rate (e.g. 0.08 for 8%)"
+            label={t("fields.taxRate")}
             type="number"
             min="0"
             max="1"
@@ -91,33 +93,33 @@ export function SettingsForm({ company }: { company: Company }) {
         <TextareaField
           id="set-cancel"
           name="cancellation_policy"
-          label="Cancellation policy"
+          label={t("fields.cancellationPolicy")}
           rows={3}
-          placeholder="Cancellations made less than 24 hours before the visit are billed at 50%."
+          placeholder={t("fields.cancellationPlaceholder")}
           defaultValue={settings.cancellation_policy ?? ""}
         />
         <div>
-          <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Recurring-visit price multipliers</p>
-          <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">1 = full price, 0.95 = 5% off. Applied when quoting recurring work.</p>
+          <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{t("form.multipliersTitle")}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">{t("form.multipliersDescription")}</p>
           <div className="mt-2 grid gap-4 sm:grid-cols-3">
             <Field
               id="set-weekly"
               name="freq_weekly"
-              label="Weekly"
+              label={t("fields.weekly")}
               type="number" min="0" max="2" step="0.01"
               defaultValue={settings.frequency_multipliers?.weekly ?? 1}
             />
             <Field
               id="set-biweekly"
               name="freq_biweekly"
-              label="Every 2 weeks"
+              label={t("fields.biweekly")}
               type="number" min="0" max="2" step="0.01"
               defaultValue={settings.frequency_multipliers?.biweekly ?? 1}
             />
             <Field
               id="set-monthly"
               name="freq_monthly"
-              label="Monthly"
+              label={t("fields.monthly")}
               type="number" min="0" max="2" step="0.01"
               defaultValue={settings.frequency_multipliers?.monthly ?? 1}
             />
@@ -126,11 +128,9 @@ export function SettingsForm({ company }: { company: Company }) {
       </section>
 
       <section className="space-y-4">
-        <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">Automatic quote follow-ups</h3>
+        <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">{t("form.followups")}</h3>
         <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
-          When you send a quote, TidyPro automatically nudges the customer if they go quiet —
-          only the big expensive tools do this. Sending stops the moment they approve, decline,
-          or the quote expires.
+          {t("form.followupsDescription")}
         </p>
         <label className="flex min-h-11 cursor-pointer items-center gap-3">
           <input
@@ -139,20 +139,20 @@ export function SettingsForm({ company }: { company: Company }) {
             defaultChecked={settings.followup_enabled !== false}
             className="h-5 w-5 rounded accent-brand-600"
           />
-          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Send automatic follow-ups</span>
+          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{t("form.followupsEnable")}</span>
         </label>
         <Field
           id="set-followup-days"
           name="followup_days"
-          label="Follow up after (days, comma-separated)"
-          placeholder="2, 5"
+          label={t("fields.followupDays")}
+          placeholder={t("fields.followupDaysPlaceholder")}
           defaultValue={(settings.followup_days ?? [2, 5]).join(", ")}
-          hint="Up to 3 touches, e.g. “2, 5” emails the customer 2 and 5 days after the quote is sent."
+          hint={t("fields.followupDaysHint")}
         />
       </section>
 
       <Button type="submit" disabled={pending}>
-        {pending ? "Saving…" : "Save settings"}
+        {pending ? t("form.saving") : t("form.save")}
       </Button>
     </form>
   );

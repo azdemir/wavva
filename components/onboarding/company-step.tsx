@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/input";
 import { saveCompanyProfile } from "@/lib/actions/onboarding";
 import type { Company } from "@/lib/auth";
 
 export function CompanyStep({ company }: { company?: Company | null }) {
+  const t = useTranslations("onboarding");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -29,8 +31,8 @@ export function CompanyStep({ company }: { company?: Company | null }) {
       <Field
         id="ob-name"
         name="name"
-        label="Business name"
-        placeholder="Capital Region Clean Co."
+        label={t("company.businessName")}
+        placeholder={t("company.businessNamePlaceholder")}
         defaultValue={company?.name ?? ""}
         required
       />
@@ -38,29 +40,29 @@ export function CompanyStep({ company }: { company?: Company | null }) {
         <Field
           id="ob-phone"
           name="phone"
-          label="Business phone"
+          label={t("company.phone")}
           type="tel"
-          placeholder="(518) 555-0100"
+          placeholder={t("company.phonePlaceholder")}
           defaultValue={company?.phone ?? ""}
         />
         <Field
           id="ob-email"
           name="email"
-          label="Business email"
+          label={t("company.email")}
           type="email"
-          placeholder="hello@company.com"
+          placeholder={t("company.emailPlaceholder")}
           defaultValue={company?.email ?? ""}
         />
       </div>
       <Field
         id="ob-website"
         name="website"
-        label="Website (optional)"
-        placeholder="www.company.com"
+        label={t("company.website")}
+        placeholder={t("company.websitePlaceholder")}
         defaultValue={company?.website ?? ""}
       />
       <Button type="submit" className="w-full" disabled={pending}>
-        {pending ? "Saving…" : "Continue"}
+        {pending ? t("common.saving") : t("common.continue")}
       </Button>
     </form>
   );

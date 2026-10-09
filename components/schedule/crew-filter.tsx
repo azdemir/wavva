@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 /** Crew-member filter for the week schedule. Updates the `crew` query param. */
 export function CrewFilter({
@@ -10,11 +11,12 @@ export function CrewFilter({
 }) {
   const router = useRouter();
   const sp = useSearchParams();
+  const t = useTranslations("schedule");
   const current = sp.get("crew") ?? "all";
 
   return (
     <label className="flex items-center gap-2 text-sm">
-      <span className="font-medium text-slate-600 dark:text-slate-300">Crew</span>
+      <span className="font-medium text-slate-600 dark:text-slate-300">{t("crewFilter.label")}</span>
       <select
         value={current}
         onChange={(e) => {
@@ -26,7 +28,7 @@ export function CrewFilter({
         }}
         className="h-9 rounded-lg border border-slate-300 bg-white px-2.5 text-sm text-slate-700 focus:outline-2 focus:outline-brand-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
       >
-        <option value="all">Everyone</option>
+        <option value="all">{t("crewFilter.everyone")}</option>
         {members.map((m) => (
           <option key={m.user_id} value={m.user_id}>
             {m.email}

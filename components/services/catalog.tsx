@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Field, SelectField } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -34,7 +35,7 @@ export type AddonRow = {
   is_active: boolean;
 };
 
-const unitLabels = { per_visit: "per visit", per_hour: "per hour", per_sqft: "per sq ft" } as const;
+const unitKeys = ["per_visit", "per_hour", "per_sqft"] as const;
 
 function useFeedback() {
   const [error, setError] = useState<string | null>(null);
@@ -60,6 +61,7 @@ function ErrorNote({ message }: { message: string | null }) {
 }
 
 export function ServiceManager({ initial }: { initial: ServiceRow[] }) {
+  const t = useTranslations("services");
   const { error, pending, run } = useFeedback();
   const [editing, setEditing] = useState<string | null>(null);
   const [q, setQ] = useState("");
@@ -72,8 +74,8 @@ export function ServiceManager({ initial }: { initial: ServiceRow[] }) {
       <ErrorNote message={error} />
       <Field
         id="service-search"
-        label="Search services"
-        placeholder="Search by name…"
+        label={t("manager.searchLabel")}
+        placeholder={t("manager.searchPlaceholder")}
         value={q}
         onChange={(e) => setQ(e.target.value)}
       />
@@ -91,24 +93,24 @@ export function ServiceManager({ initial }: { initial: ServiceRow[] }) {
                 className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-800 p-4"
               >
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <Field id={`se-name-${s.id}`} name="name" label="Name" required defaultValue={s.name} />
-                  <SelectField id={`se-cat-${s.id}`} name="category" label="Type" defaultValue={s.category}>
-                    <option value="residential">Residential</option>
-                    <option value="commercial">Commercial</option>
+                  <Field id={`se-name-${s.id}`} name="name" label={t("manager.nameLabel")} required defaultValue={s.name} />
+                  <SelectField id={`se-cat-${s.id}`} name="category" label={t("manager.typeLabel")} defaultValue={s.category}>
+                    <option value="residential">{t("categories.residential")}</option>
+                    <option value="commercial">{t("categories.commercial")}</option>
                   </SelectField>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <Field id={`se-price-${s.id}`} name="price" label="Base price ($)" type="number" min="0" step="0.01" required defaultValue={(s.base_price_cents / 100).toFixed(2)} />
-                  <SelectField id={`se-unit-${s.id}`} name="unit" label="Priced" defaultValue={s.unit}>
-                    {(Object.keys(unitLabels) as (keyof typeof unitLabels)[]).map((u) => (
-                      <option key={u} value={u}>{unitLabels[u]}</option>
+                  <Field id={`se-price-${s.id}`} name="price" label={t("manager.basePriceLabel")} type="number" min="0" step="0.01" required defaultValue={(s.base_price_cents / 100).toFixed(2)} />
+                  <SelectField id={`se-unit-${s.id}`} name="unit" label={t("manager.pricedLabel")} defaultValue={s.unit}>
+                    {unitKeys.map((u) => (
+                      <option key={u} value={u}>{t(`units.${u}`)}</option>
                     ))}
                   </SelectField>
                 </div>
-                <Field id={`se-desc-${s.id}`} name="description" label="Description" defaultValue={s.description ?? ""} />
+                <Field id={`se-desc-${s.id}`} name="description" label={t("manager.descriptionLabel")} defaultValue={s.description ?? ""} />
                 <div className="flex gap-2">
-                  <Button type="submit" disabled={pending}>Save</Button>
-                  <Button type="button" variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
+                  <Button type="submit" disabled={pending}>{t("manager.save")}</Button>
+                  <Button type="button" variant="outline" onClick={() => setEditing(null)}>{t("manager.cancel")}</Button>
                 </div>
               </form>
             ) : (
@@ -116,21 +118,21 @@ export function ServiceManager({ initial }: { initial: ServiceRow[] }) {
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-slate-900 dark:text-slate-100">
                     {s.name}{" "}
-                    <Badge tone={s.category === "residential" ? "brand" : "accent"}>{s.category}</Badge>{" "}
-                    {!s.is_active && <Badge tone="slate">inactive</Badge>}
+                    <Badge tone={s.category === "residential" ? "brand" : "accent"}>{t(`categories.${s.category}`)}</Badge>{" "}
+                    {!s.is_active && <Badge tone="slate">{t("manager.inactive")}</Badge>}
                   </p>
                   <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
-                    {formatCents(s.base_price_cents)} {unitLabels[s.unit]}
+                    {formatCents(s.base_price_cents)} {t(`units.${s.unit}`)}
                     {s.description ? ` · ${s.description}` : ""}
                   </p>
                 </div>
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" onClick={() => run(() => setServiceActive(s.id, !s.is_active))} disabled={pending}>
-                    {s.is_active ? "Deactivate" : "Activate"}
+                    {s.is_active ? t("manager.deactivate") : t("manager.activate")}
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => setEditing(s.id)}>Edit</Button>
-                  <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50" onClick={() => { if (confirm(`Delete "${s.name}"?`)) run(() => deleteService(s.id)); }} disabled={pending}>
-                    Delete
+                  <Button variant="outline" size="sm" onClick={() => setEditing(s.id)}>{t("manager.edit")}</Button>
+                  <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50" onClick={() => { if (confirm(t("manager.confirmDelete", { name: s.name }))) run(() => deleteService(s.id)); }} disabled={pending}>
+                    {t("manager.delete")}
                   </Button>
                 </div>
               </div>
@@ -140,29 +142,30 @@ export function ServiceManager({ initial }: { initial: ServiceRow[] }) {
       </ul>
 
       <form action={(fd) => { void run(() => createService(fd)); }} className="space-y-3 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 p-4">
-        <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">Add a service</p>
+        <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t("manager.addTitle")}</p>
         <div className="grid gap-3 sm:grid-cols-2">
-          <Field id="ns-name" name="name" label="Name" required placeholder="Standard home cleaning" />
-          <SelectField id="ns-cat" name="category" label="Type">
-            <option value="residential">Residential</option>
-            <option value="commercial">Commercial</option>
+          <Field id="ns-name" name="name" label={t("manager.nameLabel")} required placeholder={t("manager.namePlaceholder")} />
+          <SelectField id="ns-cat" name="category" label={t("manager.typeLabel")}>
+            <option value="residential">{t("categories.residential")}</option>
+            <option value="commercial">{t("categories.commercial")}</option>
           </SelectField>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
-          <Field id="ns-price" name="price" label="Base price ($)" type="number" min="0" step="0.01" required placeholder="129.00" />
-          <SelectField id="ns-unit" name="unit" label="Priced">
-            <option value="per_visit">per visit</option>
-            <option value="per_hour">per hour</option>
-            <option value="per_sqft">per sq ft</option>
+          <Field id="ns-price" name="price" label={t("manager.basePriceLabel")} type="number" min="0" step="0.01" required placeholder="129.00" />
+          <SelectField id="ns-unit" name="unit" label={t("manager.pricedLabel")}>
+            <option value="per_visit">{t("units.per_visit")}</option>
+            <option value="per_hour">{t("units.per_hour")}</option>
+            <option value="per_sqft">{t("units.per_sqft")}</option>
           </SelectField>
         </div>
-        <Button type="submit" disabled={pending}>Add service</Button>
+        <Button type="submit" disabled={pending}>{t("manager.addSubmit")}</Button>
       </form>
     </div>
   );
 }
 
 export function AddonManager({ initial }: { initial: AddonRow[] }) {
+  const t = useTranslations("services");
   const { error, pending, run } = useFeedback();
   const [editing, setEditing] = useState<string | null>(null);
   const [q, setQ] = useState("");
@@ -175,8 +178,8 @@ export function AddonManager({ initial }: { initial: AddonRow[] }) {
       <ErrorNote message={error} />
       <Field
         id="addon-search"
-        label="Search add-ons"
-        placeholder="Search by name…"
+        label={t("addons.searchLabel")}
+        placeholder={t("addons.searchPlaceholder")}
         value={q}
         onChange={(e) => setQ(e.target.value)}
       />
@@ -194,28 +197,28 @@ export function AddonManager({ initial }: { initial: AddonRow[] }) {
                 className="flex flex-wrap items-end gap-3 rounded-xl border border-slate-200 dark:border-slate-800 p-4"
               >
                 <div className="min-w-40 flex-1">
-                  <Field id={`ae-name-${a.id}`} name="name" label="Name" required defaultValue={a.name} />
+                  <Field id={`ae-name-${a.id}`} name="name" label={t("manager.nameLabel")} required defaultValue={a.name} />
                 </div>
                 <div className="w-36">
-                  <Field id={`ae-price-${a.id}`} name="price" label="Price ($)" type="number" min="0" step="0.01" required defaultValue={(a.price_cents / 100).toFixed(2)} />
+                  <Field id={`ae-price-${a.id}`} name="price" label={t("addons.priceLabel")} type="number" min="0" step="0.01" required defaultValue={(a.price_cents / 100).toFixed(2)} />
                 </div>
-                <Button type="submit" disabled={pending}>Save</Button>
-                <Button type="button" variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
+                <Button type="submit" disabled={pending}>{t("manager.save")}</Button>
+                <Button type="button" variant="outline" onClick={() => setEditing(null)}>{t("manager.cancel")}</Button>
               </form>
             ) : (
               <div className="flex flex-wrap items-center gap-3">
                 <p className="min-w-0 flex-1 font-medium text-slate-900 dark:text-slate-100">
                   {a.name}{" "}
                   <span className="text-sm font-normal text-slate-500 dark:text-slate-400 dark:text-slate-500">{formatCents(a.price_cents)}</span>{" "}
-                  {!a.is_active && <Badge tone="slate">inactive</Badge>}
+                  {!a.is_active && <Badge tone="slate">{t("manager.inactive")}</Badge>}
                 </p>
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" onClick={() => run(() => setAddonActive(a.id, !a.is_active))} disabled={pending}>
-                    {a.is_active ? "Deactivate" : "Activate"}
+                    {a.is_active ? t("manager.deactivate") : t("manager.activate")}
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => setEditing(a.id)}>Edit</Button>
-                  <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50" onClick={() => { if (confirm(`Delete "${a.name}"?`)) run(() => deleteAddon(a.id)); }} disabled={pending}>
-                    Delete
+                  <Button variant="outline" size="sm" onClick={() => setEditing(a.id)}>{t("manager.edit")}</Button>
+                  <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50" onClick={() => { if (confirm(t("manager.confirmDelete", { name: a.name }))) run(() => deleteAddon(a.id)); }} disabled={pending}>
+                    {t("manager.delete")}
                   </Button>
                 </div>
               </div>
@@ -226,15 +229,15 @@ export function AddonManager({ initial }: { initial: AddonRow[] }) {
 
       <form action={(fd) => { void run(() => createAddon(fd)); }} className="flex flex-wrap items-end gap-3 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 p-4">
         <div className="min-w-40 flex-1">
-          <Field id="na-name" name="name" label="Add-on name" required placeholder="Inside fridge" />
+          <Field id="na-name" name="name" label={t("addons.nameLabel")} required placeholder={t("addons.namePlaceholder")} />
         </div>
         <div className="w-36">
-          <Field id="na-price" name="price" label="Price ($)" type="number" min="0" step="0.01" required placeholder="25.00" />
+          <Field id="na-price" name="price" label={t("addons.priceLabel")} type="number" min="0" step="0.01" required placeholder="25.00" />
         </div>
-        <Button type="submit" disabled={pending}>Add add-on</Button>
+        <Button type="submit" disabled={pending}>{t("addons.addSubmit")}</Button>
       </form>
       <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">
-        Recurring-visit discounts (weekly / biweekly / monthly) live in Settings.
+        {t("addons.note")}
       </p>
     </div>
   );

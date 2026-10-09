@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Field, SelectField, TextareaField } from "@/components/ui/input";
 import { formatCents } from "@/lib/format";
@@ -46,6 +47,7 @@ export function QuoteBuilder({
   const [notes, setNotes] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const t = useTranslations("quotes");
 
   const set = (i: number, patch: Partial<Item>) =>
     setItems((rows) => rows.map((r, j) => (j === i ? { ...r, ...patch } : r)));
@@ -105,7 +107,7 @@ export function QuoteBuilder({
       <div className="max-w-md">
         <SelectField
           id="qb-customer"
-          label="Customer"
+          label={t("builder.customer")}
           value={customerId}
           onChange={(e) => setCustomerId(e.target.value)}
         >
@@ -116,32 +118,32 @@ export function QuoteBuilder({
       </div>
 
       <div className="space-y-4">
-        <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">Line items</h3>
+        <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">{t("builder.lineItems")}</h3>
         {items.map((it, i) => (
           <div key={i} className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-800 p-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Item {i + 1}</span>
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t("builder.item", { n: i + 1 })}</span>
               {items.length > 1 && (
                 <button type="button" onClick={() => setItems((rs) => rs.filter((_, j) => j !== i))} className="text-sm font-medium text-red-600 hover:text-red-700">
-                  Remove
+                  {t("builder.remove")}
                 </button>
               )}
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <SelectField
                 id={`qb-svc-${i}`}
-                label="From service"
+                label={t("builder.fromService")}
                 value={it.kind === "service" ? it.ref_id : ""}
                 onChange={(e) => pickService(i, e.target.value)}
               >
-                <option value="">Custom line…</option>
+                <option value="">{t("builder.customLine")}</option>
                 {services.map((s) => (
                   <option key={s.id} value={s.id}>{s.name} — {formatCents(s.base_price_cents)}</option>
                 ))}
               </SelectField>
               <SelectField
                 id={`qb-addon-${i}`}
-                label="Or add-on"
+                label={t("builder.orAddon")}
                 value={it.kind === "addon" ? it.ref_id : ""}
                 onChange={(e) => pickAddon(i, e.target.value)}
               >
@@ -153,35 +155,35 @@ export function QuoteBuilder({
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
               <div className="sm:col-span-1">
-                <Field id={`qb-label-${i}`} label="Description" value={it.label} onChange={(e) => set(i, { label: e.target.value, kind: it.kind === "custom" ? "custom" : it.kind })} placeholder="What is this for?" />
+                <Field id={`qb-label-${i}`} label={t("builder.description")} value={it.label} onChange={(e) => set(i, { label: e.target.value, kind: it.kind === "custom" ? "custom" : it.kind })} placeholder={t("builder.descriptionPlaceholder")} />
               </div>
-              <Field id={`qb-qty-${i}`} label="Qty" type="number" min="0" step="0.01" value={it.qty} onChange={(e) => set(i, { qty: e.target.value })} />
-              <Field id={`qb-price-${i}`} label="Unit price ($)" type="number" min="0" step="0.01" value={it.unit_price_cents} onChange={(e) => set(i, { unit_price_cents: e.target.value })} />
+              <Field id={`qb-qty-${i}`} label={t("builder.qty")} type="number" min="0" step="0.01" value={it.qty} onChange={(e) => set(i, { qty: e.target.value })} />
+              <Field id={`qb-price-${i}`} label={t("builder.unitPrice")} type="number" min="0" step="0.01" value={it.unit_price_cents} onChange={(e) => set(i, { unit_price_cents: e.target.value })} />
             </div>
           </div>
         ))}
         <Button type="button" variant="outline" onClick={() => setItems((rs) => [...rs, emptyItem()])}>
-          + Add line item
+          {t("builder.addLineItem")}
         </Button>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <Field id="qb-discount" label="Discount ($)" type="number" min="0" step="0.01" value={discount} onChange={(e) => setDiscount(e.target.value)} placeholder="0.00" />
-        <Field id="qb-tax" label="Tax rate (e.g. 0.08)" type="number" min="0" max="1" step="0.0001" value={taxRate} onChange={(e) => setTaxRate(e.target.value)} />
-        <Field id="qb-valid" label="Valid until" type="date" value={validUntil} onChange={(e) => setValidUntil(e.target.value)} />
+        <Field id="qb-discount" label={t("builder.discount")} type="number" min="0" step="0.01" value={discount} onChange={(e) => setDiscount(e.target.value)} placeholder="0.00" />
+        <Field id="qb-tax" label={t("builder.taxRate")} type="number" min="0" max="1" step="0.0001" value={taxRate} onChange={(e) => setTaxRate(e.target.value)} />
+        <Field id="qb-valid" label={t("builder.validUntil")} type="date" value={validUntil} onChange={(e) => setValidUntil(e.target.value)} />
       </div>
 
-      <TextareaField id="qb-notes" label="Notes for the customer" rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="What's included, arrival window…" />
+      <TextareaField id="qb-notes" label={t("builder.notes")} rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t("builder.notesPlaceholder")} />
 
       <div className="rounded-xl bg-slate-100 dark:bg-slate-800 p-4 text-sm">
-        <div className="flex justify-between py-1"><span className="text-slate-600 dark:text-slate-400 dark:text-slate-500">Subtotal</span><span className="font-medium">{formatCents(totals.subtotal)}</span></div>
-        <div className="flex justify-between py-1"><span className="text-slate-600 dark:text-slate-400 dark:text-slate-500">Discount</span><span className="font-medium">−{formatCents(totals.discount)}</span></div>
-        <div className="flex justify-between py-1"><span className="text-slate-600 dark:text-slate-400 dark:text-slate-500">Tax</span><span className="font-medium">{formatCents(totals.tax)}</span></div>
-        <div className="flex justify-between border-t border-slate-200 dark:border-slate-800 pt-2 text-base font-bold text-slate-900 dark:text-slate-100"><span>Total</span><span>{formatCents(totals.total)}</span></div>
+        <div className="flex justify-between py-1"><span className="text-slate-600 dark:text-slate-400 dark:text-slate-500">{t("detail.subtotal")}</span><span className="font-medium">{formatCents(totals.subtotal)}</span></div>
+        <div className="flex justify-between py-1"><span className="text-slate-600 dark:text-slate-400 dark:text-slate-500">{t("detail.discount")}</span><span className="font-medium">−{formatCents(totals.discount)}</span></div>
+        <div className="flex justify-between py-1"><span className="text-slate-600 dark:text-slate-400 dark:text-slate-500">{t("builder.taxLabel")}</span><span className="font-medium">{formatCents(totals.tax)}</span></div>
+        <div className="flex justify-between border-t border-slate-200 dark:border-slate-800 pt-2 text-base font-bold text-slate-900 dark:text-slate-100"><span>{t("detail.total")}</span><span>{formatCents(totals.total)}</span></div>
       </div>
 
       <Button onClick={submit} disabled={pending || !customerId} className="w-full sm:w-auto">
-        {pending ? "Creating…" : "Create quote"}
+        {pending ? t("builder.creating") : t("builder.createQuote")}
       </Button>
     </div>
   );

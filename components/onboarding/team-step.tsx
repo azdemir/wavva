@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +14,7 @@ import {
 type Row = { email: string; role: "owner" | "manager" | "cleaner" };
 
 export function TeamStep({ baseUrl }: { baseUrl: string }) {
+  const t = useTranslations("onboarding");
   const [rows, setRows] = useState<Row[]>([{ email: "", role: "cleaner" }]);
   const [invites, setInvites] = useState<CreatedInvite[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -50,8 +52,7 @@ export function TeamStep({ baseUrl }: { baseUrl: string }) {
   return (
     <div className="space-y-5">
       <p className="text-sm text-slate-600 dark:text-slate-400">
-        Invite managers and cleaners. They&apos;ll get a private link to join
-        your workspace — share it with them directly for now.
+        {t("team.intro")}
       </p>
       {error && (
         <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -62,7 +63,7 @@ export function TeamStep({ baseUrl }: { baseUrl: string }) {
       {invites.length > 0 && (
         <div className="space-y-2 rounded-xl border border-accent-200 bg-accent-50 p-4">
           <p className="text-sm font-semibold text-accent-800">
-            Invites created — share these links:
+            {t("team.invitesCreated")}
           </p>
           {invites.map((inv) => (
             <div key={inv.link} className="flex items-center gap-2 text-sm">
@@ -80,16 +81,16 @@ export function TeamStep({ baseUrl }: { baseUrl: string }) {
           <div className="flex-1">
             <Field
               id={`inv-email-${i}`}
-              label={i === 0 ? "Email" : ""}
+              label={i === 0 ? t("team.email") : ""}
               type="email"
               value={r.email}
               onChange={(e) => set(i, { email: e.target.value })}
-              placeholder="teammate@example.com"
+              placeholder={t("team.emailPlaceholder")}
             />
           </div>
           <div className="w-32 shrink-0">
             <label htmlFor={`inv-role-${i}`} className={`block text-sm font-medium text-slate-700 ${i === 0 ? "" : "sr-only"}`}>
-              Role
+              {t("team.role")}
             </label>
             <select
               id={`inv-role-${i}`}
@@ -97,9 +98,9 @@ export function TeamStep({ baseUrl }: { baseUrl: string }) {
               onChange={(e) => set(i, { role: e.target.value as Row["role"] })}
               className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
             >
-              <option value="cleaner">Cleaner</option>
-              <option value="manager">Manager</option>
-              <option value="owner">Owner</option>
+              <option value="cleaner">{t("team.roles.cleaner")}</option>
+              <option value="manager">{t("team.roles.manager")}</option>
+              <option value="owner">{t("team.roles.owner")}</option>
             </select>
           </div>
           {rows.length > 1 && (
@@ -108,7 +109,7 @@ export function TeamStep({ baseUrl }: { baseUrl: string }) {
               onClick={() => setRows((rs) => rs.filter((_, j) => j !== i))}
               className="mb-2 shrink-0 text-sm font-medium text-red-600 hover:text-red-700"
             >
-              Remove
+              {t("team.remove")}
             </button>
           )}
         </div>
@@ -119,19 +120,19 @@ export function TeamStep({ baseUrl }: { baseUrl: string }) {
           variant="outline"
           onClick={() => setRows((rs) => [...rs, { email: "", role: "cleaner" }])}
         >
-          + Add invite
+          {t("team.addInvite")}
         </Button>
         <Button type="button" variant="outline" onClick={submit} disabled={pending}>
-          {pending ? "Creating…" : "Create invites"}
+          {pending ? t("team.creating") : t("team.createInvites")}
         </Button>
       </div>
 
       <div className="border-t border-slate-200 dark:border-slate-800 pt-5">
         <Button onClick={finish} className="w-full" disabled={finishing}>
-          {finishing ? "Finishing…" : "Finish setup →"}
+          {finishing ? t("team.finishing") : t("team.finish")}
         </Button>
         <p className="mt-2 text-center text-xs text-slate-500 dark:text-slate-400">
-          You can invite your team later from the Team page too.
+          {t("team.inviteLater")}
         </p>
       </div>
     </div>

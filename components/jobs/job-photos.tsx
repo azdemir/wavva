@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { CameraIcon } from "@/components/ui/icons";
 import {
   requestPhotoUpload,
@@ -29,6 +30,8 @@ function putWithProgress(
   blob: Blob,
   contentType: string,
   onProgress: (pct: number) => void,
+  httpFail: (status: number) => string,
+  connFail: string,
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
@@ -40,8 +43,8 @@ function putWithProgress(
     xhr.onload = () =>
       xhr.status >= 200 && xhr.status < 300
         ? resolve()
-        : reject(new Error(`Upload failed (${xhr.status}).`));
-    xhr.onerror = () => reject(new Error("Upload failed. Check your connection."));
+        : reject(new Error(httpFail(xhr.status)));
+    xhr.onerror = () => reject(new Error(connFail));
     xhr.send(blob);
   });
 }
@@ -93,6 +96,7 @@ function compressImage(file: File): Promise<{ blob: Blob; contentType: string }>
 
 function PhotoSection({
   title,
+  titleKey,
   description,
   kind,
   photos,
@@ -100,8 +104,10 @@ function PhotoSection({
   readOnly,
   onPick,
   onDelete,
+  t,
 }: {
   title: string;
+  titleKey: "before" | "after";
   description: string;
   kind: "before" | "after";
   photos: JobPhoto[];
@@ -109,6 +115,7 @@ function PhotoSection({
   readOnly: boolean;
   onPick: (kind: "before" | "after") => void;
   onDelete: (photo: JobPhoto) => void;
+  t: (key: string) => string;
 }) {
   const kindUploading = uploading.filter((u) => u.kind === kind);
   return (
@@ -123,7 +130,7 @@ function PhotoSection({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={p.viewUrl}
-              alt={`${title} photo`}
+              alt={titleKey === "before" ? t("photos.photoAltBefore") : t("photos.photoAltAfter")}
               className="h-full w-full object-cover"
               loading="lazy"
             />
@@ -131,7 +138,7 @@ function PhotoSection({
               <button
                 type="button"
                 onClick={() => onDelete(p)}
-                aria-label="Delete photo"
+                aria-label={t("photos.deleteLabel")}
                 className="absolute right-1 top-1 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-lg font-bold leading-none text-white"
               >
                 ×
@@ -142,7 +149,7 @@ function PhotoSection({
         {kindUploading.map((u) => (
           <div key={u.id} className="relative aspect-square overflow-hidden rounded-lg bg-slate-100 dark:bg-slate-800">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={u.preview} alt="Uploading…" className="h-full w-full object-cover opacity-60" />
+            <img src={u.preview} alt={t("photos.uploadingAlt")} className="h-full w-full object-cover opacity-60" />
             <div className="absolute inset-x-2 bottom-2 h-1.5 overflow-hidden rounded-full bg-black/30">
               <div
                 className="h-full rounded-full bg-brand-500 transition-all"
@@ -159,7 +166,7 @@ function PhotoSection({
           >
             <CameraIcon className="h-7 w-7" />
             <span className="px-1 text-center text-xs font-medium leading-tight">
-              Take photo
+              {t("photos.takePhoto")}
             </span>
           </button>
         )}
@@ -191,6 +198,7 @@ export function JobPhotos({
   const inputRef = useRef<HTMLInputElement | null>(null);
   const pickKind = useRef<"before" | "after">("before");
   const router = useRouter();
+  const t = useTranslations("jobs");
 
   function onPick(kind: "before" | "after") {
     pickKind.current = kind;
@@ -204,7 +212,7 @@ export function JobPhotos({
     if (!file) return;
     const kind = pickKind.current;
     if (!file.type.startsWith("image/")) {
-      setError("Please choose an image file.");
+      setError(t("photos.notImage"));
       return;
     }
     const tempId = `upload-${Date.now()}`;
@@ -216,26 +224,32 @@ export function JobPhotos({
       const { blob, contentType } = await compressImage(file);
       const req = await requestPhotoUpload(jobId, kind, contentType);
       if (req.error || !req.uploadUrl || !req.storageKey) {
-        throw new Error(req.error ?? "Couldn't start the upload.");
+        throw new Error(req.error ?? t("photos.startFail"));
       }
-      await putWithProgress(req.uploadUrl, blob, contentType, (progress) =>
-        setUploading((u) => u.map((x) => (x.id === tempId ? { ...x, progress } : x))),
+      await putWithProgress(
+        req.uploadUrl,
+        blob,
+        contentType,
+        (progress) =>
+          setUploading((u) => u.map((x) => (x.id === tempId ? { ...x, progress } : x))),
+        (status) => t("photos.httpFail", { status }),
+        t("photos.connFail"),
       );
       const done = await confirmPhotoUpload(jobId, kind, req.storageKey, contentType);
-      if (done.error || !done.ok) throw new Error(done.error ?? "Couldn't save the photo.");
+      if (done.error || !done.ok) throw new Error(done.error ?? t("photos.saveFail"));
       // Refresh the server-rendered photo list (fresh signed URLs).
       setUploading((u) => u.filter((x) => x.id !== tempId));
       URL.revokeObjectURL(preview);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed. Try again.");
+      setError(err instanceof Error ? err.message : t("photos.uploadFail"));
       setUploading((u) => u.filter((x) => x.id !== tempId));
       URL.revokeObjectURL(preview);
     }
   }
 
   async function onDelete(photo: JobPhoto) {
-    if (!window.confirm("Delete this photo?")) return;
+    if (!window.confirm(t("photos.deleteConfirm"))) return;
     setDeletingId(photo.id);
     const result = await deleteJobPhoto(photo.id);
     setDeletingId(null);
@@ -257,26 +271,30 @@ export function JobPhotos({
         </div>
       )}
       <PhotoSection
-        title="Before"
-        description="Snap when you arrive"
+        title={t("photos.before")}
+        titleKey="before"
+        description={t("photos.beforeDesc")}
         kind="before"
         photos={before}
         uploading={uploading}
         readOnly={readOnly}
         onPick={onPick}
         onDelete={onDelete}
+        t={t}
       />
       <PhotoSection
-        title="After"
-        description="Snap when the work is done"
+        title={t("photos.after")}
+        titleKey="after"
+        description={t("photos.afterDesc")}
         kind="after"
         photos={after}
         uploading={uploading}
         readOnly={readOnly}
         onPick={onPick}
         onDelete={onDelete}
+        t={t}
       />
-      {deletingId && <p className="text-xs text-slate-500">Deleting…</p>}
+      {deletingId && <p className="text-xs text-slate-500">{t("photos.deleting")}</p>}
       {/* One shared picker; `capture` opens the camera on phones. */}
       <input
         ref={inputRef}

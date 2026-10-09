@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTime } from "@/lib/format";
 
@@ -8,6 +9,7 @@ import { formatDateTime } from "@/lib/format";
  * what already went out. Only rendered while relevant (sent quotes).
  */
 export async function FollowupStatus({ quoteId, companyId }: { quoteId: string; companyId: string }) {
+  const t = await getTranslations("quotes");
   const supabase = await createClient();
   const { data: touches } = await supabase
     .from("quote_followups")
@@ -21,27 +23,26 @@ export async function FollowupStatus({ quoteId, companyId }: { quoteId: string; 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Automatic follow-ups</CardTitle>
+        <CardTitle>{t("followup.title")}</CardTitle>
       </CardHeader>
       <CardContent>
         <ul className="space-y-2 text-sm">
-          {touches.map((t) => (
-            <li key={t.step} className="flex min-w-0 items-center justify-between gap-3">
+          {touches.map((tch) => (
+            <li key={tch.step} className="flex min-w-0 items-center justify-between gap-3">
               <span className="min-w-0 truncate text-slate-600 dark:text-slate-400 dark:text-slate-500">
-                Follow-up {t.step}
+                {t("followup.step", { n: tch.step })}
                 <span className="text-slate-400 dark:text-slate-500">
-                  {" "}· {t.sent_at ? `sent ${formatDateTime(t.sent_at)}` : `scheduled ${formatDateTime(t.scheduled_for)}`}
+                  {" "}· {tch.sent_at ? t("followup.sentAt", { when: formatDateTime(tch.sent_at) }) : t("followup.scheduledFor", { when: formatDateTime(tch.scheduled_for) })}
                 </span>
               </span>
-              <Badge tone={t.sent_at ? "accent" : "amber"} className="shrink-0">
-                {t.sent_at ? "Sent" : "Scheduled"}
+              <Badge tone={tch.sent_at ? "accent" : "amber"} className="shrink-0">
+                {tch.sent_at ? t("followup.sent") : t("followup.scheduled")}
               </Badge>
             </li>
           ))}
         </ul>
         <p className="mt-3 text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">
-          Sending stops automatically if the customer approves, declines, or the quote expires.
-          Configure this in Settings.
+          {t("followup.note")}
         </p>
       </CardContent>
     </Card>

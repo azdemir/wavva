@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/input";
 import { saveChecklist } from "@/lib/actions/jobs";
@@ -17,6 +18,7 @@ export function JobChecklist({
   initial: ChecklistItem[];
   readOnly?: boolean;
 }) {
+  const t = useTranslations("jobs");
   const [items, setItems] = useState<ChecklistItem[]>(initial);
   const [newLabel, setNewLabel] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +41,7 @@ export function JobChecklist({
       )}
       {items.length > 0 && (
         <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
-          {done} of {items.length} done
+          {t("checklist.progress", { done, total: items.length })}
         </p>
       )}
       <ul className="space-y-2">
@@ -63,9 +65,9 @@ export function JobChecklist({
                 type="button"
                 onClick={() => persist(items.filter((_, j) => j !== i))}
                 className="shrink-0 rounded-md px-3 py-2 text-xs font-medium text-slate-400 dark:text-slate-500 hover:text-red-600"
-                aria-label={`Remove ${item.label}`}
+                aria-label={t("checklist.removeLabel", { label: item.label })}
               >
-                Remove
+                {t("checklist.remove")}
               </button>
             )}
           </li>
@@ -85,14 +87,14 @@ export function JobChecklist({
           <div className="flex-1">
             <Field
               id="checklist-new"
-              label="Add checklist item"
+              label={t("checklist.addLabel")}
               value={newLabel}
               onChange={(e) => setNewLabel(e.target.value)}
-              placeholder="e.g. Vacuum all bedrooms"
+              placeholder={t("checklist.addPlaceholder")}
             />
           </div>
           <Button type="submit" variant="outline" className="mt-7">
-            Add
+            {t("checklist.add")}
           </Button>
         </form>
       )}

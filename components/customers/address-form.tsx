@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Field, TextareaField } from "@/components/ui/input";
 import {
@@ -10,6 +11,7 @@ import {
 import { createAddress } from "@/lib/actions/customers";
 
 export function AddressForm({ customerId }: { customerId: string }) {
+  const t = useTranslations("customers");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [open, setOpen] = useState(false);
@@ -21,7 +23,7 @@ export function AddressForm({ customerId }: { customerId: string }) {
   if (!open) {
     return (
       <Button variant="outline" onClick={() => setOpen(true)}>
-        + Add address
+        {t("addressForm.addAddress")}
       </Button>
     );
   }
@@ -51,44 +53,44 @@ export function AddressForm({ customerId }: { customerId: string }) {
       )}
       <input type="hidden" name="customer_id" value={customerId} />
       <div className="grid gap-4 sm:grid-cols-3">
-        <Field id="addr-label" name="label" label="Label" defaultValue="Home" placeholder="Home" />
+        <Field id="addr-label" name="label" label={t("addressForm.labelLabel")} defaultValue={t("addressForm.labelDefault")} placeholder={t("addressForm.labelPlaceholder")} />
         <div className="sm:col-span-2">
           <AddressAutocomplete
             id="addr-line1"
             name="address_line1"
-            label="Street address"
+            label={t("addressForm.streetLabel")}
             required
-            placeholder="Start typing an address…"
+            placeholder={t("addressForm.streetPlaceholder")}
             onSelect={handleSelect}
           />
         </div>
       </div>
-      <Field id="addr-line2" name="address_line2" label="Apt / unit (optional)" placeholder="Apt 4B" />
+      <Field id="addr-line2" name="address_line2" label={t("addressForm.aptLabel")} placeholder={t("addressForm.aptPlaceholder")} />
       <div className="grid gap-4 sm:grid-cols-3">
         <Field
           id="addr-city"
           name="city"
-          label="City"
+          label={t("addressForm.cityLabel")}
           required
-          placeholder="Albany"
+          placeholder={t("addressForm.cityPlaceholder")}
           value={city}
           onChange={(e) => setCity(e.target.value)}
         />
         <Field
           id="addr-state"
           name="state"
-          label="State"
+          label={t("addressForm.stateLabel")}
           required
-          placeholder="NY"
+          placeholder={t("addressForm.statePlaceholder")}
           value={state}
           onChange={(e) => setState(e.target.value)}
         />
         <Field
           id="addr-zip"
           name="zip"
-          label="ZIP"
+          label={t("addressForm.zipLabel")}
           required
-          placeholder="12203"
+          placeholder={t("addressForm.zipPlaceholder")}
           value={zip}
           onChange={(e) => setZip(e.target.value)}
         />
@@ -96,20 +98,20 @@ export function AddressForm({ customerId }: { customerId: string }) {
       <TextareaField
         id="addr-access"
         name="access_instructions"
-        label="Access instructions (sensitive — only shown to assigned staff)"
+        label={t("addressForm.accessLabel")}
         rows={2}
-        placeholder="Lockbox code, parking, alarm…"
+        placeholder={t("addressForm.accessPlaceholder")}
       />
       <label className="flex items-center gap-2.5 text-sm text-slate-700 dark:text-slate-300">
         <input type="checkbox" name="is_default" className="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-brand-600 dark:text-brand-400" />
-        Default address for this customer
+        {t("addressForm.defaultAddress")}
       </label>
       <div className="flex gap-2">
         <Button type="submit" disabled={pending}>
-          {pending ? "Saving…" : "Save address"}
+          {pending ? t("addressForm.saving") : t("addressForm.saveAddress")}
         </Button>
         <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-          Cancel
+          {t("addressForm.cancel")}
         </Button>
       </div>
     </form>

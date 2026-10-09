@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/input";
 import { updateInvoiceNumber } from "@/lib/actions/invoices";
@@ -13,6 +14,7 @@ export function InvoiceNumberEditor({
   invoiceId: string;
   current: string;
 }) {
+  const t = useTranslations("invoices");
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,7 +28,7 @@ export function InvoiceNumberEditor({
         }}
         className="text-xs font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400"
       >
-        Edit number
+        {t("numberEditor.editNumber")}
       </button>
     );
   }
@@ -47,14 +49,14 @@ export function InvoiceNumberEditor({
         <Field
           id="invoice-number"
           name="invoice_number"
-          label="Invoice number"
+          label={t("numberEditor.invoiceNumber")}
           defaultValue={current}
           required
           maxLength={50}
         />
       </div>
       <Button type="submit" size="sm">
-        Save
+        {t("numberEditor.save")}
       </Button>
       <Button
         type="button"
@@ -65,7 +67,7 @@ export function InvoiceNumberEditor({
           setEditing(false);
         }}
       >
-        Cancel
+        {t("numberEditor.cancel")}
       </Button>
       {error && <p className="w-full text-xs text-red-600">{error}</p>}
     </form>
