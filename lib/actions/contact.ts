@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { Resend } from "resend";
 import { rateLimit, limits, rateLimitError } from "@/lib/rate-limit";
+import { recordContactFormLead } from "@/lib/studio/actions";
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, "Enter your name").max(100),
@@ -59,5 +60,8 @@ export async function sendContactMessage(
       .join("\n"),
   });
   if (error) return { error: "Couldn't send your message — please try again." };
+
+  // Best-effort: track the sender as a CRM lead in Studio. Never blocks.
+  await recordContactFormLead({ name, email, company, message });
   return { ok: true };
 }

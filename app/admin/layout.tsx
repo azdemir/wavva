@@ -21,6 +21,12 @@ export default async function AdminLayout({
           </Link>
           <div className="flex items-center gap-4">
             <span className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">{user.email}</span>
+            <Link
+              href="/studio"
+              className="text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400"
+            >
+              Studio
+            </Link>
             <form action={signOut}>
               <button type="submit" className="text-sm font-medium text-slate-500 dark:text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:text-slate-200">
                 Sign out
