@@ -7,6 +7,7 @@ import { requireCompany } from "@/lib/auth";
 import { isStaff, NOT_PERMITTED } from "@/lib/permissions";
 import { logAudit } from "@/lib/audit";
 import { customerSchema, addressSchema } from "@/lib/validation";
+import { missingColumnName } from "@/lib/supabase/schema-fallback";
 
 export type ActionResult = { error?: string; ok?: boolean };
 
@@ -28,19 +29,27 @@ export async function createCustomer(formData: FormData): Promise<ActionResult> 
   if (!parsed.success) return { error: "Please check the customer details." };
 
   const supabase = await createClient();
-  const { data, error } = await supabase
+  const row = {
+    company_id: ctx.company.id,
+    name: parsed.data.name,
+    email: parsed.data.email || null,
+    phone: parsed.data.phone || null,
+    notes: parsed.data.notes || null,
+    sms_consent: parsed.data.sms_consent,
+  };
+  let { data, error } = await supabase
     .from("customers")
-    .insert({
-      company_id: ctx.company.id,
-      name: parsed.data.name,
-      customer_type: parsed.data.customer_type,
-      email: parsed.data.email || null,
-      phone: parsed.data.phone || null,
-      notes: parsed.data.notes || null,
-      sms_consent: parsed.data.sms_consent,
-    })
+    .insert({ ...row, customer_type: parsed.data.customer_type })
     .select("id")
     .single();
+  if (error && missingColumnName(error) === "customer_type") {
+    // DB behind on migration 0008 — save without the type instead of failing.
+    ({ data, error } = await supabase
+      .from("customers")
+      .insert(row)
+      .select("id")
+      .single());
+  }
   if (error || !data) return { error: error?.message ?? "Could not create customer." };
 
   await logAudit(supabase, {
@@ -60,18 +69,26 @@ export async function updateCustomer(id: string, formData: FormData): Promise<Ac
   if (!parsed.success) return { error: "Please check the customer details." };
 
   const supabase = await createClient();
-  const { error } = await supabase
+  const patch = {
+    name: parsed.data.name,
+    email: parsed.data.email || null,
+    phone: parsed.data.phone || null,
+    notes: parsed.data.notes || null,
+    sms_consent: parsed.data.sms_consent,
+  };
+  let { error } = await supabase
     .from("customers")
-    .update({
-      name: parsed.data.name,
-      customer_type: parsed.data.customer_type,
-      email: parsed.data.email || null,
-      phone: parsed.data.phone || null,
-      notes: parsed.data.notes || null,
-      sms_consent: parsed.data.sms_consent,
-    })
+    .update({ ...patch, customer_type: parsed.data.customer_type })
     .eq("id", id)
     .eq("company_id", ctx.company.id);
+  if (error && missingColumnName(error) === "customer_type") {
+    // DB behind on migration 0008 — save without the type instead of failing.
+    ({ error } = await supabase
+      .from("customers")
+      .update(patch)
+      .eq("id", id)
+      .eq("company_id", ctx.company.id));
+  }
   if (error) return { error: error.message };
 
   revalidatePath(`/dashboard/customers/${id}`);

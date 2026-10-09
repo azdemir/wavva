@@ -4,6 +4,16 @@ All notable changes to TidyPro. Dates are in America/New_York.
 
 ## 2026-10-09
 
+### Fixed
+
+- **Customers work even when the database is behind on migrations** — if
+  `customer_type` is missing from the schema cache (migration 0008 not run),
+  creating/editing customers, the customer list, and the Excel export now
+  retry without the new column instead of failing. The customers page shows
+  an amber setup notice naming the exact migration file to run in Supabase.
+  New helper `lib/supabase/schema-fallback.ts` detects PostgREST PGRST204
+  "column not in schema cache" errors.
+
 ### Changed
 
 - **New Basic $10/mo tier; Starter moves to $15/mo** — four plans now: Basic

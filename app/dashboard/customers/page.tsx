@@ -10,6 +10,7 @@ import { Pagination } from "@/components/ui/pagination";
 import { FilterPills, FilterSearch, ExportButton } from "@/components/ui/filters";
 import { parsePageParam, PAGE_SIZE } from "@/lib/pagination";
 import { PlusIcon, UsersIcon } from "@/components/ui/icons";
+import { missingColumnName } from "@/lib/supabase/schema-fallback";
 
 const types = ["all", "residential", "commercial"] as const;
 const typeTones = { residential: "slate", commercial: "brand" } as const;
@@ -28,21 +29,44 @@ export default async function CustomersPage({
     : "all";
   const page = parsePageParam(params.page);
 
-  let query = supabase
-    .from("customers")
-    .select("id, name, customer_type, email, phone, created_at", { count: "exact" })
-    .eq("company_id", company.id)
-    .order("name", { ascending: true });
-  if (type !== "all") query = query.eq("customer_type", type);
-  if (q) {
-    const like = `%${q.replace(/[%_]/g, "")}%`;
-    query = query.or(`name.ilike.${like},email.ilike.${like},phone.ilike.${like}`);
-  }
+  // Fetch the list; if the DB is behind on migration 0008 (no customer_type
+  // column), retry without the new column instead of failing the page.
+  const fetchPage = (withType: boolean) => {
+    let query = supabase
+      .from("customers")
+      .select(
+        withType
+          ? "id, name, customer_type, email, phone, created_at"
+          : "id, name, email, phone, created_at",
+        { count: "exact" }
+      )
+      .eq("company_id", company.id)
+      .order("name", { ascending: true });
+    if (withType && type !== "all") query = query.eq("customer_type", type);
+    if (q) {
+      const like = `%${q.replace(/[%_]/g, "")}%`;
+      query = query.or(`name.ilike.${like},email.ilike.${like},phone.ilike.${like}`);
+    }
+    return query.range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
+  };
 
-  const { data: customers, count } = await query.range(
-    (page - 1) * PAGE_SIZE,
-    page * PAGE_SIZE - 1,
-  );
+  let { data: customersRaw, count, error } = await fetchPage(true);
+  let schemaStale = false;
+  if (error && missingColumnName(error) === "customer_type") {
+    schemaStale = true;
+    ({ data: customersRaw, count } = await fetchPage(false));
+  }
+  // The conditional select widens the inferred row type; the runtime shape
+  // is the same in both branches.
+  type CustomerListRow = {
+    id: string;
+    name: string;
+    customer_type?: string | null;
+    email: string | null;
+    phone: string | null;
+    created_at: string;
+  };
+  const customers = customersRaw as unknown as CustomerListRow[] | null;
   const total = count ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const filtering = type !== "all" || q !== "";
@@ -63,14 +87,31 @@ export default async function CustomersPage({
         </div>
       </div>
 
+      {schemaStale && (
+        <div
+          role="status"
+          className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200"
+        >
+          <span className="font-semibold">Database update needed.</span> Your
+          database is missing the customer-type column — run{" "}
+          <code className="rounded bg-amber-100 px-1 font-mono text-[13px] dark:bg-amber-900">
+            supabase/migrations/0008_customer_type.sql
+          </code>{" "}
+          in your Supabase project to enable Residential/Commercial types.
+          Everything else works normally.
+        </div>
+      )}
+
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <FilterPills
-          basePath="/dashboard/customers"
-          param="type"
-          options={types.map((t) => ({ value: t }))}
-          current={type}
-          preserve={{ q: q || undefined }}
-        />
+        {!schemaStale && (
+          <FilterPills
+            basePath="/dashboard/customers"
+            param="type"
+            options={types.map((t) => ({ value: t }))}
+            current={type}
+            preserve={{ q: q || undefined }}
+          />
+        )}
         <FilterSearch
           id="cust-search"
           label="Search customers"

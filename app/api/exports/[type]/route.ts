@@ -5,6 +5,7 @@ import { isStaff } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { one } from "@/lib/relations";
 import { rateLimit } from "@/lib/rate-limit";
+import { missingColumnName } from "@/lib/supabase/schema-fallback";
 
 const MAX_ROWS = 5000;
 const TYPES = ["customers", "invoices", "bookings"] as const;
@@ -141,18 +142,29 @@ export async function GET(
   let rows: Record<string, unknown>[] = [];
 
   if (t === "customers") {
-    let query = supabase
-      .from("customers")
-      .select("name, customer_type, email, phone, sms_consent, notes, created_at")
-      .eq("company_id", company.id)
-      .order("name", { ascending: true })
-      .limit(MAX_ROWS);
-    if (custType === "residential" || custType === "commercial") {
-      query = query.eq("customer_type", custType);
+    const buildQuery = (withType: boolean) => {
+      let query = supabase
+        .from("customers")
+        .select(
+          withType
+            ? "name, customer_type, email, phone, sms_consent, notes, created_at"
+            : "name, email, phone, sms_consent, notes, created_at"
+        )
+        .eq("company_id", company.id)
+        .order("name", { ascending: true })
+        .limit(MAX_ROWS);
+      if (withType && (custType === "residential" || custType === "commercial")) {
+        query = query.eq("customer_type", custType);
+      }
+      if (q) query = query.or(`name.ilike.${like},email.ilike.${like},phone.ilike.${like}`);
+      return query;
+    };
+    let { data: rowsRaw, error } = await buildQuery(true);
+    if (error && missingColumnName(error) === "customer_type") {
+      // DB behind on migration 0008 — export without the type column.
+      ({ data: rowsRaw } = await buildQuery(false));
     }
-    if (q) query = query.or(`name.ilike.${like},email.ilike.${like},phone.ilike.${like}`);
-    const { data } = await query;
-    rows = (data ?? []) as Record<string, unknown>[];
+    rows = (rowsRaw ?? []) as unknown as Record<string, unknown>[];
   } else if (t === "invoices") {
     let query = supabase
       .from("invoices")
