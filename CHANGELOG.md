@@ -2,6 +2,21 @@
 
 All notable changes to TidyPro. Dates are in America/New_York.
 
+## 2026-10-09
+
+### Changed
+
+- **Pricing realigned to match ZenMaid** — plans are now Starter **$19/mo**,
+  Growth **$39/mo**, Pro **$49/mo** (tier names unchanged). Feature lists
+  restructured to mirror the competitor's shape while staying honest to what
+  TidyPro ships: Starter (1 user, 50 customers, scheduling, quotes, invoicing,
+  portal), Growth (5 users, unlimited customers, automated quote follow-up,
+  recurring bookings, crew checklists), Pro (unlimited users, reports,
+  before/after photos, priority support). Seat limits and feature gates
+  unchanged. NOTE: `lib/plans.ts` prices are informational — the actual charge
+  comes from `STRIPE_PRICE_STARTER/GROWTH/PRO`, which must be recreated in the
+  Stripe dashboard at the new amounts.
+
 ## 2026-10-08
 
 ### Added

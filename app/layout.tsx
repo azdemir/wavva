@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     template: "%s | TidyPro",
   },
   description:
-    "TidyPro is cleaning business software for scheduling, quotes, crew management, invoicing, and payments. Built for Upstate NY cleaners. Flat pricing from $49/mo — no per-user fees. Start free for 14 days.",
+    "TidyPro is cleaning business software for scheduling, quotes, crew management, invoicing, and payments. Built for Upstate NY cleaners. Flat pricing from $19/mo — no per-user fees. Start free for 14 days.",
   alternates: {
     canonical: "/",
   },

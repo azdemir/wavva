@@ -16,9 +16,9 @@ import { getContent } from "@/lib/studio/content";
 
 
 export const metadata: Metadata = {
-  title: "Flat Pricing from $49/mo — No Per-User Fees",
+  title: "Flat Pricing from $19/mo — No Per-User Fees",
   description:
-    "TidyPro pricing: flat monthly plans from $49 — Starter, Growth $99, Pro $199. No per-user fees, ever. 14-day free trial, no credit card required. Cancel anytime.",
+    "TidyPro pricing: flat monthly plans — Starter $19, Growth $39, Pro $49. No per-user fees, ever. 14-day free trial, no credit card required. Cancel anytime.",
   alternates: { canonical: "/pricing" },
 };
 
@@ -31,7 +31,7 @@ const comparisonRows: { label: string; values: (string | boolean)[] }[] = [
   { label: "Crew scheduling & conflict alerts", values: [false, true, true] },
   { label: "Before/after photo uploads", values: [false, false, true] },
   { label: "Business reports", values: [false, false, true] },
-  { label: "Support", values: ["Email", "Priority", "Dedicated onboarding"] },
+  { label: "Support", values: ["Email", "Priority", "Priority"] },
 ];
 
 export default async function PricingPage() {
