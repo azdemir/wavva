@@ -130,9 +130,21 @@ export default async function SchedulePage({
         {days.map(({ date, jobs: dayJobs }) => (
           <Card key={date.toISOString()}>
             <CardContent className="p-0">
-              <p className="border-b border-slate-100 dark:border-slate-800 px-4 py-3 text-sm font-semibold text-slate-700 dark:text-slate-300">
-                {fmtDay(date)}
-              </p>
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 px-4 py-3">
+                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  {fmtDay(date)}
+                </p>
+                {!isCleaner && (
+                  <Link
+                    href={`/dashboard/bookings/new?date=${dayKey(date)}`}
+                    title={t("addBooking")}
+                    aria-label={`${t("addBooking")} — ${fmtDay(date)}`}
+                    className="flex h-6 w-6 items-center justify-center rounded-md text-lg leading-none text-slate-400 hover:bg-slate-100 hover:text-brand-600 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-brand-400"
+                  >
+                    +
+                  </Link>
+                )}
+              </div>
               <ul className="divide-y divide-slate-100 dark:divide-slate-800">
                 {dayJobs.length === 0 && (
                   <li className="px-4 py-3 text-xs text-slate-400 dark:text-slate-500">{t("noVisits")}</li>

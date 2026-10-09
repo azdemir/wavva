@@ -27,6 +27,7 @@ import {
   GearIcon,
   BellIcon,
   ChartIcon,
+  DownloadIcon,
 } from "@/components/ui/icons";
 import { Logo, LogoMark } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -61,6 +62,7 @@ const nav: NavItem[] = [
   { href: "/dashboard/billing", labelKey: "billing", icon: CardIcon, roles: ["owner"] },
   { href: "/dashboard/team", labelKey: "team", icon: UsersIcon, roles: ["owner"] },
   { href: "/dashboard/settings", labelKey: "settings", icon: GearIcon, roles: ["owner"] },
+  { href: "/dashboard/import", labelKey: "import", icon: DownloadIcon, roles: STAFF },
   { href: "/dashboard/audit", labelKey: "audit", icon: BellIcon, roles: ["owner"] },
 ];
 

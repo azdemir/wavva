@@ -10,12 +10,12 @@ import { formatCents } from "@/lib/format";
 export default async function NewBookingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ quoteId?: string }>;
+  searchParams: Promise<{ quoteId?: string; date?: string }>;
 }) {
   const { company } = await requirePermission("bookings.manage");
   const t = await getTranslations("bookings");
   const supabase = await createClient();
-  const { quoteId } = await searchParams;
+  const { quoteId, date } = await searchParams;
 
   const [{ data: customers }, { data: services }] = await Promise.all([
     supabase
@@ -53,6 +53,19 @@ export default async function NewBookingPage({
         notes: t("new.prefillNotes", { number: quote.quote_number, total: formatCents(quote.total_cents) }),
       };
     }
+  }
+
+  // Optional ?date=YYYY-MM-DD (from the schedule week view) prefills the
+  // booking's start/end datetimes. Strictly validated — never trusted raw.
+  let startDate: string | undefined;
+  if (date && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    const d = new Date(`${date}T12:00:00Z`);
+    if (!Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === date) {
+      startDate = date;
+    }
+  }
+  if (startDate) {
+    prefill = { ...(prefill ?? {}), startDate };
   }
 
   if ((customers ?? []).length === 0) {    return (
