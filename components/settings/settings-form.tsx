@@ -57,7 +57,7 @@ export function SettingsForm({ company }: { company: Company }) {
         <Field id="set-name" name="name" label="Business name" defaultValue={company.name} required />
         <div className="grid gap-4 sm:grid-cols-2">
           <Field id="set-phone" name="phone" label="Phone" type="tel" defaultValue={company.phone ?? ""} />
-          <Field id="set-email" name="email" label="Email" type="email" defaultValue={company.email ?? ""} />
+          <Field id="set-email" name="email" label="Email" type="email" defaultValue={company.email ?? ""} hint="Used as the sender for emails to your customers (portal links, quote follow-ups). Its domain must be verified in Resend." />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field id="set-website" name="website" label="Website" defaultValue={company.website ?? ""} />

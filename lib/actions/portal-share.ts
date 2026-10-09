@@ -5,6 +5,7 @@ import { requireCompany } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { one } from "@/lib/relations";
 import { rateLimit } from "@/lib/rate-limit";
+import { senderFor } from "@/lib/notifications/sender";
 
 const schema = z.object({
   customerId: z.string().uuid(),
@@ -37,7 +38,9 @@ export async function sendPortalLinkEmail(
 
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return { ok: false, error: "Email sending is not configured." };
-  const from = process.env.EMAIL_FROM ?? "TidyPro <hello@tidypro.example>";
+  // From the business's email (set in Settings), so the customer sees
+  // mail from the company — not the platform.
+  const from = senderFor(company);
 
   const { Resend } = await import("resend");
   const resend = new Resend(apiKey);
@@ -55,6 +58,11 @@ export async function sendPortalLinkEmail(
     text: `Hi ${c.name},\n\n${company.name} has set up a private customer portal for you. Use this link to approve quotes, see upcoming visits, and pay invoices — no login needed:\n\n${link}\n\nPlease keep this link private — anyone with it can view your account.\n\n— The ${company.name} team`,
   });
 
-  if (error) return { ok: false, error: "Could not send the email. Try again." };
+  if (error) {
+    const hint = company.email
+      ? " If you send from your business email, its domain must be verified in Resend."
+      : "";
+    return { ok: false, error: `Could not send the email.${hint} Try again.` };
+  }
   return { ok: true };
 }

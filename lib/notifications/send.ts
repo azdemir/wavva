@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { renderTemplate, type TemplateName } from "./templates";
+import { senderFor } from "./sender";
 
 let resend: Resend | null = null;
 
@@ -21,6 +22,11 @@ type QueuedNotification = {
   channel: string;
   template: string;
   payload: Record<string, unknown>;
+  // Supabase types the to-one join as an array; normalize at runtime.
+  companies:
+    | { name: string; email: string | null }
+    | { name: string; email: string | null }[]
+    | null;
 };
 
 /**
@@ -32,11 +38,10 @@ export async function processNotificationQueue(
   limit = 25,
 ): Promise<{ sent: number; failed: number; skipped: number }> {
   const resendClient = getResend();
-  const from = process.env.EMAIL_FROM ?? "TidyPro <hello@tidypro.example>";
 
   const { data } = await supabase
     .from("notifications")
-    .select("id, company_id, channel, template, payload")
+    .select("id, company_id, channel, template, payload, companies(name, email)")
     .eq("status", "queued")
     .eq("channel", "email")
     .order("created_at", { ascending: true })
@@ -56,6 +61,10 @@ export async function processNotificationQueue(
       failed++;
       continue;
     }
+    // From the business's email so the customer sees the company, not the platform.
+    const joined = n.companies;
+    const company = Array.isArray(joined) ? joined[0] : joined;
+    const from = senderFor(company ?? { name: "", email: null });
     try {
       const { subject, html, text } = renderTemplate(
         n.template as TemplateName,

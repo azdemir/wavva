@@ -72,10 +72,11 @@ export function PortalLinkButton({
           <code className="block break-all rounded-lg bg-slate-100 dark:bg-slate-800 px-3 py-2 text-xs text-slate-700 dark:text-slate-300">
             {link}
           </code>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             <Button
               type="button"
               variant="outline"
+              className="w-full"
               onClick={() => navigator.clipboard?.writeText(link)}
             >
               Copy link
@@ -83,6 +84,7 @@ export function PortalLinkButton({
             <Button
               type="button"
               variant="outline"
+              className="w-full"
               onClick={sendEmail}
               disabled={emailState === "sending" || !customerEmail}
               title={customerEmail ? `Send to ${customerEmail}` : "No email on file"}
@@ -95,14 +97,14 @@ export function PortalLinkButton({
             </Button>
             <a
               href={smsHref}
-              className="inline-flex h-9 items-center justify-center rounded-lg border border-slate-300 dark:border-slate-700 px-4 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="inline-flex h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
             >
               Send via text
             </a>
             <Button
               type="button"
               variant="outline"
-              className="border-red-200 text-red-600 hover:bg-red-50"
+              className="w-full border-red-200 text-red-600 hover:bg-red-50"
               onClick={revoke}
               disabled={pending}
             >
