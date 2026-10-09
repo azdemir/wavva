@@ -16,9 +16,9 @@ import { getContent } from "@/lib/studio/content";
 
 
 export const metadata: Metadata = {
-  title: "Pricing",
+  title: "Flat Pricing from $49/mo — No Per-User Fees",
   description:
-    "Simple monthly plans for cleaning businesses: Starter $49, Growth $99, Pro $199. Start free for 14 days, no credit card required.",
+    "TidyPro pricing: flat monthly plans from $49 — Starter, Growth $99, Pro $199. No per-user fees, ever. 14-day free trial, no credit card required. Cancel anytime.",
   alternates: { canonical: "/pricing" },
 };
 
@@ -49,6 +49,7 @@ export default async function PricingPage() {
           eyebrow={heroEyebrow}
           title={heroTitle}
           description={heroDescription}
+          crumbs={[{ label: "Pricing", href: "/pricing" }]}
         />
 
         <section className="bg-white pt-4 pb-16 sm:pb-20 dark:bg-slate-950">

@@ -13,6 +13,7 @@ import { isSupabaseConfigured } from "@/lib/supabase/server";
 export const metadata: Metadata = {
   title: "Create account",
   description: "Create your TidyPro account and set up your cleaning business.",
+  robots: { index: false, follow: false },
 };
 
 export default async function SignUpPage() {

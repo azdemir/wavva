@@ -7,9 +7,9 @@ import { TrialForm } from "@/components/marketing/trial-form";
 import { getContent } from "@/lib/studio/content";
 
 export const metadata: Metadata = {
-  title: "Start your free trial",
+  title: "Start Your Free 14-Day Trial",
   description:
-    "Start a free 14-day trial of TidyPro — quotes, scheduling, teams, and invoicing for your cleaning business. No credit card required.",
+    "Start a free 14-day trial of TidyPro cleaning business software — scheduling, quotes, crew tools, and invoicing. No credit card required. Flat pricing from $49/mo.",
   alternates: { canonical: "/demo" },
 };
 

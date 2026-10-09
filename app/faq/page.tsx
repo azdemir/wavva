@@ -8,9 +8,9 @@ import { getContent } from "@/lib/studio/content";
 
 
 export const metadata: Metadata = {
-  title: "FAQ",
+  title: "Cleaning Business Software FAQ",
   description:
-    "Answers about getting started with TidyPro, the product, billing, and how your business data stays private.",
+    "TidyPro FAQ: how the 14-day trial works, flat pricing with no per-user fees, migrating from Jobber or spreadsheets, data privacy, and what happens after you cancel.",
   alternates: { canonical: "/faq" },
 };
 
@@ -54,6 +54,7 @@ export default async function FaqPage() {
           eyebrow={eyebrow}
           title={title}
           description={description}
+          crumbs={[{ label: "FAQ", href: "/faq" }]}
         />
 
         <section className="bg-white py-16 sm:py-20 dark:bg-slate-950">

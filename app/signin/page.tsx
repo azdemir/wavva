@@ -13,6 +13,7 @@ import { isSupabaseConfigured } from "@/lib/supabase/server";
 export const metadata: Metadata = {
   title: "Sign in",
   description: "Sign in to your TidyPro workspace.",
+  robots: { index: false, follow: false },
 };
 
 export default async function SignInPage({

@@ -11,7 +11,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Logo } from "@/components/ui/logo";
 
-export const metadata: Metadata = { title: "Accept invite" };
+export const metadata: Metadata = {
+  title: "Accept invite",
+  robots: { index: false, follow: false },
+};
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (

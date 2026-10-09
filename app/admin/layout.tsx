@@ -1,8 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { requirePlatformAdmin } from "@/lib/admin";
 import { signOut } from "@/lib/actions/auth";
 
 export const instant = false;
+
+// Platform admin shell — deliberately separate from the company dashboard.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 /** Platform admin shell — deliberately separate from the company dashboard. */
 export default async function AdminLayout({

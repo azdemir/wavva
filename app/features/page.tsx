@@ -19,9 +19,9 @@ import {
 import { getContent } from "@/lib/studio/content";
 
 export const metadata: Metadata = {
-  title: "Features",
+  title: "Cleaning Business Software Features",
   description:
-    "Scheduling, quotes and bookings, crew tools, invoicing and payments, customer portal, and reminders — everything TidyPro does for cleaning businesses.",
+    "Cleaning business software features: scheduling without double-bookings, quotes that convert to bookings, crew mobile tools, invoicing with online payments, customer portal, and automated reminders.",
   alternates: { canonical: "/features" },
 };
 
@@ -72,6 +72,7 @@ export default async function FeaturesPage() {
           eyebrow={heroEyebrow}
           title={heroTitle}
           description={heroDescription}
+          crumbs={[{ label: "Features", href: "/features" }]}
         />
 
         <section className="bg-white py-16 sm:py-20 dark:bg-slate-950">

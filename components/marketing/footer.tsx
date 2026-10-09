@@ -10,12 +10,14 @@ const columns = [
       { label: "Features", href: "/features" },
       { label: "How it works", href: "/#how-it-works" },
       { label: "Pricing", href: "/pricing" },
+      { label: "Compare", href: "/compare" },
       { label: "FAQ", href: "/faq" },
     ],
   },
   {
     title: "Company",
     links: [
+      { label: "About", href: "/about" },
       { label: "Start free trial", href: "/demo" },
       { label: "Sign in", href: "/signin" },
       { label: "Contact", href: "/contact" },

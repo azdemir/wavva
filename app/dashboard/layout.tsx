@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { requireCompany } from "@/lib/auth";
 import { signOut } from "@/lib/actions/auth";
@@ -7,6 +8,11 @@ import { PLANS, isPlanId } from "@/lib/plans";
 
 // Workspace routes render per request (auth session) — never prerendered.
 export const instant = false;
+
+// Private app surface: never indexed.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 import {
   HomeIcon,
   UsersIcon,

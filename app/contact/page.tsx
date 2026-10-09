@@ -11,8 +11,9 @@ import { getContent } from "@/lib/studio/content";
 
 
 export const metadata: Metadata = {
-  title: "Contact",
-  description: `Contact the ${site.name} team about plans, the pilot program, or whether TidyPro fits your cleaning business.`,
+  title: "Contact TidyPro",
+  description:
+    "Contact TidyPro about cleaning business software plans, the pilot program, or whether TidyPro fits your residential or commercial cleaning business.",
   alternates: { canonical: "/contact" },
 };
 
@@ -40,6 +41,7 @@ export default async function ContactPage() {
           eyebrow={heroEyebrow}
           title={heroTitle}
           description={heroDescription}
+          crumbs={[{ label: "Contact", href: "/contact" }]}
         />
 
         <section className="bg-white py-16 sm:py-20 dark:bg-slate-950">

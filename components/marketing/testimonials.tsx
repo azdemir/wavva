@@ -16,10 +16,11 @@ function initials(name: string): string {
 }
 
 export async function Testimonials() {
-  const [eyebrow, title, description, stories] = await Promise.all([
+  const [eyebrow, title, description, disclaimer, stories] = await Promise.all([
     getContent<string>("home.stories.eyebrow"),
     getContent<string>("home.stories.title"),
     getContent<string>("home.stories.description"),
+    getContent<string>("home.stories.disclaimer"),
     getContent<Story[]>("home.stories.items"),
   ]);
   return (
@@ -71,6 +72,11 @@ export async function Testimonials() {
             </figure>
           ))}
         </div>
+        {disclaimer && (
+          <p className="mt-8 text-center text-xs text-slate-400 dark:text-slate-500">
+            {disclaimer}
+          </p>
+        )}
       </Container>
     </section>
   );

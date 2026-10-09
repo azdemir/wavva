@@ -22,11 +22,12 @@ const SITE_URL =
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "TidyPro — Operations software for cleaning businesses",
+    default:
+      "Cleaning Business Software — Scheduling, Quotes & Invoicing | TidyPro",
     template: "%s | TidyPro",
   },
   description:
-    "TidyPro helps residential and commercial cleaning businesses manage quotes, scheduling, teams, invoices, and customers in one simple place.",
+    "TidyPro is cleaning business software for scheduling, quotes, crew management, invoicing, and payments. Built for Upstate NY cleaners. Flat pricing from $49/mo — no per-user fees. Start free for 14 days.",
   alternates: {
     canonical: "/",
   },

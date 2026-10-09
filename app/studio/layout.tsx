@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { requirePlatformAdmin } from "@/lib/admin";
 import { signOut } from "@/lib/actions/auth";
 import { LogoMark } from "@/components/ui/logo";
 
 export const instant = false;
+
+// Internal founder tooling: never indexed.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 const NAV = [
   { href: "/studio", label: "Overview" },

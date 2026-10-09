@@ -16,6 +16,7 @@ import { TeamStep } from "@/components/onboarding/team-step";
 export const metadata: Metadata = {
   title: "Set up your business",
   description: "Set up your cleaning business workspace in a few steps.",
+  robots: { index: false, follow: false },
 };
 
 const stepMeta = [

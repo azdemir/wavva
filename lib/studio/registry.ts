@@ -453,6 +453,17 @@ export const CONTENT_REGISTRY: ContentDef[] = [
     paths: HOME,
   },
   {
+    key: "home.stories.disclaimer",
+    page: "home",
+    section: "Customer stories",
+    label: "Sample-stories disclaimer",
+    help: "Shown under the stories while they are illustrative samples. Clear it once real customer stories are published.",
+    field: { kind: "text", max: 200 },
+    default:
+      "Illustrative examples — real customer stories coming soon.",
+    paths: HOME,
+  },
+  {
     key: "home.stories.items",
     page: "home",
     section: "Customer stories",
