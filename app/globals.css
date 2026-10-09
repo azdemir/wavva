@@ -6,6 +6,11 @@
 @theme {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Editorial display face — headlines only. */
+  --font-display: var(--font-instrument-serif), ui-serif, Georgia, Cambria,
+    "Times New Roman", serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo,
+    monospace;
 
   /* Brand blue — primary actions, navigation, links */
   --color-brand-50: #eff6ff;
@@ -33,10 +38,21 @@
   --color-accent-900: #14532d;
   --color-accent-950: #052e16;
 
+  /* Night — always-dark bands (CTA, footer) that stay dark in light mode
+     too, so the page keeps its rhythm either way. */
+  --color-night: #07080c;
+  --color-night-soft: #0d1017;
+  --color-night-line: #1d222c;
+
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
   --animate-fade-up: fade-up 0.7s ease-out both;
   --animate-fade-in: fade-in 0.9s ease-out both;
   --animate-shimmer: shimmer 1.4s ease-in-out infinite;
   --animate-hero-badge-float: hero-badge-float 7s ease-in-out infinite;
+  --animate-marquee-slow: marquee 70s linear infinite;
+  --animate-drift: drift 22s ease-in-out infinite;
+  --animate-pulse-ring: pulse-ring 2.8s ease-out infinite;
 }
 
 @keyframes fade-up {
@@ -78,24 +94,140 @@
   }
 }
 
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(3%, -4%, 0) scale(1.08);
+  }
+  66% {
+    transform: translate3d(-3%, 3%, 0) scale(0.96);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.7;
+  }
+  70%,
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Semantic surfaces — flip automatically with the theme.              */
+/* Registered with `inline` so generated utilities reference the live  */
+/* variable instead of freezing its value at build time.               */
+/* ------------------------------------------------------------------ */
+
 :root {
+  color-scheme: light;
+  --surface: #ffffff;
+  --surface-2: #f7f8fa;
+  --surface-3: #eef1f5;
+  --line: #e5e8ed;
+  --line-strong: #d3d8e0;
+  --ink: #0a0e17;
+  --ink-2: #414b5e;
+  --ink-3: #6c7689;
+}
+
+/* Light is the default for EVERYONE (see theme-provider): we deliberately
+   do not follow the OS prefers-color-scheme, so a visitor on a dark-mode
+   machine still lands on the intended light design. Dark is opt-in via the
+   toggle and is remembered. */
+:root:not(.dark) {
   color-scheme: light;
 }
 
 .dark {
   color-scheme: dark;
+  --surface: #07080c;
+  --surface-2: #0e1117;
+  --surface-3: #161a23;
+  --line: #1c2029;
+  --line-strong: #2a303c;
+  --ink: #f3f5f8;
+  --ink-2: #a9b2c0;
+  --ink-3: #78828f;
+}
+
+@theme inline {
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
 }
 
 body {
-  @apply bg-white font-sans text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100;
+  @apply bg-surface font-sans text-ink antialiased;
+  font-feature-settings: "cv11", "ss01";
+  text-rendering: optimizeLegibility;
 }
 
 ::selection {
-  background-color: var(--color-brand-100);
+  background-color: var(--color-brand-200);
+  color: var(--color-brand-950);
 }
 
 .dark ::selection {
-  background-color: var(--color-brand-900);
+  background-color: var(--color-brand-800);
+  color: white;
+}
+
+/* ------------------------------------------------------------------ */
+/* Scroll reveal — opt-in via the <Reveal> wrapper.                    */
+/* Content is in the DOM for crawlers; only the transform is withheld. */
+/* ------------------------------------------------------------------ */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.9s var(--ease-expo),
+    transform 0.9s var(--ease-expo);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Fine film grain — kills banding in the big gradient washes.
+   Note: no `position` here on purpose. Tailwind utilities live in a cascade
+   layer and this rule doesn't, so declaring one would beat `absolute` from
+   the class list. The host element must already be positioned. */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.032;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.dark .grain::after {
+  opacity: 0.05;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -105,6 +237,12 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
   }
 }
 

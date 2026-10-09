@@ -354,7 +354,7 @@ export function DashboardTour() {
             type="button"
             onClick={() => setPlaying((p) => !p)}
             aria-label={playing ? "Pause tour" : "Play tour"}
-            className="flex h-7 w-7 items-center justify-center rounded-full text-slate-500 ring-1 ring-slate-200 transition hover:bg-slate-100 hover:text-slate-800 [margin:-8px] [padding:8px] dark:text-slate-400 dark:ring-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-slate-500 ring-1 ring-slate-200 transition hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:ring-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
           >
             {playing ? <PauseIcon className="h-3.5 w-3.5" /> : <PlayIcon className="h-3.5 w-3.5" />}
           </button>
@@ -374,8 +374,14 @@ export function DashboardTour() {
             ))}
           </div>
 
-          {/* Stage */}
-          <div className="relative min-w-0 flex-1 bg-slate-50 dark:bg-slate-950" style={{ aspectRatio: "16 / 10" }}>
+          {/* Stage. overflow-hidden stops the scenes from painting over the
+              caption and timeline bars; min-h keeps the two-column stat grid
+              inside the frame on narrow phones, where a 16:10 box is too
+              short. */}
+          <div
+            className="relative min-h-[19rem] min-w-0 flex-1 overflow-hidden bg-slate-50 sm:min-h-0 dark:bg-slate-950"
+            style={{ aspectRatio: "16 / 10" }}
+          >
             <SceneOverview key={`overview-${cycle}`} active={scene === 0} />
             <SceneQuotes key={`quotes-${cycle}`} active={scene === 1} />
             <SceneSchedule key={`schedule-${cycle}`} active={scene === 2} />
@@ -383,37 +389,38 @@ export function DashboardTour() {
             <SceneInvoices key={`invoices-${cycle}`} active={scene === 4} />
             {scene === 5 && <SceneEnd />}
 
-            {/* Caption — cinematic subtitle scrim (desktop overlay) */}
-            {s.caption && (
-              <div key={scene} className="pointer-events-none absolute inset-x-0 bottom-0 hidden bg-gradient-to-t from-slate-900/55 via-slate-900/20 to-transparent px-4 pb-2.5 pt-8 sm:block">
-                <p className="animate-fade-up text-xs font-semibold text-white drop-shadow">
-                  {s.caption}
-                </p>
-              </div>
-            )}
-          </div>
+            </div>
         </div>
 
-        {/* Caption below the frame on mobile (no overlay) */}
-        {s.caption && (
-          <p key={`m-${scene}`} className="animate-fade-up px-1 pt-2 text-center text-xs font-semibold text-slate-600 dark:text-slate-400 sm:hidden">
-            {s.caption}
-          </p>
-        )}
+        {/* Caption lives in its own bar below the frame. An in-stage scrim
+            overlay used to darken the product UI behind it and read as a
+            rendering bug. */}
+        <div className="h-8 shrink-0 border-t border-slate-100 bg-white px-4 dark:border-slate-800 dark:bg-slate-900">
+          {s.caption && (
+            <p
+              key={`m-${scene}`}
+              className="animate-fade-up flex h-full items-center justify-center text-center text-xs font-medium text-slate-600 dark:text-slate-400"
+            >
+              {s.caption}
+            </p>
+          )}
+        </div>
 
         {/* Timeline */}
         <div className="flex items-center gap-2 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5">
           <div className="flex flex-1 gap-1" aria-hidden="true">
             {SCENES.map((sc, i) => (
+              /* 40px-tall hit area with the 4px progress bar optically centred,
+                 so the scrubber is comfortable to tap without looking chunky. */
               <button
                 key={sc.id}
                 type="button"
                 tabIndex={-1}
                 onClick={() => setScene(i)}
-                className="group h-6 flex-1 cursor-pointer"
+                className="group flex h-10 flex-1 cursor-pointer items-center"
                 aria-label={`Go to ${sc.id}`}
               >
-                <span className="block h-1 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                <span className="block h-1 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                   {i < scene && <span className="block h-full w-full bg-brand-500" />}
                   {i === scene && !reduced && playing && (
                     <span

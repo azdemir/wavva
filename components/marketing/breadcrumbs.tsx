@@ -41,12 +41,17 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
                   {item.href && !last ? (
                     <Link
                       href={item.href}
-                      className="hover:text-slate-700 dark:hover:text-slate-200"
+                      className="inline-flex min-h-10 items-center hover:text-slate-700 dark:hover:text-slate-200"
                     >
                       {item.label}
                     </Link>
                   ) : (
-                    <span aria-current={last ? "page" : undefined}>{item.label}</span>
+                    <span
+                      aria-current={last ? "page" : undefined}
+                      className="inline-flex min-h-10 items-center"
+                    >
+                      {item.label}
+                    </span>
                   )}
                 </li>
               </Fragment>

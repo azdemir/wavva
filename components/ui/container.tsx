@@ -7,7 +7,20 @@ export function Container({
 }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={`mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 ${className}`}
+      className={`mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10 ${className}`}
+      {...rest}
+    />
+  );
+}
+
+/** Narrow measure for long-form reading (FAQ answers, legal copy). */
+export function NarrowContainer({
+  className = "",
+  ...rest
+}: HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div
+      className={`mx-auto w-full max-w-3xl px-5 sm:px-8 ${className}`}
       {...rest}
     />
   );

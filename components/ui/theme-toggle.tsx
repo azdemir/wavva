@@ -24,7 +24,7 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
       onClick={toggle}
       aria-label={label}
       title={label}
-      className={`inline-flex h-11 w-11 items-center justify-center rounded-lg text-slate-500 ring-1 ring-slate-200 transition hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:ring-slate-800 dark:hover:bg-slate-800 dark:hover:text-slate-200 sm:h-9 sm:w-9 ${className}`}
+      className={`inline-flex h-11 w-11 items-center justify-center rounded-lg text-slate-500 ring-1 ring-slate-200 transition hover:bg-slate-100 hover:text-slate-700 sm:h-10 sm:w-10 dark:text-slate-400 dark:ring-slate-800 dark:hover:bg-slate-800 dark:hover:text-slate-200 ${className}`}
     >
       {/* Placeholder until mounted so SSR and hydration agree. */}
       {!mounted ? (

@@ -161,12 +161,12 @@ export default function CompareJobberPage() {
                 {FAQS.map((f) => (
                   <details
                     key={f.q}
-                    className="group rounded-xl border border-slate-200 bg-white px-6 py-4 open:shadow-sm dark:border-slate-800 dark:bg-slate-950"
+                    className="group rounded-xl border border-slate-200 bg-white px-6 open:shadow-sm dark:border-slate-800 dark:bg-slate-950"
                   >
-                    <summary className="cursor-pointer list-none text-base font-semibold text-slate-900 dark:text-slate-100 [&::-webkit-details-marker]:hidden">
+                    <summary className="flex min-h-12 cursor-pointer list-none items-center py-3 text-base font-semibold text-slate-900 dark:text-slate-100 [&::-webkit-details-marker]:hidden">
                       {f.q}
                     </summary>
-                    <p className="mt-3 leading-relaxed text-slate-600 dark:text-slate-400">
+                    <p className="pb-4 leading-relaxed text-slate-600 dark:text-slate-400">
                       {f.a}
                     </p>
                   </details>

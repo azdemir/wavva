@@ -1,4 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+// Typed against the shared catalog in lib/communications, not the legacy
+// ./templates union. `send.ts` already renders through resolveTemplate(),
+// so the queue has to accept the same keys. The old TemplateName union is a
+// strict subset of TemplateKey, so every existing caller keeps compiling.
 import type { TemplateKey } from "@/lib/communications/templates";
 
 export type EnqueueInput = {

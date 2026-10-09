@@ -1,19 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useReducedMotion } from "@/components/ui/use-reduced-motion";
 
 /**
- * Two-line hero headline, mortgage-sample style:
- * first line static in ink, second line cycling in brand blue.
- * Soft fade cycling; prefers-reduced-motion shows the first line statically.
- * Copy comes from the Studio CMS (props) with code defaults.
+ * Two-line hero headline in the editorial serif:
+ * the static line sits in ink, the rotating line cycles beneath it with a
+ * blue→mint gradient. A soft fade carries the rotation; prefers-reduced-motion
+ * pins the first line and drops the animation entirely.
+ *
+ * Copy arrives from the Studio CMS as props, with code defaults so the
+ * component still renders standalone.
+ *
+ * SEO note: the visible artwork is aria-hidden and the real <h1> carries a
+ * single clean sentence — crawlers and screen readers never see the rotating
+ * variants concatenated into nonsense.
  */
 export function HeroHeadlines({
   staticLine: staticText = "Run your cleaning business",
   dynamicLines: dynamicTexts = [
     "from one tidy place.",
-    "without missed calls.",
-    "that follows up for you.",
+    "without the missed calls.",
+    "on autopilot, finally.",
   ],
 }: {
   staticLine?: string;
@@ -21,55 +29,44 @@ export function HeroHeadlines({
 }) {
   const lines =
     dynamicTexts.length > 0 ? dynamicTexts : ["from one tidy place."];
-  // Reserve height for the tallest phrase so the rotating line never
-  // shifts the layout below it.
-  const tallest = lines.reduce((a, b) => (a.length >= b.length ? a : b));
+
   const [index, setIndex] = useState(0);
-  const [reduced, setReduced] = useState(
-    () =>
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  );
+  const reduced = useReducedMotion();
 
   useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const onChange = (e: MediaQueryListEvent) => setReduced(e.matches);
-    mq.addEventListener("change", onChange);
-    if (mq.matches) {
-      return () => mq.removeEventListener("change", onChange);
-    }
+    if (reduced) return;
     const t = setInterval(() => {
       setIndex((i) => (i + 1) % lines.length);
-    }, 4500);
-    return () => {
-      clearInterval(t);
-      mq.removeEventListener("change", onChange);
-    };
-  }, [lines.length]);
+    }, 4600);
+    return () => clearInterval(t);
+  }, [lines.length, reduced]);
 
-  const staticLine = (
-    <span className="block text-slate-900 dark:text-slate-50">
-      {staticText}
-    </span>
-  );
-
-  // SEO: crawlers and screen readers get ONE clean headline. The rotating
-  // animation is purely visual (aria-hidden) so the H1 is never a jumble
-  // of concatenated variants.
   const cleanHeadline = `${staticText} ${lines[0]}`;
+
+  const shell =
+    "font-display text-[2.75rem] leading-[0.94] tracking-[-0.03em] text-balance sm:text-6xl lg:text-[4.25rem]";
+
+  /* The gradient must live on each line, NOT on their shared parent:
+     `background-clip: text` clips the parent's background to the glyphs of
+     every descendant, so all rotating phrases would be painted at once and
+     the inactive ones would stay visible regardless of their opacity. */
+  const gradientLine =
+    "bg-gradient-to-r from-brand-600 via-brand-500 to-accent-500 bg-clip-text text-transparent dark:from-brand-300 dark:via-brand-300 dark:to-accent-300";
+
+  const lineClass = (active: boolean) =>
+    `transition-[opacity,transform,filter] duration-[900ms] ease-expo ${
+      active
+        ? "translate-y-0 opacity-100 blur-0"
+        : "pointer-events-none translate-y-5 opacity-0 blur-[3px]"
+    }`;
 
   if (reduced) {
     return (
       <>
         <h1 className="sr-only">{cleanHeadline}</h1>
-        <div
-          aria-hidden="true"
-          className="font-serif text-4xl font-medium tracking-tight sm:text-5xl"
-        >
-          {staticLine}
-          <span className="block text-brand-600 dark:text-brand-400">
-            {lines[0]}
-          </span>
+        <div aria-hidden="true" className={shell}>
+          <span className="block text-ink">{staticText}</span>
+          <span className={`mt-1 block italic ${gradientLine}`}>{lines[0]}</span>
         </div>
       </>
     );
@@ -78,22 +75,16 @@ export function HeroHeadlines({
   return (
     <>
       <h1 className="sr-only">{cleanHeadline}</h1>
-      <div
-        aria-hidden="true"
-        className="font-serif text-4xl font-medium tracking-tight sm:text-5xl"
-      >
-        {staticLine}
-        <span className="relative block text-brand-600 dark:text-brand-400">
-          {/* Reserve height for the tallest phrase to avoid layout shift */}
-          <span className="invisible block">{tallest}</span>
+      <div aria-hidden="true" className={shell}>
+        <span className="block text-ink">{staticText}</span>
+        {/* Every phrase occupies the same grid cell, so the box is always as
+            tall as the tallest one and the copy below never shifts — no
+            measuring, no spacer, and wrapping is handled for free. */}
+        <span className="mt-1 grid italic">
           {lines.map((line, i) => (
             <span
               key={line}
-              className={`absolute inset-0 transition-all duration-700 ease-out ${
-                i === index
-                  ? "translate-y-0 opacity-100"
-                  : "pointer-events-none translate-y-4 opacity-0"
-              }`}
+              className={`[grid-area:1/1] ${gradientLine} ${lineClass(i === index)}`}
             >
               {line}
             </span>
