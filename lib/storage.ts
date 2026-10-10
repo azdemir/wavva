@@ -8,7 +8,8 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 /**
  * S3-compatible object storage (Supabase Storage, Cloudflare R2, AWS S3, …)
- * for job photos and company logos.
+ * for job photos. (Company logos use Supabase Storage directly via
+ * lib/company-logo.ts, so they need no S3 env vars.)
  *
  * Browsers upload straight to storage via presigned PUT URLs, so large phone
  * photos never pass through the app server. All signing happens here,
@@ -100,35 +101,12 @@ export async function getPhotoViewUrl(key: string): Promise<string | null> {
   });
 }
 
-/** Deterministic object key for a company logo (one per company; re-upload overwrites). */
-export function logoStorageKey(companyId: string, ext: string): string {
-  const safeExt = ext.replace(/[^a-z0-9]/gi, "").slice(0, 5) || "png";
-  return `company-logos/${companyId}/logo.${safeExt}`;
-}
-
-/**
- * Upload a small file (e.g. a company logo) straight to storage.
- * For large user uploads prefer the presigned-URL pattern above so the
- * bytes never pass through the app server.
- */
-export async function putLogoObject(
-  key: string,
-  body: Uint8Array,
-  contentType: string,
-): Promise<boolean> {
-  const s3 = getClient();
-  if (!s3) return false;
-  const { bucket } = config();
-  await s3.send(
-    new PutObjectCommand({ Bucket: bucket, Key: key, ContentType: contentType }),
-  );
-  return true;
-}
-
 /**
  * Resolve a stored companies.logo_url to a viewable URL.
- * - http(s) values are returned as-is (manually entered URLs).
- * - anything else is treated as a storage key and gets a presigned GET URL.
+ * - http(s) values (Supabase Storage public URLs, manually entered URLs)
+ *   are returned as-is.
+ * - anything else is treated as a legacy S3 storage key and gets a
+ *   presigned GET URL.
  */
 export async function getLogoViewUrl(
   logoUrl: string | null | undefined,

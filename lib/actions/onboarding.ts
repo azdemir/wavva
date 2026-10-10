@@ -22,7 +22,7 @@ function err(message: string): ActionResult {
 }
 
 const logoErrorKeys: Record<LogoUploadError, string> = {
-  storage_not_configured: "errors.logoNoStorage",
+  not_setup: "errors.logoNotSetup",
   invalid_type: "errors.logoInvalidType",
   too_large: "errors.logoTooLarge",
   upload_failed: "errors.logoUploadFailed",
@@ -129,7 +129,7 @@ export async function saveCompanyProfile(
     const logoDb = active ? supabase : db;
     const { error: logoErr } = await logoDb
       .from("companies")
-      .update({ logo_url: up.key })
+      .update({ logo_url: up.url })
       .eq("id", companyId);
     if (logoErr) return err(logoErr.message);
   }

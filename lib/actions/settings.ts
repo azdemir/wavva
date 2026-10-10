@@ -14,7 +14,7 @@ import {
 } from "@/lib/company-logo";
 
 const logoErrorKeys: Record<LogoUploadError, string> = {
-  storage_not_configured: "errors.logoNoStorage",
+  not_setup: "errors.logoNotSetup",
   invalid_type: "errors.logoInvalidType",
   too_large: "errors.logoTooLarge",
   upload_failed: "errors.logoUploadFailed",
@@ -90,7 +90,7 @@ export async function updateCompanySettings(formData: FormData) {
     if (up.error) return { error: t(logoErrorKeys[up.error]) };
     const { error: logoErr } = await supabase
       .from("companies")
-      .update({ logo_url: up.key })
+      .update({ logo_url: up.url })
       .eq("id", ctx.company.id);
     if (logoErr) return { error: logoErr.message };
   } else if (formData.get("remove_logo") === "1" && ctx.company.logo_url) {

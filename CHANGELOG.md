@@ -15,11 +15,12 @@ All notable changes to TidyPro. Dates are in America/New_York.
   `schedule.unknownCustomer` string in EN/ES/UK.
 
 - **Company logo** — onboarding (step 1) and Settings → company profile now
-  ask for an optional logo (PNG/JPG/WebP, ≤2 MB, uploaded to object
-  storage). It appears on quote/invoice print documents and in the customer
-  portal header; when no logo is set, print documents show the TidyPro logo
-  and the portal keeps the TidyPro mark. New `lib/company-logo.ts` upload
-  helper (`company-logos/{companyId}/logo.{ext}`); `companies.logo_url`
+  ask for an optional logo (PNG/JPG/WebP, ≤500 KB, stored in a public
+  Supabase Storage `company-logos` bucket — no S3 keys needed). It appears
+  on quote/invoice print documents and in the customer portal header; when
+  no logo is set, print documents show the TidyPro logo and the portal keeps
+  the TidyPro mark. New `lib/company-logo.ts` upload helper and migration
+  `0014_company_logos.sql` (run it on Supabase); `companies.logo_url`
   column already existed.
 
 ### Fixed (unpushed)
