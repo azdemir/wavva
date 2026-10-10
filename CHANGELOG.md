@@ -4,7 +4,7 @@ All notable changes to TidyPro. Dates are in America/New_York.
 
 ## 2026-10-10
 
-### Arcade: 3 cleaning mini-games on the dashboard
+### Arcade: 3 cleaning mini-games on the dashboard — PUSHED `26f72f5`/`23debe8`/`dc4f151`/`63b6030`
 
 - New `/dashboard/arcade` route (all roles, all tiers — it's just for fun),
   with a game-picker shell and per-game best scores in localStorage.
