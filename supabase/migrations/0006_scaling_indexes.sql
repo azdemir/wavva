@@ -17,9 +17,14 @@ create index if not exists idx_notifications_company_created
   on public.notifications(company_id, created_at desc);
 
 -- Quote follow-up cron: pending follow-ups ordered by due date.
-create index if not exists idx_quote_followups_status_due
-  on public.quote_followups(status, due_at)
-  where status = 'pending';
+-- NOTE: 0005 already ships the equivalent index (quote_followups_due_idx
+-- on (scheduled_for) where sent_at is null). The index below originally
+-- referenced nonexistent columns (status, due_at) and failed on every
+-- database, aborting the rest of this migration — it is intentionally
+-- left out. Do not re-add without checking 0005's actual columns.
+-- create index if not exists idx_quote_followups_status_due
+--   on public.quote_followups(status, due_at)
+--   where status = 'pending';
 
 -- Invoices list: per-company newest-first (covers the dashboard
 -- outstanding-balance scan too).
