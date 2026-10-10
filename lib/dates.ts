@@ -69,3 +69,17 @@ function zonedTimeToUtc(
   const guess = new Date(Date.UTC(year, month - 1, day, hour, minute));
   return new Date(guess.getTime() - tzOffsetMinutes(timezone, guess) * 60000);
 }
+
+/**
+ * UTC instant of midnight (start of day) for a zoned calendar date.
+ * Month/day may overflow (e.g. day 0 → last day of previous month) —
+ * Date.UTC normalizes them the same way the calendar does.
+ */
+export function zonedDayStartUtc(
+  timezone: string,
+  year: number,
+  month: number,
+  day: number,
+): Date {
+  return zonedTimeToUtc(year, month, day, 0, 0, timezone);
+}

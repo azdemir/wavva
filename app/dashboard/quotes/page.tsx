@@ -14,13 +14,15 @@ import { PlusIcon, QuoteIcon } from "@/components/ui/icons";
 import { formatCents, formatDate } from "@/lib/format";
 import { one } from "@/lib/relations";
 import { FilterPills, FilterSearch } from "@/components/ui/filters";
+import { PeriodSummary } from "@/components/ui/period-summary";
+import { PERIODS, parsePeriod, periodStartUtc } from "@/lib/periods";
 
 const statuses = ["all", "draft", "sent", "approved", "declined", "expired"] as const;
 
 export default async function QuotesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; q?: string; page?: string }>;
+  searchParams: Promise<{ status?: string; q?: string; page?: string; period?: string }>;
 }) {
   const { company } = await requirePermission("quotes.manage");
   const t = await getTranslations("quotes");
@@ -28,6 +30,8 @@ export default async function QuotesPage({
   const params = await searchParams;
   const status = params.status ?? "all";
   const valid = statuses.includes(status as (typeof statuses)[number]) ? status : "all";
+  const period = parsePeriod(params.period);
+  const periodStart = periodStartUtc(company.timezone || "America/New_York", period);
   const q = (params.q ?? "").trim();
   const like = `%${q.replace(/[%_]/g, "")}%`;
   const page = parsePageParam(params.page);
@@ -48,6 +52,7 @@ export default async function QuotesPage({
     .eq("company_id", company.id)
     .order("created_at", { ascending: false });
   if (valid !== "all") query = query.eq("status", valid);
+  if (periodStart) query = query.gte("created_at", periodStart);
   if (q) {
     query =
       customerIds && customerIds.length > 0
@@ -57,8 +62,42 @@ export default async function QuotesPage({
 
   const { data: quotes, count } = await query.range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
   const total = count ?? 0;
-  const filtering = valid !== "all" || q !== "";
-  const keep = { status: valid !== "all" ? valid : undefined, q: q || undefined };
+  const filtering = valid !== "all" || q !== "" || period !== "all";
+  const keep = {
+    status: valid !== "all" ? valid : undefined,
+    q: q || undefined,
+    period: period !== "all" ? period : undefined,
+  };
+
+  // Totals for the same filtered set (supabase-js caps a single select at
+  // 1000 rows, so page through for a correct total).
+  let agg = supabase
+    .from("quotes")
+    .select("total_cents, status")
+    .eq("company_id", company.id);
+  if (valid !== "all") agg = agg.eq("status", valid);
+  if (periodStart) agg = agg.gte("created_at", periodStart);
+  if (q) {
+    agg =
+      customerIds && customerIds.length > 0
+        ? agg.or(`quote_number.ilike.${like},customer_id.in.(${customerIds.join(",")})`)
+        : agg.ilike("quote_number", like);
+  }
+  let sumTotal = 0;
+  let sumApproved = 0;
+  let aggCount = 0;
+  const BATCH = 1000;
+  for (let offset = 0; ; offset += BATCH) {
+    const { data: rows } = await agg.range(offset, offset + BATCH - 1);
+    const batch = rows ?? [];
+    if (batch.length === 0) break;
+    for (const r of batch) {
+      sumTotal += (r.total_cents as number) ?? 0;
+      if (r.status === "approved") sumApproved += (r.total_cents as number) ?? 0;
+      aggCount += 1;
+    }
+    if (batch.length < BATCH) break;
+  }
 
   return (
     <div className="space-y-6">
@@ -78,16 +117,35 @@ export default async function QuotesPage({
             label: s === "all" ? t("list.filterAll") : t(`status.${s}`),
           }))}
           current={valid}
-          preserve={{ q: q || undefined }}
+          preserve={{ q: q || undefined, period: period !== "all" ? period : undefined }}
         />
         <FilterSearch
           id="quote-search"
           label={t("list.searchLabel")}
           defaultValue={q}
           placeholder={t("list.searchPlaceholder")}
-          preserve={{ status: valid !== "all" ? valid : undefined }}
+          preserve={{ status: valid !== "all" ? valid : undefined, period: period !== "all" ? period : undefined }}
         />
       </div>
+
+      <FilterPills
+        basePath="/dashboard/quotes"
+        param="period"
+        options={PERIODS.map((p) => ({ value: p, label: t(`list.period.${p}`) }))}
+        current={period}
+        preserve={{ status: valid !== "all" ? valid : undefined, q: q || undefined }}
+      />
+
+      {aggCount > 0 && (
+        <PeriodSummary
+          title={t(`list.period.${period}`)}
+          stats={[
+            { label: t("list.summary.total"), value: formatCents(sumTotal) },
+            { label: t("list.summary.approved"), value: formatCents(sumApproved) },
+            { label: t("list.summary.count"), value: String(aggCount) },
+          ]}
+        />
+      )}
 
       {(quotes ?? []).length === 0 ? (
         <Card>

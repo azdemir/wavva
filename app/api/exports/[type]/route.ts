@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { one } from "@/lib/relations";
 import { rateLimit } from "@/lib/rate-limit";
 import { missingColumnName } from "@/lib/supabase/schema-fallback";
+import { parsePeriod, periodStartUtc } from "@/lib/periods";
 
 const MAX_ROWS = 5000;
 const TYPES = ["customers", "invoices", "bookings"] as const;
@@ -175,6 +176,11 @@ export async function GET(
       .order("created_at", { ascending: false })
       .limit(MAX_ROWS);
     if (status !== "all") query = query.eq("status", status);
+    const periodStart = periodStartUtc(
+      company.timezone || "America/New_York",
+      parsePeriod(sp.get("period")),
+    );
+    if (periodStart) query = query.gte("created_at", periodStart);
     if (q) {
       const ids = await matchingCustomerIds(supabase, company.id, q);
       query =
