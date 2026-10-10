@@ -115,6 +115,20 @@ export async function completeJob(id: string, formData: FormData): Promise<Actio
     });
   }
 
+  // Outgoing integration webhooks (Zapier etc.): never breaks job completion.
+  try {
+    const { fireIntegrationEvent } = await import("@/lib/integrations/webhooks");
+    await fireIntegrationEvent(ctx.company.id, "job.completed", {
+      job_id: id,
+      customer_id: doneJob?.customer_id ?? null,
+      customer_name: doneCustomer?.name ?? null,
+      scheduled_start: doneJob?.scheduled_start ?? null,
+      completed_at: new Date().toISOString(),
+    });
+  } catch {
+    // ignore — webhook delivery is best-effort
+  }
+
   revalidatePath(`/dashboard/jobs/${id}`);
   revalidatePath("/dashboard/schedule");
   revalidatePath("/dashboard/my-jobs");

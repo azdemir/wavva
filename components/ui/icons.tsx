@@ -91,28 +91,6 @@ export function CheckIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-export function MinusIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <Base {...props}>
-      <path d="M6 12h12" />
-    </Base>
-  );
-}
-
-/** Half-filled circle — "sort of, with caveats" in the comparison table. */
-export function PartialIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <Base {...props}>
-      <circle cx="12" cy="12" r="8.5" />
-      <path
-        d="M12 3.5a8.5 8.5 0 0 1 0 17z"
-        fill="currentColor"
-        stroke="none"
-      />
-    </Base>
-  );
-}
-
 export function ArrowRightIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <Base {...props}>
@@ -249,6 +227,16 @@ export function ChartIcon(props: SVGProps<SVGSVGElement>) {
       <path d="M10 20V4" />
       <path d="M16 20v-7" />
       <path d="M2.5 20h19" />
+    </Base>
+  );
+}
+
+export function PlugIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Base {...props}>
+      <path d="M9 3.5V9M15 3.5V9" />
+      <path d="M6.5 9h11v3.5a5.5 5.5 0 0 1-11 0V9z" />
+      <path d="M12 18v3.5" />
     </Base>
   );
 }

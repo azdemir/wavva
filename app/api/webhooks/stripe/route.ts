@@ -89,11 +89,12 @@ export async function POST(request: Request) {
       });
       const { data: invoice } = await svc
         .from("invoices")
-        .select("invoice_number, total_cents, amount_paid_cents, customer_id, customers(name, email, phone, sms_consent), companies(name)")
+        .select("invoice_number, total_cents, amount_paid_cents, status, customer_id, customers(name, email, phone, sms_consent), companies(name)")
         .eq("id", invoiceId)
         .single();
       if (invoice) {
         const paid = invoice.amount_paid_cents + amount;
+        const nowPaid = paid >= invoice.total_cents && invoice.status !== "paid";
         await svc
           .from("invoices")
           .update({
@@ -101,6 +102,22 @@ export async function POST(request: Request) {
             status: paid >= invoice.total_cents ? "paid" : "sent",
           })
           .eq("id", invoiceId);
+
+        // Outgoing integration webhooks (Zapier etc.): never breaks the payment flow.
+        if (nowPaid) {
+          try {
+            const { fireIntegrationEvent } = await import("@/lib/integrations/webhooks");
+            const invCustomer = invoice.customers as { name?: string } | null;
+            await fireIntegrationEvent(companyId, "invoice.paid", {
+              invoice_id: invoiceId,
+              invoice_number: invoice.invoice_number,
+              amount_cents: paid,
+              customer_name: invCustomer?.name ?? null,
+            });
+          } catch {
+            // ignore — webhook delivery is best-effort
+          }
+        }
 
         const customer = Array.isArray(invoice.customers) ? invoice.customers[0] : invoice.customers;
         const company = Array.isArray(invoice.companies) ? invoice.companies[0] : invoice.companies;

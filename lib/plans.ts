@@ -80,6 +80,7 @@ export const PLANS: Record<PlanId, Plan> = {
       "Business reports",
       "Before/after photo uploads",
       "Automated SMS & email templates",
+      "Mailchimp & Zapier integrations",
       "QuickBooks accounting sync",
       "Priority support",
     ],
@@ -127,6 +128,7 @@ export type PlanFeature =
   | "reports"
   | "photos"
   | "communications"
+  | "integrations"
   | "quickbooks";
 
 const FEATURE_MIN_PLAN: Record<PlanFeature, PlanId> = {
@@ -135,6 +137,7 @@ const FEATURE_MIN_PLAN: Record<PlanFeature, PlanId> = {
   reports: "pro", // Company reporting dashboard
   photos: "pro", // Before/after job photo uploads
   communications: "pro", // Automated SMS & email templates
+  integrations: "pro", // Mailchimp & Zapier integrations
   quickbooks: "pro", // QuickBooks Online accounting sync
 };
 

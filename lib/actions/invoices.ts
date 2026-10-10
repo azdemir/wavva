@@ -240,6 +240,20 @@ export async function recordPayment(id: string, formData: FormData): Promise<Act
     .eq("company_id", ctx.company.id);
   if (iErr) return { error: iErr.message };
 
+  // Outgoing integration webhooks (Zapier etc.): never breaks payment recording.
+  if (paid >= invoice.total_cents && invoice.status !== "paid") {
+    try {
+      const { fireIntegrationEvent } = await import("@/lib/integrations/webhooks");
+      await fireIntegrationEvent(ctx.company.id, "invoice.paid", {
+        invoice_id: id,
+        amount_cents: paid,
+        provider: "manual",
+      });
+    } catch {
+      // ignore — webhook delivery is best-effort
+    }
+  }
+
   await logAudit(supabase, {
     company_id: ctx.company.id,
     action: "invoice.payment_recorded",

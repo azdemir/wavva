@@ -213,6 +213,19 @@ export async function setQuoteStatus(id: string, status: string): Promise<Action
           smsConsent: customer.sms_consent ?? false,
         },
       });
+      // Outgoing integration webhooks (Zapier etc.): never breaks approval.
+      try {
+        const { fireIntegrationEvent } = await import("@/lib/integrations/webhooks");
+        await fireIntegrationEvent(ctx.company.id, "quote.approved", {
+          quote_id: id,
+          quote_number: full.quote_number,
+          customer_id: full.customer_id,
+          customer_name: customer.name,
+          approved_at: new Date().toISOString(),
+        });
+      } catch {
+        // ignore — webhook delivery is best-effort
+      }
     }
   }
 

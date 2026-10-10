@@ -186,6 +186,23 @@ export async function createBooking(input: unknown): Promise<ActionResult> {
     });
   }
 
+  // Outgoing integration webhooks (Zapier etc.): never breaks booking creation.
+  try {
+    const { fireIntegrationEvent } = await import("@/lib/integrations/webhooks");
+    await fireIntegrationEvent(ctx.company.id, "booking.created", {
+      booking_id: booking.id,
+      booking_number: bookingRow.booking_number,
+      customer_id: full?.customer_id ?? null,
+      customer_name: notifCustomer?.name ?? null,
+      scheduled_start: full?.scheduled_start ?? null,
+      scheduled_end: full?.scheduled_end ?? null,
+      recurrence: parsed.data.recurrence,
+      jobs: jobs.length,
+    });
+  } catch {
+    // ignore — notifications above already handled customer comms
+  }
+
   redirect(`/dashboard/bookings/${booking.id}`);
 }
 
@@ -378,6 +395,17 @@ export async function cancelBooking(id: string): Promise<ActionResult> {
     entity_type: "booking",
     entity_id: id,
   });
+
+  // Outgoing integration webhooks (Zapier etc.): never breaks cancellation.
+  try {
+    const { fireIntegrationEvent } = await import("@/lib/integrations/webhooks");
+    await fireIntegrationEvent(ctx.company.id, "booking.cancelled", {
+      booking_id: id,
+      cancelled_at: new Date().toISOString(),
+    });
+  } catch {
+    // ignore — webhook delivery is best-effort
+  }
 
   revalidatePath(`/dashboard/bookings/${id}`);
   revalidatePath("/dashboard/bookings");
