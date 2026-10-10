@@ -1,0 +1,29 @@
+{
+  "actions": {
+    "createFailed": "No se pudo crear la plantilla.",
+    "invalid": "Esa plantilla no es válida."
+  },
+  "addItem": "Añadir elemento",
+  "cancel": "Cancelar",
+  "created": "Plantilla creada.",
+  "delete": "Eliminar",
+  "deleteConfirm": "¿Eliminar esta plantilla? Las citas que ya la usaron conservan sus listas de verificación.",
+  "deleted": "Plantilla eliminada.",
+  "description": "Listas de verificación digitales reutilizables. Adjunta una al reservar una cita y cada visita comenzará con sus elementos listos para marcar.",
+  "editTemplate": "Editar plantilla",
+  "itemCount": "{count, plural, one {# elemento} other {# elementos}}",
+  "itemPlaceholder": "p. ej. Aspirar todos los dormitorios",
+  "itemsLabel": "Elementos de la lista",
+  "newTemplate": "Nueva plantilla",
+  "noTemplates": "Aún no hay plantillas. Crea una para adjuntar listas de verificación digitales a las citas.",
+  "removeItem": "Quitar",
+  "save": "Guardar plantilla",
+  "settingsCard": {
+    "description": "Listas de verificación digitales reutilizables para citas: cada visita comienza con los elementos de la plantilla.",
+    "title": "Plantillas de listas de verificación"
+  },
+  "templateName": "Nombre de la plantilla",
+  "templateNamePlaceholder": "p. ej. Limpieza profunda",
+  "title": "Plantillas de listas de verificación",
+  "updated": "Plantilla guardada."
+}

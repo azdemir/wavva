@@ -1,0 +1,29 @@
+{
+  "actions": {
+    "createFailed": "Couldn't create the template.",
+    "invalid": "That template isn't valid."
+  },
+  "addItem": "Add item",
+  "cancel": "Cancel",
+  "created": "Template created.",
+  "delete": "Delete",
+  "deleteConfirm": "Delete this template? Appointments that already used it keep their visit checklists.",
+  "deleted": "Template deleted.",
+  "description": "Reusable digital checklists. Attach one when booking an appointment and every visit starts with its items ready to check off.",
+  "editTemplate": "Edit template",
+  "itemCount": "{count, plural, one {# item} other {# items}}",
+  "itemPlaceholder": "e.g. Vacuum all bedrooms",
+  "itemsLabel": "Checklist items",
+  "newTemplate": "New template",
+  "noTemplates": "No templates yet. Create one to attach digital checklists to appointments.",
+  "removeItem": "Remove",
+  "save": "Save template",
+  "settingsCard": {
+    "description": "Reusable digital checklists for appointments — every visit starts with the template's items.",
+    "title": "Checklist templates"
+  },
+  "templateName": "Template name",
+  "templateNamePlaceholder": "e.g. Deep clean",
+  "title": "Checklist templates",
+  "updated": "Template saved."
+}

@@ -4,6 +4,32 @@ All notable changes to TidyPro. Dates are in America/New_York.
 
 ## 2026-10-09
 
+### Added (unpushed)
+
+- **Digital checklist templates for appointments** — owners can define
+  reusable checklist templates in Settings → Checklist templates (Growth+
+  feature; new `checklist_templates` table, migration
+  `0015_checklist_templates.sql`). When booking an appointment, staff pick a
+  template and every visit the booking generates is seeded with its items,
+  ready for the cleaner to check off on the job page. The template link is
+  stored on the booking (`bookings.checklist_template_id`, shown on the
+  booking detail page); deleting a template never touches already-seeded
+  visit checklists. New `checklists` i18n namespace (EN/ES/UK) plus
+  booking-form/detail strings in all three locales. Booking creation keeps
+  working before migration 0015 is run (schema-drift fallback: the link is
+  skipped and visits are seeded directly from the template items).
+  Advertised on the Growth tier ("Reusable checklist templates").
+
+### Fixed (unpushed)
+
+- **Start button no longer just disappears** — starting a job now shows
+  immediate "Starting…" feedback, then the action row visibly becomes an
+  in-progress state (pulsing amber badge: "In progress · started 10:30 AM ·
+  25 min") instead of a blank spot, and "Complete job" becomes the primary
+  button while the job runs. New `jobs.detail.starting`,
+  `jobs.detail.inProgress`, `jobs.detail.inProgressDetail` strings in
+  EN/ES/UK.
+
 ### Added
 
 - **Cinematic cursor-driven dashboard tour (hero)** — the marketing hero's
