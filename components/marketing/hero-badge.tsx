@@ -49,7 +49,7 @@ export function HeroBadge({ className = "" }: { className?: string }) {
               No tech skills required
             </span>
             <span aria-hidden="true" className="h-3 w-px bg-line-strong" />
-            <span className="text-ink-3">Live in minutes</span>
+            <span className="text-ink-3"></span>
           </span>
         </div>
       </div>
