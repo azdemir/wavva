@@ -43,10 +43,13 @@ All notable changes to TidyPro. Dates are in America/New_York.
   until migration 0017 is run.
 
 - **Dashboard navigation revision** — the left sidebar stays as the
-  primary dashboard navigation (role/plan gating unchanged); the top bar
-  is slimmed down to user controls only — profile menu (company avatar
-  with initials, company name, email, role + plan badges, website-home
-  link, sign out), language switcher, and light/dark toggle. On mobile the
+  primary dashboard navigation (role/plan gating unchanged), now just the
+  logo plus nav links: the old sidebar footer (Website home link, company
+  name / email / role, Sign out) was removed since the top bar's profile
+  menu already covers all of it. The top bar is slimmed down to user
+  controls only — profile menu (company avatar with initials, company
+  name, email, role + plan badges, website-home link, sign out), language
+  switcher, and light/dark toggle — in a thin 48px bar. On mobile the
   sidebar becomes a hamburger menu in the top bar. New `nav.userMenu.*`
   strings in EN/ES/UK.
 

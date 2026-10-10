@@ -114,7 +114,7 @@ export function DashboardUserBar({
 
   return (
     <header className="no-print sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95">
-      <div className="flex h-16 items-center gap-1 px-4 md:px-8">
+      <div className="flex h-12 items-center gap-1 px-4 md:px-8">
         <button
           type="button"
           className="mr-1 inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 md:hidden"

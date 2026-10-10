@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { requireCompany } from "@/lib/auth";
-import { signOut } from "@/lib/actions/auth";
 import { Badge } from "@/components/ui/badge";
 import { SubscriptionBanner } from "@/components/billing/subscription-banner";
 import { PLANS, isPlanId, type PlanId } from "@/lib/plans";
@@ -106,19 +105,6 @@ async function NavLinks({ onNavigate, plan, role }: { onNavigate?: () => void; p
           </Link>
         );
       })}
-      <div className="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800">
-        <Link
-          href="/"
-          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-          onClick={onNavigate}
-          aria-label={t("backHomeLabel")}
-        >
-          <svg className="h-5 w-5 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M10 3 3 10h3v7h4v-5h4v5h4v-7h3L10 3z" />
-          </svg>
-          <span className="flex-1">{t("websiteHome")}</span>
-        </Link>
-      </div>
     </nav>
   );
 }
@@ -167,27 +153,6 @@ export default async function DashboardLayout({
           </Link>
           <div className="flex-1 overflow-y-auto px-3">
             <NavLinks plan={plan} role={membership.role} />
-          </div>
-          <div className="border-t border-slate-200 p-4 dark:border-slate-800">
-            <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
-              {company.name}
-            </p>
-            <p className="truncate text-xs text-slate-500 dark:text-slate-400">
-              {user.email} ·{" "}
-              {membership.role === "owner"
-                ? t("roleOwner")
-                : membership.role === "manager"
-                  ? t("roleManager")
-                  : t("roleCleaner")}
-            </p>
-            <form action={signOut} className="mt-3">
-              <button
-                type="submit"
-                className="text-sm font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-              >
-                {t("signOut")}
-              </button>
-            </form>
           </div>
         </div>
       </aside>
