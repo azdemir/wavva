@@ -157,10 +157,12 @@ export function WebhooksCard({
                   {hook.events.map((e) => (
                     <Badge key={e} tone="slate">
                       {(() => {
-                        const key = `events.${e}`;
+                        const catalogEntry = events.find((c) => c.event === e);
+                        const key = catalogEntry
+                          ? catalogEntry.descriptionKey
+                          : `events.${e}`;
                         try {
-                          const label = t(key);
-                          return label === key ? e : label;
+                          return t(key);
                         } catch {
                           return e;
                         }
@@ -234,19 +236,15 @@ export function WebhooksCard({
               {events.map((e) => {
                 const checked = picked.includes(e.event);
                 const label = (() => {
-                  const key = `events.${e.event}`;
                   try {
-                    const l = t(key);
-                    return l === key ? e.event : l;
+                    return t(e.descriptionKey);
                   } catch {
                     return e.event;
                   }
                 })();
                 const desc = (() => {
-                  const key = `events.${e.event}Desc`;
                   try {
-                    const d = t(key);
-                    return d === key ? null : d;
+                    return t(`${e.descriptionKey}Desc`);
                   } catch {
                     return null;
                   }
