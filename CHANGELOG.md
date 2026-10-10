@@ -4,6 +4,15 @@ All notable changes to TidyPro. Dates are in America/New_York.
 
 ## 2026-10-10
 
+### Fixed
+
+- **Billing tier display**: the billing page read the raw stored plan from the
+  database, so founders on the all-access grant saw "Starter" while every
+  other page treated them as Pro. `getBillingState()` now uses the effective
+  plan from `requireCompany()` (founder grant / Studio tier override), so the
+  displayed tier matches the feature gates.
+
+
 ### Changed
 
 - **Reports page rebuilt (comprehensive)**: the old 3-KPI page is now a full

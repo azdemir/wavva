@@ -107,7 +107,7 @@ export async function getBillingState() {
   const [{ data: company }, { count: memberCount }] = await Promise.all([
     supabase
       .from("companies")
-      .select("plan, subscription_status, stripe_subscription_id")
+      .select("subscription_status, stripe_subscription_id")
       .eq("id", ctx.company.id)
       .single(),
     supabase.from("memberships").select("id", { count: "exact", head: true }).eq("company_id", ctx.company.id),
@@ -137,7 +137,9 @@ export async function getBillingState() {
   }).catch(() => {});
 
   return {
-    plan: (company?.plan ?? "starter") as PlanId,
+    // Effective plan (founder all-access grant / Studio tier override), so the
+    // billing page agrees with the feature gates instead of the raw DB value.
+    plan: (isPlanId(ctx.company.plan) ? ctx.company.plan : "starter") as PlanId,
     subscriptionStatus: (company?.subscription_status ?? "none") as string,
     hasSubscription: !!company?.stripe_subscription_id,
     memberCount: memberCount ?? 0,
