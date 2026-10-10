@@ -2,9 +2,11 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
+import { hasFeature, isPlanId } from "@/lib/plans";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent } from "@/components/ui/card";
 import { BookingForm, type BookingPrefill } from "@/components/bookings/booking-form";
+import { listChecklistTemplates } from "@/lib/actions/checklists";
 import { formatCents } from "@/lib/format";
 
 export default async function NewBookingPage({
@@ -30,6 +32,8 @@ export default async function NewBookingPage({
       .eq("is_active", true)
       .order("name"),
   ]);
+  const plan = isPlanId(company.plan) ? company.plan : "starter";
+  const checklistTemplates = hasFeature(plan, "checklists") ? await listChecklistTemplates() : [];
 
   let prefill: BookingPrefill | undefined;
   if (quoteId) {
@@ -121,6 +125,7 @@ export default async function NewBookingPage({
           <BookingForm
             customers={formCustomers}
             services={services ?? []}
+            checklistTemplates={checklistTemplates}
             prefill={prefill}
           />
         </CardContent>

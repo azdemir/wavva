@@ -44,6 +44,19 @@ export default async function SettingsPage() {
           </CardContent>
         </Card>
       </Link>
+      <Link href="/dashboard/settings/checklists" className="block">
+        <Card className="transition hover:border-brand-300 hover:shadow-sm">
+          <CardContent className="flex items-center justify-between py-5">
+            <div>
+              <p className="font-semibold text-slate-900 dark:text-slate-100">{t("checklistsCard.title")}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">
+                {t("checklistsCard.description")}
+              </p>
+            </div>
+            <span className="text-sm font-semibold text-brand-700 dark:text-brand-400">{t("checklistsCard.manage")}</span>
+          </CardContent>
+        </Card>
+      </Link>
       <Card>
         <CardContent className="pt-6">
           <SettingsForm company={company} logoPreviewUrl={logoPreviewUrl} />

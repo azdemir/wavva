@@ -12,6 +12,7 @@ export type FormCustomer = {
   addresses: { id: string; label: string; address_line1: string; city: string; state: string; is_default: boolean }[];
 };
 export type FormService = { id: string; name: string };
+export type FormChecklistTemplate = { id: string; name: string; items: { label: string }[] };
 
 export type BookingPrefill = {
   quoteId?: string;
@@ -26,10 +27,12 @@ export type BookingPrefill = {
 export function BookingForm({
   customers,
   services,
+  checklistTemplates = [],
   prefill,
 }: {
   customers: FormCustomer[];
   services: FormService[];
+  checklistTemplates?: FormChecklistTemplate[];
   prefill?: BookingPrefill;
 }) {
   const t = useTranslations("bookings");
@@ -43,11 +46,16 @@ export function BookingForm({
   );
   const [serviceId, setServiceId] = useState(prefill?.serviceId ?? "");
   const [recurrence, setRecurrence] = useState("none");
+  const [templateId, setTemplateId] = useState("");
   const [start, setStart] = useState(prefill?.startDate ? `${prefill.startDate}T09:00` : "");
   const [end, setEnd] = useState(prefill?.startDate ? `${prefill.startDate}T11:00` : "");
   const [notes, setNotes] = useState(prefill?.notes ?? "");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const selectedTemplate = useMemo(
+    () => checklistTemplates.find((x) => x.id === templateId),
+    [checklistTemplates, templateId],
+  );
 
   function onCustomerChange(id: string) {
     setCustomerId(id);
@@ -69,6 +77,7 @@ export function BookingForm({
         service_address_id: addressId,
         service_id: serviceId || "",
         quote_id: prefill?.quoteId || "",
+        checklist_template_id: templateId || "",
         recurrence,
         scheduled_start: start,
         scheduled_end: end,
@@ -133,6 +142,22 @@ export function BookingForm({
         <Field id="bk-start" label={t("form.start")} type="datetime-local" required value={start} onChange={(e) => setStart(e.target.value)} />
         <Field id="bk-end" label={t("form.end")} type="datetime-local" required value={end} onChange={(e) => setEnd(e.target.value)} />
       </div>
+
+      {checklistTemplates.length > 0 && (
+        <div>
+          <SelectField id="bk-template" label={t("form.checklistTemplate")} value={templateId} onChange={(e) => setTemplateId(e.target.value)}>
+            <option value="">{t("form.noChecklist")}</option>
+            {checklistTemplates.map((tpl) => (
+              <option key={tpl.id} value={tpl.id}>
+                {tpl.name} ({t("form.checklistItems", { count: tpl.items.length })})
+              </option>
+            ))}
+          </SelectField>
+          {selectedTemplate && (
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{t("form.checklistHint")}</p>
+          )}
+        </div>
+      )}
 
       <TextareaField id="bk-notes" label={t("form.notes")} rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t("form.notesPlaceholder")} />
 

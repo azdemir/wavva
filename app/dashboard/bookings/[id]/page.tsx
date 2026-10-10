@@ -61,6 +61,19 @@ export default async function BookingDetailPage({
         ? t("recurrence.biweekly")
         : t("recurrence.monthly");
 
+  // Attached checklist template (migration 0015); absent before the migration runs.
+  let checklistTemplate: { name: string; items: unknown[] } | null = null;
+  const templateId = (booking as { checklist_template_id?: string | null }).checklist_template_id;
+  if (templateId) {
+    const { data: tpl } = await supabase
+      .from("checklist_templates")
+      .select("name, items")
+      .eq("id", templateId)
+      .eq("company_id", company.id)
+      .maybeSingle();
+    if (tpl) checklistTemplate = { name: tpl.name, items: (tpl.items ?? []) as unknown[] };
+  }
+
   return (
     <div className="max-w-3xl space-y-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -109,6 +122,14 @@ export default async function BookingDetailPage({
             <div>
               <p className="font-medium text-slate-700 dark:text-slate-300">{t("detail.fromQuote")}</p>
               <p className="text-slate-900 dark:text-slate-100">{one(booking.quotes)?.quote_number}</p>
+            </div>
+          )}
+          {checklistTemplate && (
+            <div>
+              <p className="font-medium text-slate-700 dark:text-slate-300">{t("detail.checklistTemplate")}</p>
+              <p className="text-slate-900 dark:text-slate-100">
+                {checklistTemplate.name} · {t("detail.checklistItems", { count: checklistTemplate.items.length })}
+              </p>
             </div>
           )}
           {booking.notes && (

@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { requireCompany } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { one } from "@/lib/relations";
-import { startJob, completeJob, cancelJob, saveJobNotes } from "@/lib/actions/jobs";
+import { completeJob, cancelJob, saveJobNotes } from "@/lib/actions/jobs";
+import { StartJobButton } from "@/components/jobs/start-job-button";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,15 @@ import { formatTime, formatDate } from "@/lib/format";
 import { getTranslations } from "next-intl/server";
 
 export const instant = false;
+
+/**
+ * Whole minutes since an ISO timestamp. Module-level (not a hook) so the
+ * render-purity lint rule doesn't flag the clock read; the server component
+ * renders once per request, so the value is stable for the render.
+ */
+function elapsedMinutes(fromIso: string): number {
+  return Math.max(0, Math.round((Date.now() - new Date(fromIso).getTime()) / 60000));
+}
 
 export default async function JobDetailPage({
   params,
@@ -89,6 +99,10 @@ export default async function JobDetailPage({
     ).filter((p): p is JobPhoto => p.viewUrl !== null);
   }
   const readOnly = job.status === "completed" || job.status === "canceled";
+  // Minutes since the job was started — shown in the in-progress state so
+  // the Start button is replaced by visible job activity, not a blank row.
+  const elapsedMin =
+    job.status === "in_progress" && job.started_at ? elapsedMinutes(job.started_at) : null;
   const whenLabel =
     job.scheduled_start === job.scheduled_end
       ? `${formatDate(job.scheduled_start)}, ${formatTime(job.scheduled_start, tz)}`
@@ -159,10 +173,17 @@ export default async function JobDetailPage({
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="flex flex-wrap items-center gap-2">
-              {job.status === "scheduled" && (
-                <form action={async () => { "use server"; await startJob(id); }}>
-                  <Button type="submit">{t("detail.start")}</Button>
-                </form>
+              {job.status === "scheduled" && <StartJobButton jobId={id} />}
+              {job.status === "in_progress" && (
+                <p className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-amber-100 px-4 py-2 text-sm font-semibold text-amber-900 dark:bg-amber-950 dark:text-amber-200">
+                  <span className="relative flex h-2.5 w-2.5" aria-hidden="true">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-500 opacity-75" />
+                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-amber-600" />
+                  </span>
+                  {elapsedMin !== null && job.started_at
+                    ? t("detail.inProgressDetail", { time: formatTime(job.started_at, tz), minutes: elapsedMin })
+                    : t("detail.inProgress")}
+                </p>
               )}
               {isStaff && (
                 <form action={async () => { "use server"; await cancelJob(id); }} className="ml-auto">
@@ -188,7 +209,11 @@ export default async function JobDetailPage({
                   defaultValue={job.completion_notes ?? ""}
                   placeholder={t("detail.notesPlaceholder")}
                 />
-                <Button type="submit" variant="outline" className="w-full border-accent-300 text-accent-700 hover:bg-accent-50 dark:border-accent-800 dark:text-accent-400 dark:hover:bg-accent-950 sm:w-auto">
+                <Button
+                  type="submit"
+                  variant={job.status === "in_progress" ? undefined : "outline"}
+                  className={job.status === "in_progress" ? "w-full sm:w-auto" : "w-full border-accent-300 text-accent-700 hover:bg-accent-50 dark:border-accent-800 dark:text-accent-400 dark:hover:bg-accent-950 sm:w-auto"}
+                >
                   {t("detail.complete")}
                 </Button>
               </form>
