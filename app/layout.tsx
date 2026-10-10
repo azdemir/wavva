@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import "./globals.css";
+import { SessionTimeout } from "@/components/auth/session-timeout";
 import {
   ThemeProvider,
   themeInitScript,
@@ -112,7 +113,10 @@ export default function RootLayout(props: LayoutProps<"/">) {
         />
       </head>
       <body className="flex min-h-full flex-col">
-        <ThemeProvider>{props.children}</ThemeProvider>
+        <ThemeProvider>
+          <SessionTimeout />
+          {props.children}
+        </ThemeProvider>
       </body>
     </html>
   );

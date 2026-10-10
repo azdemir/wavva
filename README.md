@@ -50,6 +50,10 @@ need secrets, copy `.env.example` to `.env.local` and fill in test-mode keys.
   enforced in the database via `company_id`, not in application code
 - Supabase Auth (email/password) with `@supabase/ssr`; `proxy.ts` refreshes
   the session; all server data access uses the user's JWT so RLS applies
+- Signed-in browser sessions sign out after 15 minutes of inactivity.
+  Pointer, keyboard, touch, and scroll activity reset the timer across tabs.
+  The timer also checks on focus and wake-up, and persists across reloads.
+  This is a browser-side timeout, not a server-enforced token expiry.
 - Team invites via shareable token links (`/invite/[token]`); acceptance
   uses the service-role key server-side only (invitees aren't members yet,
   so RLS can't authorize them)

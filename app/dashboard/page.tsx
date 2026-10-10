@@ -14,6 +14,9 @@ import { TJobStatusPill, TQuoteStatusPill } from "@/components/ui/translated-sta
 import { EmptyState } from "@/components/ui/empty-state";
 import { PlusIcon, CalendarIcon, QuoteIcon, UsersIcon, CardIcon } from "@/components/ui/icons";
 
+// Authenticated dashboard data is loaded per request, not during prefetching.
+export const instant = false;
+
 export default async function DashboardPage() {
   const { membership, company } = await requireCompany();
   // Cleaners work from My jobs — the stats dashboard is staff-only.

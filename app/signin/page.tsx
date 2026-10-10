@@ -19,12 +19,12 @@ export const metadata: Metadata = {
 export default async function SignInPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string }>;
+  searchParams: Promise<{ next?: string; reason?: string }>;
 }) {
   // Already signed in? Skip the form.
   const user = await getSessionUser();
   if (user) redirect("/dashboard");
-  const next = (await searchParams).next;
+  const { next, reason } = await searchParams;
 
   return (
     <AuthCard
@@ -42,6 +42,11 @@ export default async function SignInPage({
         </>
       }
     >
+      {reason === "inactivity" && (
+        <p role="status" className="mb-4 rounded-lg bg-brand-50 p-3 text-sm text-brand-700 dark:bg-brand-950 dark:text-brand-300">
+          You were signed out after 15 minutes of inactivity. Sign in to continue.
+        </p>
+      )}
       {isSupabaseConfigured() ? (
         <AuthForm
           action={signIn}
