@@ -562,7 +562,28 @@ export function ImportWizard({
   };
 
   const dupList = (duplicates ?? []).filter((d) => d.status === "duplicate");
-  const newCount = (duplicates ?? []).length - dupList.length;
+  const dupIndices = new Set(dupList.map((d) => d.index));
+  // Rows with validation errors are rejected at commit time, so they are not
+  // counted as "new" — this keeps the duplicates-step counts consistent with
+  // the final import result.
+  const invalidIndices = previewRows
+    .map((_, i) => i)
+    .filter((i) => (rowErrors[i] ?? []).length > 0 && !dupIndices.has(i));
+  const newCount = previewRows.length - dupIndices.size - invalidIndices.length;
+
+  // Within-file duplicate emails are flagged right in the preview, before the
+  // server-side duplicate check runs (no server round trip needed for this).
+  const withinFileDupeRows = (() => {
+    const seen = new Map<string, number>();
+    const dupes = new Set<number>();
+    previewRows.forEach((r, i) => {
+      const e = (r.email ?? "").trim().toLowerCase();
+      if (!e) return;
+      if (seen.has(e)) dupes.add(i);
+      else seen.set(e, i);
+    });
+    return dupes;
+  })();
 
   return (
     <div className="space-y-6">
@@ -763,6 +784,12 @@ export function ImportWizard({
                               {errs.map((c) => t(`validation.${c}`)).join(" ")}
                             </span>
                           )}
+                          {withinFileDupeRows.has(i) && (
+                            <span className="block text-xs text-red-600 dark:text-red-400">
+                              Duplicate email in this file — this row will be
+                              skipped on import.
+                            </span>
+                          )}
                         </td>
                       </tr>
                     );
@@ -795,11 +822,26 @@ export function ImportWizard({
               <Badge tone="slate">
                 {t("duplicates.duplicateCount", { count: dupList.length })}
               </Badge>
+              {invalidIndices.length > 0 && (
+                <Badge tone="amber">
+                  {invalidIndices.length} row
+                  {invalidIndices.length === 1 ? "" : "s"} with errors
+                </Badge>
+              )}
             </div>
             <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
               {t("duplicates.description")}
             </p>
-            {dupList.length === 0 ? (
+            {invalidIndices.length > 0 && (
+              <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-300">
+                {invalidIndices.length} row
+                {invalidIndices.length === 1 ? "" : "s"} (row{" "}
+                {invalidIndices.map((i) => i + 1).join(", ")}){" "}
+                {invalidIndices.length === 1 ? "has" : "have"} validation
+                errors and will be skipped during import.
+              </div>
+            )}
+            {dupList.length === 0 && invalidIndices.length === 0 ? (
               <p className="text-sm text-slate-500 dark:text-slate-400">
                 {t("preview.noErrors")}
               </p>

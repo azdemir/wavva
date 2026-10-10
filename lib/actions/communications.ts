@@ -82,6 +82,9 @@ export async function saveTemplateOverride(
   if (channel === "sms" && (body?.length ?? 0) > 1000) {
     return { error: "SMS text must be 1,000 characters or less." };
   }
+  if (channel === "email" && !subject?.trim()) {
+    return { error: "Email subject cannot be empty." };
+  }
   const supabase = await createClient();
   const { error } = await supabase.from("communication_templates").upsert(
     {

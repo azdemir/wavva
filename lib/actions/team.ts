@@ -50,6 +50,19 @@ export async function createInvite(
     };
   }
 
+  // A pending invite for this email already exists — say so instead of
+  // silently upserting, which previously looked like nothing happened.
+  const { data: pendingInvite } = await supabase
+    .from("invites")
+    .select("id")
+    .eq("company_id", ctx.company.id)
+    .eq("email", parsed.data.email)
+    .is("accepted_at", null)
+    .maybeSingle();
+  if (pendingInvite) {
+    return { error: "An invite is already pending for this email." };
+  }
+
   const { error } = await supabase.from("invites").upsert(
     {
       company_id: ctx.company.id,

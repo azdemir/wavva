@@ -47,6 +47,20 @@ export async function signUp(formData: FormData): Promise<AuthResult> {
   redirect("/onboarding");
 }
 
+/**
+ * Post-login redirect targets must be same-origin relative paths: a single
+ * leading "/", never "//" (protocol-relative URLs), and no backslashes
+ * (some browsers normalize "\" to "/", which can turn a path like
+ * "/\evil.com" into an off-site redirect). Anything else is rejected so the
+ * caller can fall back to a safe default.
+ */
+function safeNextPath(next: unknown): string | null {
+  if (typeof next !== "string") return null;
+  if (!next.startsWith("/") || next.startsWith("//")) return null;
+  if (next.includes("\\")) return null;
+  return next;
+}
+
 export async function signIn(formData: FormData): Promise<AuthResult> {
   if (!isSupabaseConfigured()) return { error: NOT_CONFIGURED_ERROR };
   const rl = await rateLimit("auth:signin", limits.auth.max, limits.auth.windowMs);
@@ -66,13 +80,9 @@ export async function signIn(formData: FormData): Promise<AuthResult> {
   });
   if (error) return { error: error.message };
 
-  // Honor an explicit redirect (e.g. an invite link); otherwise the
-  // dashboard layout routes based on onboarding state.
-  const next = formData.get("next");
-  if (typeof next === "string" && next.startsWith("/") && !next.startsWith("//")) {
-    redirect(next);
-  }
-  redirect("/dashboard");
+  // Honor an explicit redirect (e.g. a deep link preserved as ?next=);
+  // otherwise the dashboard layout routes based on onboarding state.
+  redirect(safeNextPath(formData.get("next")) ?? "/dashboard");
 }
 
 export async function signOut() {

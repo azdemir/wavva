@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
@@ -13,6 +14,7 @@ import { PrinterIcon } from "@/components/ui/icons";
 import { formatCents, formatDate } from "@/lib/format";
 import { one } from "@/lib/relations";
 import { FollowupStatus } from "@/components/quotes/followup-status";
+import { PortalLinkButton } from "@/components/portal/portal-link-button";
 
 export default async function QuoteDetailPage({
   params,
@@ -57,6 +59,9 @@ export default async function QuoteDetailPage({
   }[];
 
   const customer = one(quote.customers) as { id: string; name: string; email: string | null; phone: string | null } | null;
+
+  const h = await headers();
+  const baseUrl = `${h.get("x-forwarded-proto") ?? "http"}://${h.get("host")}`;
 
   return (
     <div className="max-w-3xl space-y-8">
@@ -171,6 +176,26 @@ export default async function QuoteDetailPage({
           )}
         </CardContent>
       </Card>
+
+      {customer && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("detail.portalTitle")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-3 text-sm text-slate-600 dark:text-slate-400">
+              {t("detail.portalDescription")}
+            </p>
+            <PortalLinkButton
+              customerId={customer.id}
+              baseUrl={baseUrl}
+              customerName={customer.name}
+              customerEmail={customer.email}
+              customerPhone={customer.phone}
+            />
+          </CardContent>
+        </Card>
+      )}
 
       <p className="text-sm">
         <Link href="/dashboard/quotes" className="font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400">
