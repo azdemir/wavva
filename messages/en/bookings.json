@@ -72,7 +72,8 @@
     "searchLabel": "Search bookings",
     "searchPlaceholder": "Booking # or customer name…",
     "title": "Bookings",
-    "upcoming": "Upcoming ({count})"
+    "upcoming": "Upcoming ({count})",
+    "calendarView": "Calendar"
   },
   "new": {
     "addCustomer": "Add a customer →",

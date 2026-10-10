@@ -1,1 +1,28 @@
-{"addBooking":"Add booking","crewFilter":{"everyone":"Everyone","label":"Crew"},"heading":{"description":"Your crew's week at a glance.","title":"Schedule"},"noVisits":"No visits","unknownMember":"Unknown","weekNav":{"next":"Next →","prev":"← Prev","today":"Today"},"unknownCustomer":"Unknown customer"}
+{
+  "addBooking": "Add booking",
+  "crewFilter": {
+    "everyone": "Everyone",
+    "label": "Crew"
+  },
+  "heading": {
+    "description": "Your crew's week at a glance.",
+    "title": "Schedule"
+  },
+  "noVisits": "No visits",
+  "unknownMember": "Unknown",
+  "weekNav": {
+    "next": "Next →",
+    "prev": "← Prev",
+    "today": "Today"
+  },
+  "unknownCustomer": "Unknown customer",
+  "view": {
+    "label": "Calendar view",
+    "week": "Week",
+    "month": "Month",
+    "openWeek": "Open week view"
+  },
+  "month": {
+    "more": "+{count} more"
+  }
+}

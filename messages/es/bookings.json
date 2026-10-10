@@ -72,7 +72,8 @@
     "searchLabel": "Buscar reservas",
     "searchPlaceholder": "N.º de reserva o nombre del cliente…",
     "title": "Reservas",
-    "upcoming": "Próximas ({count})"
+    "upcoming": "Próximas ({count})",
+    "calendarView": "Calendario"
   },
   "new": {
     "addCustomer": "Agregar un cliente →",

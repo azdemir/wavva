@@ -72,7 +72,8 @@
     "searchLabel": "Пошук бронювань",
     "searchPlaceholder": "№ бронювання або ім'я клієнта…",
     "title": "Бронювання",
-    "upcoming": "Майбутні ({count})"
+    "upcoming": "Майбутні ({count})",
+    "calendarView": "Календар"
   },
   "new": {
     "addCustomer": "Додати клієнта →",

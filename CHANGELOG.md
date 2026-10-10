@@ -6,6 +6,21 @@ All notable changes to TidyPro. Dates are in America/New_York.
 
 ### Added (unpushed)
 
+- **Schedule month view + Week/Month toggle** — the Schedule page now has a
+  Month option next to Week (segmented control in the header). The month
+  grid shows the full 6-week calendar with the same colorful status pills
+  (blue = scheduled, amber = in progress, green = completed) on every visit,
+  up to 3 pills per day plus a "+N more" link; day numbers and "+N more"
+  jump to that week, each day keeps its "+" quick add-booking button, and
+  adjacent-month days render dimmed. Prev/Today/Next step by month in month
+  view; the crew filter and view choice travel together in the URL, and
+  switching views preserves context (month of the shown week and vice
+  versa). Weekday headers follow the dashboard locale. New `schedule.view.*`
+  and `schedule.month.more` strings in EN/ES/UK.
+- **Bookings list → Calendar button** — a Calendar button in the bookings
+  header links to the Schedule calendar (the bookings page itself stays a
+  filterable list). New `bookings.list.calendarView` string in EN/ES/UK.
+
 - **Digital checklist templates for appointments** — owners can define
   reusable checklist templates in Settings → Checklist templates (Growth+
   feature; new `checklist_templates` table, migration

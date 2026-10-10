@@ -1,1 +1,28 @@
-{"addBooking":"Додати бронювання","crewFilter":{"everyone":"Усі","label":"Команда"},"heading":{"description":"Тиждень вашої команди одним поглядом.","title":"Розклад"},"noVisits":"Немає візитів","unknownMember":"Невідомо","weekNav":{"next":"Далі →","prev":"← Назад","today":"Сьогодні"},"unknownCustomer":"Невідомий клієнт"}
+{
+  "addBooking": "Додати бронювання",
+  "crewFilter": {
+    "everyone": "Усі",
+    "label": "Команда"
+  },
+  "heading": {
+    "description": "Тиждень вашої команди одним поглядом.",
+    "title": "Розклад"
+  },
+  "noVisits": "Немає візитів",
+  "unknownMember": "Невідомо",
+  "weekNav": {
+    "next": "Далі →",
+    "prev": "← Назад",
+    "today": "Сьогодні"
+  },
+  "unknownCustomer": "Невідомий клієнт",
+  "view": {
+    "label": "Вигляд календаря",
+    "week": "Тиждень",
+    "month": "Місяць",
+    "openWeek": "Відкрити тижневий вигляд"
+  },
+  "month": {
+    "more": "+{count} ще"
+  }
+}

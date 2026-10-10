@@ -138,6 +138,9 @@ export default async function BookingsPage({
         <Heading title={t("list.title")} description={t("list.description")} />
         <div className="flex flex-wrap gap-2">
           <ExportButton href={`/api/exports/bookings${exportQs ? `?${exportQs}` : ""}`} />
+          <Button href="/dashboard/schedule" variant="outline">
+            <CalendarIcon className="h-4 w-4" /> {t("list.calendarView")}
+          </Button>
           <Button href="/dashboard/bookings/new">
             <PlusIcon className="h-4 w-4" /> {t("list.newBooking")}
           </Button>
