@@ -20,9 +20,12 @@ import { pushInvoice } from "@/lib/quickbooks/sync";
 export type ActionResult = { error?: string; ok?: boolean };
 
 const lineSchema = z.object({
-  label: z.string().min(1).max(200),
-  qty: z.coerce.number().positive(),
-  unit_price_cents: z.coerce.number().int().min(0),
+  label: z.string().min(1, "Enter a description for each line item.").max(200),
+  qty: z.coerce.number().positive("Quantity must be more than 0."),
+  unit_price_cents: z.coerce
+    .number()
+    .int("Enter a whole number of cents.")
+    .min(0, "Enter an amount of 0 or more."),
 });
 
 const invoiceSchema = z.object({
@@ -111,7 +114,9 @@ const invoiceTransitions: Record<string, string[]> = {
   draft: ["sent", "void"],
   sent: ["paid", "overdue", "void"],
   overdue: ["paid", "void"],
-  paid: [],
+  // A paid invoice can only be voided — the record (and its payments) are
+  // kept for the books; voiding never deletes anything.
+  paid: ["void"],
   void: [],
 };
 
@@ -297,6 +302,41 @@ export async function recordPayment(id: string, formData: FormData): Promise<Act
   revalidatePath(`/dashboard/invoices/${id}`);
   revalidatePath("/dashboard/invoices");
   return { ok: true };
+}
+
+/**
+ * Mark an invoice paid in full. Unlike setInvoiceStatus(id, "paid") — which
+ * only flips the status — this records a manual payment for the remaining
+ * balance first, so "Paid $X / Balance due $0.00" stays truthful. Mirrors the
+ * Stripe webhook's payment recording with provider "manual".
+ */
+export async function markInvoicePaid(id: string): Promise<ActionResult> {
+  const ctx = await requireCompany();
+  if (!isStaff(ctx.membership.role)) return { error: NOT_PERMITTED };
+  const t = await getTranslations("invoices");
+  const supabase = await createClient();
+
+  const { data: invoice } = await supabase
+    .from("invoices")
+    .select("id, status, total_cents, amount_paid_cents")
+    .eq("id", id)
+    .eq("company_id", ctx.company.id)
+    .single();
+  if (!invoice) return { error: t("errors.invoiceNotFound") };
+  if (!["sent", "overdue"].includes(invoice.status)) {
+    return { error: t("errors.paymentsOnlyOnSent") };
+  }
+  const dueCents = invoice.total_cents - invoice.amount_paid_cents;
+  if (dueCents <= 0) {
+    // Nothing left to record — just flip the status.
+    return setInvoiceStatus(id, "paid");
+  }
+  // Delegate to recordPayment so the payment row, audit log, webhook event,
+  // and customer "payment received" notification all stay in one code path.
+  const formData = new FormData();
+  formData.set("amount", (dueCents / 100).toFixed(2));
+  formData.set("reference", "");
+  return recordPayment(id, formData);
 }
 
 const invoiceNumberSchema = z.string().trim().min(1, "Enter an invoice number.").max(50);

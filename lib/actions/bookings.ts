@@ -52,6 +52,10 @@ export async function createBooking(input: unknown): Promise<ActionResult> {
   const start = localInputToUtc(parsed.data.scheduled_start, tz);
   const end = localInputToUtc(parsed.data.scheduled_end, tz);
   if (!(end > start)) return { error: t("actions.endAfterStart") };
+  // Bookings can't start in the past (1-minute grace for clock skew).
+  if (start.getTime() < Date.now() - 60_000) {
+    return { error: "The booking start time must be in the future." };
+  }
 
   const supabase = await createClient();
 
@@ -219,6 +223,10 @@ export async function rescheduleBooking(
   const newStart = localInputToUtc(newStartInput, tz);
   const newEnd = localInputToUtc(newEndInput, tz);
   if (!(newEnd > newStart)) return { error: t("actions.endAfterStart") };
+  // Rescheduling into the past is rejected just like creating in the past.
+  if (newStart.getTime() < Date.now() - 60_000) {
+    return { error: "The booking start time must be in the future." };
+  }
 
   const supabase = await createClient();
   const { data: booking } = await supabase

@@ -1,7 +1,10 @@
 import { z } from "zod";
 
 /** Money is stored as integer cents everywhere. */
-export const cents = z.coerce.number().int().min(0);
+export const cents = z.coerce
+  .number()
+  .int("Enter a whole number of cents.")
+  .min(0, "Enter an amount of 0 or more.");
 
 export const email = z.string().email("Enter a valid email address").max(255);
 export const phone = z.string().max(32).optional().or(z.literal(""));
@@ -89,19 +92,24 @@ export const addressSchema = z.object({
 export const quoteItemSchema = z.object({
   kind: z.enum(["service", "addon", "custom"]),
   ref_id: z.string().uuid().optional().or(z.literal("")),
-  label: z.string().min(1).max(200),
-  qty: z.coerce.number().positive().default(1),
+  label: z.string().min(1, "Enter a description for each line item.").max(200),
+  qty: z.coerce.number().positive("Quantity must be more than 0.").default(1),
   unit_price_cents: cents,
 });
 
-export const quoteSchema = z.object({
-  customer_id: uuid,
-  valid_until: z.string().optional().or(z.literal("")),
-  notes: z.string().max(2000).optional().or(z.literal("")),
-  discount_cents: cents.default(0),
-  tax_rate: z.coerce.number().min(0).max(1).default(0),
-  items: z.array(quoteItemSchema).min(1, "Add at least one line item"),
-});
+export const quoteSchema = z
+  .object({
+    customer_id: uuid,
+    valid_until: z.string().optional().or(z.literal("")),
+    notes: z.string().max(2000).optional().or(z.literal("")),
+    discount_cents: cents.default(0),
+    tax_rate: z.coerce.number().min(0).max(1).default(0),
+    items: z.array(quoteItemSchema).min(1, "Add at least one line item"),
+  })
+  .refine(
+    (q) => q.items.some((i) => i.qty * i.unit_price_cents > 0),
+    "Add at least one line item with a price above $0.",
+  );
 
 export const bookingSchema = z.object({
   customer_id: uuid,

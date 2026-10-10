@@ -164,8 +164,27 @@ function matchRow(row: MappedRow, existing: ExistingCustomer[]): DuplicateMatch 
 }
 
 /**
- * Compare import rows against existing customers.
- * Returns one match entry per row: "new" or "duplicate".
+ * Find emails that appear in more than one row of the same file.
+ * Returns a map of row index -> first row index that used the email.
+ */
+function findWithinFileDuplicateEmails(rows: MappedRow[]): Map<number, number> {
+  const seen = new Map<string, number>();
+  const dupes = new Map<number, number>();
+  rows.forEach((row, i) => {
+    const email = (row.email ?? "").trim().toLowerCase();
+    if (!email) return;
+    const first = seen.get(email);
+    if (first === undefined) seen.set(email, i);
+    else dupes.set(i, first);
+  });
+  return dupes;
+}
+
+/**
+ * Compare import rows against existing customers AND against each other.
+ * Returns one match entry per row: "new" or "duplicate". A row that matches
+ * an existing customer keeps that (more informative) match; a row that only
+ * duplicates another row in the same file is flagged against that row.
  */
 export async function findImportDuplicates(
   rowsInput: unknown,
@@ -180,8 +199,21 @@ export async function findImportDuplicates(
   const supabase = await createClient();
   try {
     const existing = await loadExistingCustomers(supabase, ctx.company.id);
+    const withinFile = findWithinFileDuplicateEmails(rows);
     return {
-      matches: rows.map((row, index) => ({ ...matchRow(row, existing), index })),
+      matches: rows.map((row, index) => {
+        const m = { ...matchRow(row, existing), index };
+        const firstIdx = withinFile.get(index);
+        if (firstIdx !== undefined && m.status !== "duplicate") {
+          return {
+            index,
+            status: "duplicate" as const,
+            matchedName: `Row ${firstIdx + 1} in this file`,
+            matchOn: "email" as const,
+          };
+        }
+        return m;
+      }),
     };
   } catch {
     return { error: t("actions.duplicateCheckFailed") };
@@ -252,6 +284,9 @@ export async function commitImport(input: unknown): Promise<CommitResult> {
   } catch {
     return { error: t("actions.duplicateCheckFailed") };
   }
+  // Within-file duplicates are rejected here too, so a tampered client
+  // can't smuggle them past the duplicates step.
+  const withinFileDupes = findWithinFileDuplicateEmails(rows);
 
   // Booking numbers: query the count once, then increment per insert.
   const { count: bookingCount } = await supabase
@@ -270,6 +305,17 @@ export async function commitImport(input: unknown): Promise<CommitResult> {
         errors.push({
           row: rowNo,
           message: codes.map((c) => t(`validation.${c}`)).join(" "),
+        });
+        continue;
+      }
+
+      // A row duplicating another row in the same file is always rejected —
+      // importing it would create two customers sharing one email.
+      const firstIdx = withinFileDupes.get(i);
+      if (firstIdx !== undefined) {
+        errors.push({
+          row: rowNo,
+          message: `Duplicate email in this file (row ${firstIdx + 1}).`,
         });
         continue;
       }

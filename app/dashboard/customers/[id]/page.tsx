@@ -5,9 +5,11 @@ import { getTranslations } from "next-intl/server";
 import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { updateCustomer, deleteCustomer, deleteAddress } from "@/lib/actions/customers";
+import { isCustomerEmailTaken } from "@/lib/actions/customer-duplicates";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ConfirmActionButton } from "@/components/ui/confirm-action-button";
 import { Badge, type JobStatus, type QuoteStatus } from "@/components/ui/badge";
 import { TJobStatusPill, TQuoteStatusPill } from "@/components/ui/translated-status-pill";
 import { CustomerForm } from "@/components/customers/customer-form";
@@ -79,6 +81,10 @@ export default async function CustomerDetailPage({
             }}
             action={async (formData) => {
               "use server";
+              const email = String(formData.get("email") ?? "");
+              if (await isCustomerEmailTaken(email, id)) {
+                return { error: "A customer with this email address already exists." };
+              }
               return updateCustomer(id, formData);
             }}
             submitLabel={t("detail.saveChanges")}
@@ -187,19 +193,47 @@ export default async function CustomerDetailPage({
 
       <Card>
         <CardContent className="pt-6">
-          <form
+          <ConfirmActionButton
+            label={t("detail.deleteCustomer")}
+            confirmMessage="Delete this customer? Their addresses will be removed too. This can't be undone."
+            pendingLabel="Deleting…"
+            className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950"
             action={async () => {
               "use server";
-              await deleteCustomer(id);
+              // Surface a clear reason instead of failing silently: quotes,
+              // jobs and invoices reference the customer with ON DELETE
+              // RESTRICT, so the database itself would refuse the delete.
+              const { company: actionCompany } = await requirePermission("customers.manage");
+              const db = await createClient();
+              const [b, q, j, inv] = await Promise.all([
+                db.from("bookings").select("id", { count: "exact", head: true }).eq("customer_id", id).eq("company_id", actionCompany.id).neq("status", "canceled"),
+                db.from("quotes").select("id", { count: "exact", head: true }).eq("customer_id", id).eq("company_id", actionCompany.id),
+                db.from("jobs").select("id", { count: "exact", head: true }).eq("customer_id", id).eq("company_id", actionCompany.id),
+                db.from("invoices").select("id", { count: "exact", head: true }).eq("customer_id", id).eq("company_id", actionCompany.id),
+              ]);
+              const activeBookings = b.count ?? 0;
+              if (activeBookings > 0) {
+                return {
+                  error: `This customer has ${activeBookings} active booking${activeBookings === 1 ? "" : "s"}. Cancel ${activeBookings === 1 ? "it" : "them"} first, then delete.`,
+                };
+              }
+              const history: string[] = [];
+              const qc = q.count ?? 0, jc = j.count ?? 0, ic = inv.count ?? 0;
+              if (qc > 0) history.push(`${qc} quote${qc === 1 ? "" : "s"}`);
+              if (jc > 0) history.push(`${jc} job${jc === 1 ? "" : "s"}`);
+              if (ic > 0) history.push(`${ic} invoice${ic === 1 ? "" : "s"}`);
+              if (history.length > 0) {
+                return {
+                  error: `This customer can't be deleted because they have ${history.join(", ")} on record. Customers with history are kept for your books.`,
+                };
+              }
+              return deleteCustomer(id);
             }}
-          >
-            <Button type="submit" variant="outline" className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950">
-              {t("detail.deleteCustomer")}
-            </Button>
-            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">
-              {t("detail.deleteHint")}
-            </p>
-          </form>
+          />
+          <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">
+            {t("detail.deleteHint")}{" "}
+            Customers with quotes, jobs, or invoices on record can&apos;t be deleted.
+          </p>
         </CardContent>
       </Card>
     </div>
