@@ -6,7 +6,7 @@ import { ChevronDownIcon } from "@/components/ui/icons";
 import { FEATURE_LINKS } from "./feature-links";
 
 const linkBase =
-  "rounded-md px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 dark:focus-visible:outline-brand-400";
+  "rounded-full px-3.5 py-2 text-[0.9375rem] font-medium text-ink-2 transition-colors hover:bg-surface-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600";
 
 /**
  * Desktop "Features" dropdown. Opens on hover (with a small grace delay so
@@ -146,7 +146,7 @@ export function FeaturesMenu() {
               focusItem(FEATURE_LINKS.length - 1);
             }
           }}
-          className="absolute left-1/2 top-full z-50 mt-2 w-80 -translate-x-1/2 rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-800 dark:bg-slate-900"
+          className="absolute left-1/2 top-full z-50 mt-2 w-80 -translate-x-1/2 rounded-2xl border border-line bg-surface p-2 shadow-[0_24px_60px_-20px_rgba(15,23,42,0.3)]"
         >
           {FEATURE_LINKS.map((f, i) => (
             <Link
@@ -157,13 +157,13 @@ export function FeaturesMenu() {
                 itemRefs.current[i] = el;
               }}
               onClick={doClose}
-              className="flex items-start gap-3 rounded-lg px-3 py-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 dark:focus-visible:outline-brand-400"
+              className="flex items-start gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
             >
               <span className="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-950 dark:text-brand-400">
                 <f.icon className="h-5 w-5" />
               </span>
               <span>
-                <span className="block text-sm font-semibold text-slate-900 dark:text-slate-100">
+                <span className="block text-sm font-semibold text-ink">
                   {f.title}
                   {f.slug === "mobile-app" && (
                     <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 align-middle text-[11px] font-semibold text-amber-800 dark:bg-amber-950 dark:text-amber-300">
@@ -171,13 +171,13 @@ export function FeaturesMenu() {
                     </span>
                   )}
                 </span>
-                <span className="mt-0.5 block text-[13px] leading-snug text-slate-500 dark:text-slate-400">
+                <span className="mt-0.5 block text-[13px] leading-snug text-ink-2">
                   {f.blurb}
                 </span>
               </span>
             </Link>
           ))}
-          <div className="mt-1 border-t border-slate-100 px-3 pt-2 pb-1 dark:border-slate-800">
+          <div className="mt-1 border-t border-line px-3 pt-2 pb-1">
             <Link
               href="/features"
               onClick={doClose}

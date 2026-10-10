@@ -6,12 +6,19 @@ import { ChevronDownIcon } from "@/components/ui/icons";
 import { FEATURE_LINKS } from "./feature-links";
 
 const linkClass =
-  "block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800";
+  "block rounded-xl px-3.5 py-3 text-sm font-medium text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600";
+
+const otherLinks = [
+  { label: "How it works", href: "/#how-it-works" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "Compare", href: "/compare" },
+  { label: "FAQ", href: "/faq" },
+];
 
 /**
- * Mobile navigation: a Menu toggle plus an expandable "Features" accordion.
- * Fully keyboard accessible — every control is a real button/link with
- * visible focus states, and the accordion uses aria-expanded + a region.
+ * Mobile / tablet navigation: a Menu toggle plus an expandable "Features"
+ * accordion. Fully keyboard accessible — every control is a real button/link
+ * with visible focus states, and the accordion uses aria-expanded + a region.
  */
 export function MobileNav({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -19,19 +26,22 @@ export function MobileNav({ children }: { children: React.ReactNode }) {
   const featuresRegionId = useId();
 
   return (
-    <div className="relative md:hidden">
+    <div className="relative lg:hidden">
       <button
         type="button"
         aria-expanded={menuOpen}
         aria-label={menuOpen ? "Close menu" : "Open menu"}
         onClick={() => setMenuOpen((v) => !v)}
-        className="cursor-pointer rounded-lg border border-slate-300 dark:border-slate-700 px-4 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 dark:focus-visible:outline-brand-400"
+        className="flex h-10 cursor-pointer list-none items-center gap-2 rounded-full border border-line-strong bg-surface px-4 text-sm font-semibold text-ink transition-colors hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
       >
         {menuOpen ? "Close" : "Menu"}
+        <ChevronDownIcon
+          className={`h-4 w-4 transition-transform duration-300 ${menuOpen ? "rotate-180" : ""}`}
+        />
       </button>
 
       {menuOpen && (
-        <div className="absolute top-12 right-0 z-50 max-h-[70vh] w-64 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 shadow-lg dark:border-slate-800 dark:bg-slate-900">
+        <div className="absolute top-14 right-0 z-50 max-h-[70vh] w-64 overflow-y-auto rounded-2xl border border-line bg-surface p-2 shadow-[0_24px_60px_-20px_rgba(15,23,42,0.3)]">
           <nav aria-label="Mobile">
             <button
               type="button"
@@ -42,7 +52,7 @@ export function MobileNav({ children }: { children: React.ReactNode }) {
             >
               Features
               <ChevronDownIcon
-                className={`h-4 w-4 text-slate-400 transition-transform ${featuresOpen ? "rotate-180" : ""}`}
+                className={`h-4 w-4 text-ink-2 transition-transform ${featuresOpen ? "rotate-180" : ""}`}
               />
             </button>
             {featuresOpen && (
@@ -50,14 +60,14 @@ export function MobileNav({ children }: { children: React.ReactNode }) {
                 id={featuresRegionId}
                 role="region"
                 aria-label="Feature pages"
-                className="mb-1 ml-2 border-l-2 border-slate-100 pl-2 dark:border-slate-800"
+                className="mb-1 ml-2 border-l-2 border-line pl-2"
               >
                 {FEATURE_LINKS.map((f) => (
                   <Link
                     key={f.slug}
                     href={f.href}
                     onClick={() => setMenuOpen(false)}
-                    className={`${linkClass} flex items-center gap-2.5 py-2`}
+                    className={`${linkClass} flex items-center gap-2.5 !py-2`}
                   >
                     <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-brand-50 text-brand-600 dark:bg-brand-950 dark:text-brand-400">
                       <f.icon className="h-4 w-4" />
@@ -74,28 +84,17 @@ export function MobileNav({ children }: { children: React.ReactNode }) {
                 ))}
               </div>
             )}
-            <Link
-              href="/#how-it-works"
-              onClick={() => setMenuOpen(false)}
-              className={linkClass}
-            >
-              How it works
-            </Link>
-            <Link
-              href="/pricing"
-              onClick={() => setMenuOpen(false)}
-              className={linkClass}
-            >
-              Pricing
-            </Link>
-            <Link
-              href="/faq"
-              onClick={() => setMenuOpen(false)}
-              className={linkClass}
-            >
-              FAQ
-            </Link>
-            <div className="mt-2 space-y-2 border-t border-slate-200 dark:border-slate-800 pt-2">
+            {otherLinks.map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                onClick={() => setMenuOpen(false)}
+                className={linkClass}
+              >
+                {l.label}
+              </Link>
+            ))}
+            <div className="mt-2 space-y-2 border-t border-line pt-3">
               {children}
             </div>
           </nav>

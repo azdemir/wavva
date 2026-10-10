@@ -6,11 +6,12 @@ import { Container } from "@/components/ui/container";
 import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { StickyHeader } from "@/components/marketing/sticky-header";
+import { FeaturesMenu } from "@/components/marketing/features-menu";
+import { MobileNav } from "@/components/marketing/mobile-nav";
 import { getSessionUser } from "@/lib/auth";
 import { getContent } from "@/lib/studio/content";
 
 const links = [
-  { label: "Features", href: "/features" },
   { label: "How it works", href: "/#how-it-works" },
   { label: "Pricing", href: "/pricing" },
   { label: "Compare", href: "/compare" },
@@ -103,6 +104,7 @@ export async function Navbar() {
           </Link>
 
           <div className="hidden min-w-0 flex-1 items-center justify-center gap-1 lg:flex">
+            <FeaturesMenu />
             {links.map((l) => (
               <Link
                 key={l.href}
@@ -125,41 +127,14 @@ export async function Navbar() {
               <AuthNavActions />
             </Suspense>
 
-            {/* Mobile / tablet: theme toggle + no-JS menu */}
+            {/* Mobile / tablet: theme toggle + menu with Features accordion */}
             <div className="flex items-center gap-2 lg:hidden">
               <ThemeToggle />
-              <details className="group relative">
-                <summary className="flex h-10 cursor-pointer list-none items-center gap-2 rounded-full border border-line-strong bg-surface px-4 text-sm font-semibold text-ink transition-colors hover:bg-surface-2 [&::-webkit-details-marker]:hidden">
-                  Menu
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="h-4 w-4 transition-transform duration-300 group-open:rotate-180"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M6 9l6 6 6-6" />
-                  </svg>
-                </summary>
-                <div className="absolute top-14 right-0 w-64 overflow-hidden rounded-2xl border border-line bg-surface p-2 shadow-[0_24px_60px_-20px_rgba(15,23,42,0.3)]">
-                  {links.map((l) => (
-                    <Link
-                      key={l.href}
-                      href={l.href}
-                      className="block rounded-xl px-3.5 py-3 text-sm font-medium text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink"
-                    >
-                      {l.label}
-                    </Link>
-                  ))}
-                  <div className="mt-2 space-y-2 border-t border-line pt-3">
-                    <Suspense fallback={null}>
-                      <MobileAuthNavActions />
-                    </Suspense>
-                  </div>
-                </div>
-              </details>
+              <MobileNav>
+                <Suspense fallback={null}>
+                  <MobileAuthNavActions />
+                </Suspense>
+              </MobileNav>
             </div>
           </div>
         </nav>
