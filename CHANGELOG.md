@@ -4,6 +4,26 @@ All notable changes to TidyPro. Dates are in America/New_York.
 
 ## 2026-10-09
 
+### Fixed (unpushed)
+
+- **Services page no longer blocks instant navigation** — the two uncached
+  Supabase reads (`services` + `addons`) moved out of the page body into a
+  `ServicesCatalog` server component behind a `<Suspense>` boundary, so the
+  page shell (heading + skeleton cards) commits immediately while the
+  catalog streams in. Data stays fresh on every visit (no caching added);
+  the managers' `revalidatePath` behavior is unchanged. New
+  `services.loading.catalog` string in EN/ES/UK.
+
+### Changed (unpushed)
+
+- **Automated communications are now a Pro-tier feature** — the Settings →
+  Communications template editor is plan-gated (owners on Basic/Starter/
+  Growth see an upgrade prompt instead), "Automated SMS & email templates"
+  is advertised in the Pro plan feature list, and the /pricing comparison
+  table gained an "Automated SMS & email templates" row (Pro only). Note:
+  the automatic trigger engine still sends for all plans — enforcing the
+  gate in the send pipeline is a follow-up if wanted.
+
 ### Added
 
 - **Calendar management from the week view** — each day column on the
