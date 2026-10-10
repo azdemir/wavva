@@ -48,4 +48,5 @@ export const NAMESPACES = [
   "checklists",
   "availability",
   "integrations",
+  "arcade",
 ] as const;

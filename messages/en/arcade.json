@@ -1,0 +1,167 @@
+{
+  "backToArcade": "Back to arcade",
+  "best": "Best",
+  "dbp": {
+    "bestCombo": "Best combo",
+    "catSeen": "THE CAT SAW THAT",
+    "catTaunts": [
+      "psst... don't.",
+      "the cat remembers",
+      "bold move",
+      "mistake.",
+      "reported."
+    ],
+    "cats": "Cats disturbed",
+    "clientEvent": "CLIENT'S HOME EARLY!",
+    "combo": "COMBO x{mult}",
+    "endTitle": "Time's up!",
+    "foot": "A very serious training simulator for cleaning pros.",
+    "golden": "Golden caught",
+    "goldenTaunts": [
+      "catch me!",
+      "jackpot!"
+    ],
+    "jackpot": "JACKPOT!",
+    "ranks": [
+      {
+        "name": "Supreme Overlord of Clean",
+        "quip": "Your mop gets its own parking spot."
+      },
+      {
+        "name": "Dust Destroyer",
+        "quip": "Dust bunnies whisper your name in fear."
+      },
+      {
+        "name": "Weekend Warrior",
+        "quip": "The baseboards nod with quiet respect."
+      },
+      {
+        "name": "Casual Tidier",
+        "quip": "The dust has filed for tenancy."
+      }
+    ],
+    "rule1": "Tap the dust bunnies before they escape.",
+    "rule2": "Golden bunnies are jackpot — sock thieves pay extra.",
+    "rule3": "Do NOT wake the cat. The cat remembers.",
+    "rule4": "Chain hits for a combo multiplier.",
+    "score": "Score",
+    "start": "Start cleaning",
+    "startTitle": "Ready?",
+    "taunts": [
+      "rent-free!",
+      "try harder",
+      "I was here first",
+      "you missed a spot",
+      "too slow!",
+      "call a pro",
+      "dust never sleeps"
+    ],
+    "timeLeft": "{s}s left",
+    "toddlerEvent": "THE TODDLER HAS ENTERED",
+    "whacked": "Bunnies whacked"
+  },
+  "description": "Take a five-minute break. You've earned it.",
+  "games": {
+    "dbp": {
+      "name": "Dust Bunny Panic",
+      "tagline": "30 seconds. Infinite dust. One sponge.",
+      "bestLabel": "Best score"
+    },
+    "sock": {
+      "name": "Sock Match Madness",
+      "tagline": "Every sock has a soulmate. Find them.",
+      "bestLabel": "Fewest moves"
+    },
+    "stain": {
+      "name": "Stain Scrub Showdown",
+      "tagline": "Scrub the impossible stains before time runs out.",
+      "bestLabel": "Most time left"
+    }
+  },
+  "play": "Play",
+  "playAgain": "Play again",
+  "sock": {
+    "endTitle": "All socks reunited!",
+    "moves": "Moves",
+    "pairNames": [
+      "The Lonely Leftovers",
+      "Toddler's Revenge",
+      "Laundry Day Survivors",
+      "Mismatched But Happy",
+      "The Great Escapees",
+      "Static Cling Duo"
+    ],
+    "pairs": "Pairs",
+    "ranks": [
+      {
+        "name": "Laundry Legend",
+        "quip": "The dryer fears you."
+      },
+      {
+        "name": "Sock Whisperer",
+        "quip": "You speak fluent laundry."
+      },
+      {
+        "name": "Casual Folder",
+        "quip": "Respectable. The socks approve."
+      },
+      {
+        "name": "Chaos Goblin",
+        "quip": "The sock drawer has seen things."
+      }
+    ],
+    "rule1": "Flip two cards at a time.",
+    "rule2": "Match all 6 pairs in as few moves as you can.",
+    "rule3": "Every pair has a name. Some are tragic.",
+    "secs": "{s}s",
+    "start": "Start matching",
+    "startTitle": "Ready to reunite some socks?",
+    "time": "Time"
+  },
+  "stain": {
+    "cleared": "Stains cleared",
+    "clearedQuips": [
+      "POOF. Gone.",
+      "Never happened.",
+      "The carpet forgives you.",
+      "Witnesses: zero.",
+      "Science can't explain it."
+    ],
+    "loseQuip": "The stains live to see another day.",
+    "loseTitle": "Time's up!",
+    "ranks": [
+      {
+        "name": "Miracle Worker",
+        "quip": "That stain told its friends about you."
+      },
+      {
+        "name": "Stain Slayer",
+        "quip": "No spill is safe."
+      },
+      {
+        "name": "Weekend Warrior",
+        "quip": "Elbow grease: applied."
+      },
+      {
+        "name": "It'll Buff Out",
+        "quip": "Probably. Eventually."
+      }
+    ],
+    "rule1": "Press and scrub each stain until it disappears.",
+    "rule2": "Clear all 5 stains before the timer runs out.",
+    "rule3": "Faster scrubbing earns a bigger time bonus.",
+    "stainNames": [
+      "Mystery Spaghetti",
+      "The Red Wine Incident",
+      "Coffee vs. Monday",
+      "Toddler Handprint",
+      "Unknown Brown (do not ask)"
+    ],
+    "start": "Start scrubbing",
+    "startTitle": "The stains are waiting.",
+    "timeLeft": "{s}s left",
+    "timeUsed": "Time used",
+    "winTitle": "Spotless!"
+  },
+  "title": "Arcade"
+}

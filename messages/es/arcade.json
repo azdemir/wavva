@@ -1,0 +1,167 @@
+{
+  "backToArcade": "Volver a la arcade",
+  "best": "Récord",
+  "dbp": {
+    "bestCombo": "Mejor combo",
+    "catSeen": "EL GATO LO VIO",
+    "catTaunts": [
+      "pss... no lo hagas.",
+      "el gato recuerda",
+      "jugada arriesgada",
+      "error.",
+      "anotado."
+    ],
+    "cats": "Gatos despertados",
+    "clientEvent": "¡EL CLIENTE LLEGÓ ANTES!",
+    "combo": "COMBO x{mult}",
+    "endTitle": "¡Se acabó el tiempo!",
+    "foot": "Un simulador de entrenamiento muy serio para profesionales de la limpieza.",
+    "golden": "Doradas atrapadas",
+    "goldenTaunts": [
+      "¡atrápame!",
+      "¡premio gordo!"
+    ],
+    "jackpot": "¡PREMIO GORDO!",
+    "ranks": [
+      {
+        "name": "Señor Supremo de la Limpieza",
+        "quip": "Tu fregona tiene su propia plaza de parking."
+      },
+      {
+        "name": "Destructor de polvo",
+        "quip": "Las pelusas susurran tu nombre con miedo."
+      },
+      {
+        "name": "Guerrero de fin de semana",
+        "quip": "Los zócalos asienten con respeto."
+      },
+      {
+        "name": "Limpiador ocasional",
+        "quip": "El polvo ha solicitado la residencia."
+      }
+    ],
+    "rule1": "Toca las pelusas de polvo antes de que escapen.",
+    "rule2": "Las pelusas doradas son el premio gordo; las del calcetín valen extra.",
+    "rule3": "NO despiertes al gato. El gato recuerda.",
+    "rule4": "Encadena aciertos para el multiplicador de combo.",
+    "score": "Puntos",
+    "start": "Empezar a limpiar",
+    "startTitle": "¿Listo?",
+    "taunts": [
+      "¡de gorra!",
+      "esfuérzate más",
+      "yo estaba aquí primero",
+      "te saltaste un punto",
+      "¡muy lento!",
+      "llama a un profesional",
+      "el polvo nunca duerme"
+    ],
+    "timeLeft": "quedan {s} s",
+    "toddlerEvent": "EL PEQUE HA ENTRADO",
+    "whacked": "Pelusas atrapadas"
+  },
+  "description": "Tómate un descanso de cinco minutos. Te lo mereces.",
+  "games": {
+    "dbp": {
+      "name": "Pánico de pelusas",
+      "tagline": "30 segundos. Polvo infinito. Una esponja.",
+      "bestLabel": "Mejor puntuación"
+    },
+    "sock": {
+      "name": "Locura de calcetines",
+      "tagline": "Cada calcetín tiene su alma gemela. Encuéntralas.",
+      "bestLabel": "Menos movimientos"
+    },
+    "stain": {
+      "name": "Duelo contra las manchas",
+      "tagline": "Frota las manchas imposibles antes de que se acabe el tiempo.",
+      "bestLabel": "Más tiempo restante"
+    }
+  },
+  "play": "Jugar",
+  "playAgain": "Jugar otra vez",
+  "sock": {
+    "endTitle": "¡Todos los calcetines reunidos!",
+    "moves": "Movimientos",
+    "pairNames": [
+      "Los solitarios olvidados",
+      "La venganza del peque",
+      "Supervivientes de la lavadora",
+      "Distintos pero felices",
+      "Los grandes escapistas",
+      "Dúo de electricidad estática"
+    ],
+    "pairs": "Parejas",
+    "ranks": [
+      {
+        "name": "Leyenda de la lavandería",
+        "quip": "La secadora te teme."
+      },
+      {
+        "name": "Susurrador de calcetines",
+        "quip": "Hablas el idioma de la colada."
+      },
+      {
+        "name": "Doblador casual",
+        "quip": "Respetable. Los calcetines aprueban."
+      },
+      {
+        "name": "Duende del caos",
+        "quip": "El cajón de los calcetines ha visto cosas."
+      }
+    ],
+    "rule1": "Voltea dos cartas a la vez.",
+    "rule2": "Encuentra las 6 parejas con los menos movimientos posibles.",
+    "rule3": "Cada pareja tiene un nombre. Algunos son trágicos.",
+    "secs": "{s} s",
+    "start": "Empezar",
+    "startTitle": "¿Listo para reunir calcetines?",
+    "time": "Tiempo"
+  },
+  "stain": {
+    "cleared": "Manchas eliminadas",
+    "clearedQuips": [
+      "¡PUF! Desapareció.",
+      "Nunca pasó.",
+      "La alfombra te perdona.",
+      "Testigos: cero.",
+      "La ciencia no puede explicarlo."
+    ],
+    "loseQuip": "Las manchas vivirán otro día.",
+    "loseTitle": "¡Se acabó el tiempo!",
+    "ranks": [
+      {
+        "name": "Milagrero",
+        "quip": "Esa mancha les contó a sus amigas de ti."
+      },
+      {
+        "name": "Cazador de manchas",
+        "quip": "Ninguna mancha está a salvo."
+      },
+      {
+        "name": "Guerrero de fin de semana",
+        "quip": "Codos en acción."
+      },
+      {
+        "name": "Ya saldrá",
+        "quip": "Probablemente. Algún día."
+      }
+    ],
+    "rule1": "Pulsa y frota cada mancha hasta que desaparezca.",
+    "rule2": "Elimina las 5 manchas antes de que se acabe el tiempo.",
+    "rule3": "Frotar más rápido da más bonus de tiempo.",
+    "stainNames": [
+      "Espagueti misterioso",
+      "El incidente del vino tinto",
+      "Café contra lunes",
+      "Manita de peque",
+      "Marrón desconocido (no preguntes)"
+    ],
+    "start": "Empezar a frotar",
+    "startTitle": "Las manchas esperan.",
+    "timeLeft": "quedan {s} s",
+    "timeUsed": "Tiempo usado",
+    "winTitle": "¡Impecable!"
+  },
+  "title": "Arcade"
+}
