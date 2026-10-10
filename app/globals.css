@@ -161,6 +161,14 @@
 
 .dark {
   color-scheme: dark;
+  --color-surface: #0a1128;
+  --color-surface-2: #101a36;
+  --color-surface-3: #151f3f;
+  --color-ink: #f1f5f9;
+  --color-ink-2: #cbd5e1;
+  --color-ink-3: #94a3b8;
+  --color-line: #273352;
+  --color-line-strong: #3a4868;
 }
 
 body {

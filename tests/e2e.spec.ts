@@ -98,12 +98,20 @@ test.describe("Theme toggle end-to-end", () => {
     await expect(toggle).toBeVisible({ timeout: 15000 });
     await toggle.click();
     await expect(page.locator("html.dark")).toHaveCount(1);
+    await expect(page.locator("main section").first()).toHaveCSS(
+      "background-color",
+      "rgb(10, 17, 40)",
+    );
     expect(
       await page.evaluate(() => localStorage.getItem("tidypro-theme")),
     ).toBe("dark");
 
     await page.reload();
     await expect(page.locator("html.dark")).toHaveCount(1);
+    await expect(page.locator("main section").first()).toHaveCSS(
+      "background-color",
+      "rgb(10, 17, 40)",
+    );
 
     // Toggle back to light (label is correct after the hydration fix).
     const lightToggle = page
@@ -112,6 +120,10 @@ test.describe("Theme toggle end-to-end", () => {
     await expect(lightToggle).toBeVisible({ timeout: 15000 });
     await lightToggle.click();
     await expect(page.locator("html.dark")).toHaveCount(0);
+    await expect(page.locator("main section").first()).toHaveCSS(
+      "background-color",
+      "rgb(233, 238, 251)",
+    );
     expectCleanConsole(errors, "theme toggle");
   });
 
