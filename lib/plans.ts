@@ -64,6 +64,7 @@ export const PLANS: Record<PlanId, Plan> = {
       "Automated quote follow-up",
       "Recurring bookings",
       "Crew scheduling & mobile checklists",
+      "Reusable checklist templates",
       "Automated reminders",
     ],
   },
@@ -78,6 +79,8 @@ export const PLANS: Record<PlanId, Plan> = {
       "Everything in Starter & Growth",
       "Business reports",
       "Before/after photo uploads",
+      "Automated SMS & email templates",
+      "QuickBooks accounting sync",
       "Priority support",
     ],
   },
@@ -118,16 +121,42 @@ export function seatLimitLabel(plan: PlanId): string {
  * Feature gating by plan. Tiers are cumulative: Growth includes everything
  * in Starter, Pro includes everything in Growth.
  */
-export type PlanFeature = "schedule" | "checklists" | "reports" | "photos";
+export type PlanFeature =
+  | "schedule"
+  | "checklists"
+  | "reports"
+  | "photos"
+  | "communications"
+  | "quickbooks";
 
 const FEATURE_MIN_PLAN: Record<PlanFeature, PlanId> = {
   schedule: "growth", // Week schedule view
   checklists: "growth", // Job checklists & crew assignment
   reports: "pro", // Company reporting dashboard
   photos: "pro", // Before/after job photo uploads
+  communications: "pro", // Automated SMS & email templates
+  quickbooks: "pro", // QuickBooks Online accounting sync
 };
 
 const PLAN_RANK: Record<PlanId, number> = { basic: 0, starter: 1, growth: 2, pro: 3 };
+
+/**
+ * Accounts with access to every tier's features, regardless of the
+ * company's plan. The founder's account is hardcoded so the grant survives
+ * env changes; platform admins (PLATFORM_ADMIN_EMAILS) are included too.
+ */
+const ALL_ACCESS_EMAILS = ["azizdemir6@gmail.com"];
+
+export function hasAllAccess(email: string | null | undefined): boolean {
+  if (!email) return false;
+  const normalized = email.toLowerCase();
+  if (ALL_ACCESS_EMAILS.includes(normalized)) return true;
+  const allowlist = (process.env.PLATFORM_ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  return allowlist.includes(normalized);
+}
 
 export function hasFeature(plan: PlanId, feature: PlanFeature): boolean {
   return PLAN_RANK[plan] >= PLAN_RANK[FEATURE_MIN_PLAN[feature]];

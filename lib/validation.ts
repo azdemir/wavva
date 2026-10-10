@@ -108,6 +108,7 @@ export const bookingSchema = z.object({
   service_address_id: uuid,
   service_id: z.string().uuid().optional().or(z.literal("")),
   quote_id: z.string().uuid().optional().or(z.literal("")),
+  checklist_template_id: z.string().uuid().optional().or(z.literal("")),
   recurrence: z.enum(["none", "weekly", "biweekly", "monthly"]).default("none"),
   scheduled_start: z.string().min(1, "Start date/time is required"),
   scheduled_end: z.string().min(1, "End date/time is required"),

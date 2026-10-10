@@ -11,6 +11,7 @@ import { bookingSchema } from "@/lib/validation";
 import { localInputToUtc } from "@/lib/dates";
 import { nextNumber } from "@/lib/pricing";
 import { one } from "@/lib/relations";
+import { missingColumnName } from "@/lib/supabase/schema-fallback";
 import { baseUrl } from "@/lib/base-url";
 import { formatDate, formatTime } from "@/lib/format";
 import { enqueueCustomerNotification } from "@/lib/communications/notify";
@@ -63,9 +64,9 @@ export async function createBooking(input: unknown): Promise<ActionResult> {
   if (!address || address.customer_id !== customer.id) {
     return { error: t("actions.addressMismatch") };
   }
-  // Independent lookups run in parallel: service/quote verification and
-  // the numbering count don't depend on each other.
-  const [{ data: svc }, { data: q }, { count }] = await Promise.all([
+  // Independent lookups run in parallel: service/quote/template verification
+  // and the numbering count don't depend on each other.
+  const [{ data: svc }, { data: q }, { count }, { data: tpl }] = await Promise.all([
     parsed.data.service_id
       ? supabase.from("services").select("id").eq("id", parsed.data.service_id).eq("company_id", ctx.company.id).maybeSingle()
       : Promise.resolve({ data: { id: "__skip" } }),
@@ -76,30 +77,56 @@ export async function createBooking(input: unknown): Promise<ActionResult> {
       .from("bookings")
       .select("id", { count: "exact", head: true })
       .eq("company_id", ctx.company.id),
+    parsed.data.checklist_template_id
+      ? supabase
+          .from("checklist_templates")
+          .select("id, items")
+          .eq("id", parsed.data.checklist_template_id)
+          .eq("company_id", ctx.company.id)
+          .maybeSingle()
+      : Promise.resolve({ data: null as { id: string; items: unknown } | null }),
   ]);
   if (parsed.data.service_id && !svc) return { error: t("actions.serviceNotFound") };
   if (parsed.data.quote_id && !q) return { error: t("actions.quoteNotFound") };
+  if (parsed.data.checklist_template_id && !tpl) return { error: t("actions.templateNotFound") };
+  const templateItems = ((tpl?.items ?? []) as { label?: unknown }[])
+    .map((i) => ({ label: String(i?.label ?? "").trim() }))
+    .filter((i) => i.label.length > 0)
+    .slice(0, 100);
 
   const settings = ctx.company.settings as { cancellation_policy?: string | null };
-  const { data: booking, error: bErr } = await supabase
+  const bookingRow: Record<string, unknown> = {
+    company_id: ctx.company.id,
+    customer_id: customer.id,
+    service_address_id: address.id,
+    service_id: parsed.data.service_id || null,
+    quote_id: parsed.data.quote_id || null,
+    booking_number: nextNumber("B", count ?? 0),
+    recurrence: parsed.data.recurrence,
+    scheduled_start: start.toISOString(),
+    scheduled_end: end.toISOString(),
+    cancellation_policy: settings.cancellation_policy ?? null,
+    notes: parsed.data.notes || null,
+  };
+  if (parsed.data.checklist_template_id) {
+    bookingRow.checklist_template_id = parsed.data.checklist_template_id;
+  }
+  let { data: booking, error: bErr } = await supabase
     .from("bookings")
-    .insert({
-      company_id: ctx.company.id,
-      customer_id: customer.id,
-      service_address_id: address.id,
-      service_id: parsed.data.service_id || null,
-      quote_id: parsed.data.quote_id || null,
-      booking_number: nextNumber("B", count ?? 0),
-      recurrence: parsed.data.recurrence,
-      scheduled_start: start.toISOString(),
-      scheduled_end: end.toISOString(),
-      cancellation_policy: settings.cancellation_policy ?? null,
-      notes: parsed.data.notes || null,
-    })
+    .insert(bookingRow)
     .select("id")
     .single();
+  if (bErr && missingColumnName(bErr) === "checklist_template_id") {
+    // Migration 0015 not run yet — create the booking without the link and
+    // seed the visit checklists directly from the template items instead.
+    delete bookingRow.checklist_template_id;
+    const retry = await supabase.from("bookings").insert(bookingRow).select("id").single();
+    booking = retry.data;
+    bErr = retry.error;
+  }
   if (bErr || !booking) return { error: bErr?.message ?? t("actions.createFailed") };
 
+  const seedChecklist = templateItems.map((i) => ({ ...i, done: false }));
   const jobs = occurrences(start, end, parsed.data.recurrence).map((o) => ({
     company_id: ctx.company.id,
     booking_id: booking.id,
@@ -108,6 +135,7 @@ export async function createBooking(input: unknown): Promise<ActionResult> {
     scheduled_start: o.start.toISOString(),
     scheduled_end: o.end.toISOString(),
     status: "scheduled",
+    checklist: seedChecklist,
   }));
   const { error: jErr } = await supabase.from("jobs").insert(jobs);
   if (jErr) {
