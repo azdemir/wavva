@@ -2,6 +2,40 @@
 
 All notable changes to TidyPro. Dates are in America/New_York.
 
+## 2026-10-10
+
+### Fixed (regression run 2026-10-10 — 13 bugs found by the testing agent, all fixed)
+
+- **Bookings**: creating or rescheduling a booking in the past is now rejected
+  ("The booking start time must be in the future."). The Create button now
+  explains when it's disabled because the customer has no address.
+- **Customers**: the delete-customer button works again (confirm dialog +
+  clear messages) — deletion is blocked with an explanation when the
+  customer has active bookings/quotes/jobs/invoices. Creating or editing a
+  customer with an already-used email is now blocked with a clear message.
+- **Quotes**: quotes now require a total above $0 ("Add at least one line
+  item with a price above $0."). The customer portal card now appears on
+  quote and invoice detail pages (built 2026-10-09, shipped with this
+  batch).
+- **Invoices**: paid invoices can now be voided (record kept for audit).
+  Manual "Mark paid" now records the payment, so balances read
+  "Paid $X / Balance due $0.00" and lists stop showing "due" for paid
+  invoices.
+- **Import**: the CSV wizard now detects duplicate emails *within* the
+  uploaded file (previously only against existing customers) and its step
+  counts stay consistent with the final result.
+- **Auth**: sign-in now honors the `?next=` deep link after login, with
+  open-redirect protection (relative paths only).
+- **Communications**: saving a template with an empty email subject now
+  shows a validation error instead of silently flagging the template
+  "Customized".
+- **Team**: re-inviting an email with a pending invite now says
+  "An invite is already pending for this email." instead of silently doing
+  nothing.
+- **Portal**: fixed the "Askyour" typo on the invalid-link page.
+- **Validation messages**: raw Zod errors ("Too small: expected string…")
+  replaced with human-readable messages in quote/invoice forms.
+
 ## 2026-10-09
 
 ### Added (unpushed)
@@ -49,7 +83,9 @@ All notable changes to TidyPro. Dates are in America/New_York.
   menu already covers all of it. The top bar is slimmed down to user
   controls only — profile menu (company avatar with initials, company
   name, email, role + plan badges, website-home link, sign out), language
-  switcher, and light/dark toggle — in a thin 48px bar. On mobile the
+  switcher, and light/dark toggle — in a thin 48px bar. The Website home
+  link then moved out of the profile dropdown into the top bar itself (and
+  the mobile hamburger menu). On mobile the
   sidebar becomes a hamburger menu in the top bar. New `nav.userMenu.*`
   strings in EN/ES/UK.
 
