@@ -1,7 +1,6 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { SessionTimeout } from "@/components/auth/session-timeout";
 import {
   ThemeProvider,
   themeInitScript,
@@ -17,18 +16,20 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-/* Editorial display face — headlines only. A high-contrast serif gives the
-   marketing site an "expensive print" voice a geometric sans can't. */
-const instrumentSerif = Instrument_Serif({
-  variable: "--font-instrument-serif",
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-  display: "swap",
-});
-
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://tidy-pro.vercel.app";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  // Prevent iOS Safari auto-zoom on input focus (which feels janky/slow).
+  // Inputs should use 16px+ font-size; this is a safety net.
+  maximumScale: 5,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
+  ],
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -103,7 +104,7 @@ export default function RootLayout(props: LayoutProps<"/">) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
@@ -113,10 +114,7 @@ export default function RootLayout(props: LayoutProps<"/">) {
         />
       </head>
       <body className="flex min-h-full flex-col">
-        <ThemeProvider>
-          <SessionTimeout />
-          {props.children}
-        </ThemeProvider>
+        <ThemeProvider>{props.children}</ThemeProvider>
       </body>
     </html>
   );
