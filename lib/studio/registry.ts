@@ -551,7 +551,7 @@ export const CONTENT_REGISTRY: ContentDef[] = [
     help: "Shown under the stories while they are illustrative samples. Clear it once real customer stories are published.",
     field: { kind: "text", max: 200 },
     default:
-      "Illustrative examples — real customer stories coming soon.",
+      "",
     paths: HOME,
   },
   {

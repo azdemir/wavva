@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Image from "next/image";
 import { cookies } from "next/headers";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
@@ -9,6 +10,13 @@ import { HeroHeadlines } from "@/components/marketing/hero-headlines";
 import { Ambient } from "@/components/marketing/ambient";
 import { getSessionUser } from "@/lib/auth";
 import { getContent } from "@/lib/studio/content";
+
+const HERO_AVATARS = [
+  "/images/hero-avatars/woman-1.jpg",
+  "/images/hero-avatars/man-1.jpg",
+  "/images/hero-avatars/woman-2.jpg",
+  "/images/hero-avatars/man-2.jpg",
+];
 
 /** Session-aware hero CTA. Streams in after the static shell. */
 async function HeroCta() {
@@ -87,6 +95,40 @@ export async function Hero() {
                 </span>
               ))}
             </p>
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
+              <div className="flex shrink-0 -space-x-3" aria-hidden="true">
+                {HERO_AVATARS.map((photo) => (
+                  <Image
+                    key={photo}
+                    src={photo}
+                    alt=""
+                    width={44}
+                    height={44}
+                    className="h-11 w-11 rounded-full border-[3px] border-surface object-cover shadow-sm"
+                  />
+                ))}
+              </div>
+              <a
+                href="#stories"
+                className="group w-fit rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-600"
+              >
+                <span className="mb-1 flex gap-1 text-amber-500" aria-hidden="true">
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <svg key={i} className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.9l-5.2 2.7 1-5.8L1.5 7.7l5.9-.9L10 1.5z" />
+                    </svg>
+                  ))}
+                </span>
+                <span className="block text-sm text-ink-3">
+                  <strong className="font-semibold text-ink">Loved by cleaning pros</strong>{" "}
+                  across Upstate New York
+                </span>
+                <span className="mt-1 block text-sm text-ink-3 transition-colors group-hover:text-brand-700">
+                  Sample stories below — yours could be next.
+                </span>
+              </a>
+            </div>
           </div>
 
           {/* ------------------------------------------------------- Product */}
