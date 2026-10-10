@@ -25,5 +25,56 @@
   "templateName": "Template name",
   "templateNamePlaceholder": "e.g. Deep clean",
   "title": "Checklist templates",
-  "updated": "Template saved."
+  "updated": "Template saved.",
+  "ai": {
+    "title": "Checklist generator",
+    "description": "Describe the home and get a tailored room-by-room checklist — including surprise touches that wow customers. Free and instant, no AI key needed.",
+    "homeType": "Home type",
+    "homeTypes": {
+      "house": "House",
+      "apartment": "Apartment",
+      "condo": "Condo"
+    },
+    "serviceLevel": "Service level",
+    "serviceLevels": {
+      "standard": "Standard clean",
+      "deep": "Deep clean",
+      "moveOut": "Move-out clean"
+    },
+    "bedrooms": "Bedrooms",
+    "bathrooms": "Bathrooms",
+    "pets": "Pets in the home",
+    "kids": "Kids in the home",
+    "notes": "Anything else (optional)",
+    "notesPlaceholder": "e.g. two-story, lots of windows, focus on the kitchen…",
+    "generate": "Generate checklist",
+    "generating": "Generating…",
+    "regenerate": "Regenerate",
+    "previewTitle": "Review and edit",
+    "previewDescription": "{count} tasks — edit anything, then save it as a reusable template.",
+    "surpriseTitle": "Surprise touches",
+    "surpriseHint": "Little extras customers don't expect — this is what gets you 5-star reviews.",
+    "templateName": "Template name",
+    "templateNamePlaceholder": "e.g. Deep clean — 3 bed house",
+    "saveTemplate": "Save as template",
+    "saving": "Saving…",
+    "addTask": "Add task",
+    "taskPlaceholder": "Task description",
+    "removeTask": "Remove task",
+    "suggestedName": "{level} — {beds} bed / {baths} bath",
+    "saved": "Template saved — find it in the booking checklist picker.",
+    "savedTitle": "Saved templates",
+    "savedDescription": "Templates appear in the booking checklist picker. Edit them fully in Settings → Checklist templates.",
+    "noTemplates": "No templates yet — generate your first one above.",
+    "itemCount": "{count} tasks",
+    "deleteTemplate": "Delete {name}",
+    "deleteConfirm": "Delete the template “{name}”?",
+    "errors": {
+      "notPermitted": "You don't have permission to do that.",
+      "rateLimited": "Too many generations — try again tomorrow.",
+      "invalid": "Check the form values and try again.",
+      "saveFailed": "Couldn't save the template.",
+      "emptySave": "Give the template a name and keep at least one task."
+    }
+  }
 }

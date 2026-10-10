@@ -25,5 +25,56 @@
   "templateName": "Nombre de la plantilla",
   "templateNamePlaceholder": "p. ej. Limpieza profunda",
   "title": "Plantillas de listas de verificación",
-  "updated": "Plantilla guardada."
+  "updated": "Plantilla guardada.",
+  "ai": {
+    "title": "Generador de listas de verificación",
+    "description": "Describe la vivienda y obtén una lista personalizada por habitación, incluidos toques sorpresa que encantan a los clientes. Gratis e instantáneo, sin clave de IA.",
+    "homeType": "Tipo de vivienda",
+    "homeTypes": {
+      "house": "Casa",
+      "apartment": "Apartamento",
+      "condo": "Condominio"
+    },
+    "serviceLevel": "Nivel de servicio",
+    "serviceLevels": {
+      "standard": "Limpieza estándar",
+      "deep": "Limpieza profunda",
+      "moveOut": "Limpieza de mudanza"
+    },
+    "bedrooms": "Habitaciones",
+    "bathrooms": "Baños",
+    "pets": "Hay mascotas",
+    "kids": "Hay niños",
+    "notes": "Algo más (opcional)",
+    "notesPlaceholder": "p. ej., dos pisos, muchas ventanas, enfocarse en la cocina…",
+    "generate": "Generar lista",
+    "generating": "Generando…",
+    "regenerate": "Regenerar",
+    "previewTitle": "Revisa y edita",
+    "previewDescription": "{count} tareas: edita lo que quieras y guárdala como plantilla reutilizable.",
+    "surpriseTitle": "Toques sorpresa",
+    "surpriseHint": "Pequeños extras que los clientes no esperan: así se consiguen reseñas de 5 estrellas.",
+    "templateName": "Nombre de la plantilla",
+    "templateNamePlaceholder": "p. ej., Limpieza profunda — casa de 3 habitaciones",
+    "saveTemplate": "Guardar como plantilla",
+    "saving": "Guardando…",
+    "addTask": "Añadir tarea",
+    "taskPlaceholder": "Descripción de la tarea",
+    "removeTask": "Eliminar tarea",
+    "suggestedName": "{level} — {beds} hab. / {baths} baños",
+    "saved": "Plantilla guardada: la verás en el selector de listas de la reserva.",
+    "savedTitle": "Plantillas guardadas",
+    "savedDescription": "Las plantillas aparecen en el selector de listas de la reserva. Edítalas en Ajustes → Plantillas de listas.",
+    "noTemplates": "Aún no hay plantillas: genera la primera arriba.",
+    "itemCount": "{count} tareas",
+    "deleteTemplate": "Eliminar {name}",
+    "deleteConfirm": "¿Eliminar la plantilla «{name}»?",
+    "errors": {
+      "notPermitted": "No tienes permiso para hacer eso.",
+      "rateLimited": "Demasiadas generaciones: inténtalo mañana.",
+      "invalid": "Revisa los valores del formulario e inténtalo de nuevo.",
+      "saveFailed": "No se pudo guardar la plantilla.",
+      "emptySave": "Ponle un nombre a la plantilla y conserva al menos una tarea."
+    }
+  }
 }
