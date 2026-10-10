@@ -19,6 +19,29 @@ import { hasFeature, isPlanId } from "@/lib/plans";
 import { isStorageConfigured, getPhotoViewUrl, PHOTO_RETENTION_DAYS } from "@/lib/storage";
 import { formatTime, formatDate } from "@/lib/format";
 import { getTranslations } from "next-intl/server";
+import { CrewAvailabilityWarnings } from "@/components/availability/crew-availability-warnings";
+
+/** Calendar date "YYYY-MM-DD" of an ISO timestamp in the given timezone. */
+function toDateISO(iso: string, tz: string): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: tz,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(iso));
+}
+
+/** "HH:MM" of an ISO timestamp in the given timezone. */
+function toHHMM(iso: string, tz: string): string {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: tz,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(new Date(iso));
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "00";
+  return `${get("hour")}:${get("minute")}`;
+}
 
 export const instant = false;
 
@@ -60,10 +83,10 @@ export default async function JobDetailPage({
     isStaff
       ? supabase
           .from("memberships")
-          .select("user_id, email, role")
+          .select("id, user_id, email, role")
           .eq("company_id", company.id)
           .order("email")
-      : Promise.resolve({ data: [] as { user_id: string; email: string; role: string }[] }),
+      : Promise.resolve({ data: [] as { id: string; user_id: string; email: string; role: string }[] }),
   ]);
   if (!job) notFound();
 
@@ -107,6 +130,14 @@ export default async function JobDetailPage({
     job.scheduled_start === job.scheduled_end
       ? `${formatDate(job.scheduled_start)}, ${formatTime(job.scheduled_start, tz)}`
       : `${formatDate(job.scheduled_start)}, ${formatTime(job.scheduled_start, tz)} – ${formatTime(job.scheduled_end, tz)}`;
+
+  // Read-only availability conflict data for assigned crew (migration 0017).
+  const crewInfo = (members ?? [])
+    .filter((m) => assigned.includes(m.user_id))
+    .map((m) => ({ membershipId: m.id, email: m.email }));
+  const jobDateISO = toDateISO(job.scheduled_start, tz);
+  const jobStartHHMM = toHHMM(job.scheduled_start, tz);
+  const jobEndHHMM = toHHMM(job.scheduled_end, tz);
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -266,6 +297,13 @@ export default async function JobDetailPage({
             ) : (
               <UpgradePrompt feature="checklists" />
             )}
+            <CrewAvailabilityWarnings
+              companyId={company.id}
+              crew={crewInfo}
+              dateISO={jobDateISO}
+              startHHMM={jobStartHHMM}
+              endHHMM={jobEndHHMM}
+            />
           </CardContent>
         </Card>
       )}
