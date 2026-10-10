@@ -9,3 +9,23 @@ export async function pushInvoice(invoiceId: string): Promise<void> {
   if (!isQuickBooksConfigured()) return;
   void invoiceId;
 }
+
+/**
+ * Sync status for the invoice QB badge. Real statuses land with the OAuth
+ * integration; until then this guarded no-op reports "not_connected" so the
+ * badge renders nothing.
+ */
+export type InvoiceSyncStatus =
+  | "not_connected"
+  | "unsynced"
+  | "synced"
+  | "failed";
+
+export async function getInvoiceSyncStatus(
+  companyId: string,
+  invoice: { id: string; qbo_id: string | null },
+): Promise<InvoiceSyncStatus> {
+  void companyId;
+  void invoice;
+  return "not_connected";
+}

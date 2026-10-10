@@ -4,35 +4,18 @@ All notable changes to TidyPro. Dates are in America/New_York.
 
 ## 2026-10-10
 
-### Studio: subscription-tier management (`/studio/tiers`, unpushed)
+### Fixed (build)
 
-- **Change any company's tier** — search companies by name or member email,
-  see the current (effective) tier, and assign Basic / Starter / Growth / Pro.
-  Works for upgrades, downgrades, and the owner's own company (no self-change
-  block).
-- **Confirmation first** — picking a tier opens a review step showing the
-  previous → new tier, features gained/lost, seat-limit and customer-cap
-  warnings, and a note when the founder all-access grant is being overridden.
-  Clear success / error messages after saving.
-- **Backend enforcement** — `studioSetCompanyTier` calls
-  `requirePlatformAdmin()` before anything else (plus rate limiting and zod
-  validation), so the capability can't be reached from the UI layer alone.
-- **Audit log** — every change records acting admin email, affected user
-  (company owner), company, previous tier, new tier, and timestamp in the new
-  `tier_change_log` table (append-only; RLS enabled, no public policies).
-  Shown as a table on the same page. Needs
-  `supabase/migrations/0018_tier_change_log.sql` run on Supabase — if it
-  hasn't been, the change is reverted with instructions instead of going
-  unlogged.
-- **Consistent application** — the tier is stored on `companies.plan`, which
-  every feature gate and limit already reads. New rule in `requireCompany()`:
-  an explicit Studio tier change overrides the founder all-access grant for
-  that company, so downgrading your own account actually takes effect (the UI
-  shows "via founder all-access grant" until you do).
-- **Build fix (pre-existing)** — `next build` was broken by the remote navbar
-  merge: `components/marketing/sticky-header.tsx` exists on remote main but
-  was never synced into this tree. Reconstructed locally from the inline
-  `<header>` it replaced; diff against the remote version before pushing.
+- **QuickBooks invoice wiring**: `app/dashboard/invoices/[id]/page.tsx`
+  referenced `getInvoiceSyncStatus` and the `QboSyncBadge` component, which
+  hadn't been pushed with the QuickBooks batch — the production build
+  failed. Added a guarded `getInvoiceSyncStatus` stub (always reports
+  `not_connected` until the OAuth integration lands, so the badge renders
+  nothing) alongside the existing `pushInvoice` stub, plus the
+  `QboSyncBadge` component itself. The full QuickBooks implementation
+  (OAuth client, `0012_quickbooks.sql`, settings UI) is still in flight
+  locally and untouched.
+
 
 ### Fixed (regression run 2026-10-10 — 13 bugs found by the testing agent, all fixed)
 
