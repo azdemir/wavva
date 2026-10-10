@@ -6,6 +6,7 @@ import {
   ThemeProvider,
   themeInitScript,
 } from "@/components/ui/theme-provider";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -117,6 +118,7 @@ export default function RootLayout(props: LayoutProps<"/">) {
           <SessionTimeout />
           {props.children}
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
