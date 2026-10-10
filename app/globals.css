@@ -37,6 +37,83 @@
   --animate-fade-in: fade-in 0.9s ease-out both;
   --animate-shimmer: shimmer 1.4s ease-in-out infinite;
   --animate-hero-badge-float: hero-badge-float 7s ease-in-out infinite;
+
+  /* Marketing design tokens — surface/ink/night system.
+     Restored 2026-10-10: these were defined by the marketing redesign and
+     silently dropped when the mobile-perf fix overwrote this file with the
+     older local copy. Without them every bg-surface/text-ink/bg-night/…
+     utility on the marketing site compiles to nothing (invisible footer,
+     black fallback borders). */
+  --color-surface: #e9eefb;
+  --color-surface-2: #f8faff;
+  --color-surface-3: #dbe3f7;
+  --color-ink: #10172a;
+  --color-ink-2: #45506b;
+  --color-ink-3: #6d7791;
+  --color-line: #d9e1f3;
+  --color-line-strong: #b3bed9;
+  --color-night: #0a1128;
+  --color-night-soft: #151d3f;
+  --color-night-line: rgb(255 255 255 / 0.12);
+
+  --font-display: var(--font-geist-sans), ui-sans-serif, system-ui,
+    -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-drift: drift 24s ease-in-out infinite alternate;
+  --animate-marquee-slow: marquee 44s linear infinite;
+
+  @keyframes drift {
+    from {
+      transform: translate3d(-4%, -2%, 0) scale(1);
+    }
+    to {
+      transform: translate3d(4%, 3%, 0) scale(1.08);
+    }
+  }
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+}
+
+/* Subtle film-grain overlay for the marketing hero. */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+}
+
+/* Scroll-reveal: hidden state only applies when scripting is enabled, so a
+   failed hydration (or no-JS) can never hide the content. */
+@media (scripting: enabled) {
+  .reveal:not(.is-visible) {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+.reveal {
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none;
+  }
 }
 
 @keyframes fade-up {
