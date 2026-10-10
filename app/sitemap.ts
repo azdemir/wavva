@@ -11,6 +11,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const pages: { path: string; priority: number; changeFrequency: "weekly" | "monthly" }[] = [
     { path: "/", priority: 1.0, changeFrequency: "weekly" },
     { path: "/features", priority: 0.9, changeFrequency: "monthly" },
+    { path: "/features/scheduling", priority: 0.8, changeFrequency: "monthly" },
+    { path: "/features/automated-communications", priority: 0.8, changeFrequency: "monthly" },
+    { path: "/features/online-booking", priority: 0.8, changeFrequency: "monthly" },
+    { path: "/features/invoicing-billing", priority: 0.8, changeFrequency: "monthly" },
+    { path: "/features/credit-card-processing", priority: 0.8, changeFrequency: "monthly" },
+    { path: "/features/mobile-app", priority: 0.7, changeFrequency: "monthly" },
+    { path: "/features/cleaner-checklist", priority: 0.8, changeFrequency: "monthly" },
     { path: "/pricing", priority: 0.9, changeFrequency: "monthly" },
     { path: "/faq", priority: 0.7, changeFrequency: "monthly" },
     { path: "/contact", priority: 0.7, changeFrequency: "monthly" },
