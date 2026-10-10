@@ -4,6 +4,30 @@ All notable changes to TidyPro. Dates are in America/New_York.
 
 ## 2026-10-10
 
+### Arcade: 3 cleaning mini-games on the dashboard
+
+- New `/dashboard/arcade` route (all roles, all tiers — it's just for fun),
+  with a game-picker shell and per-game best scores in localStorage.
+- **Dust Bunny Panic** — 30-second whack-a-mole: tap dust bunnies before
+  they escape, golden bunnies are jackpot, sock thieves pay extra, do NOT
+  wake the cat (-20 + public shaming). Combo multiplier, toddler-crumb and
+  client-home-early surprise events, funny end ranks.
+- **Sock Match Madness** — memory match with 6 CSS-drawn sock patterns;
+  every matched pair reveals its tragic name ("Toddler's Revenge").
+- **Stain Scrub Showdown** — press-and-scrub 5 named stains
+  ("Unknown Brown (do not ask)") with a sponge cursor before the 45s timer
+  ends; win/lose screens with ranks.
+- Games are imperative TS modules (`components/arcade/*-game.ts`) mounted
+  by thin client wrappers; shared WebAudio bleeps + confetti in
+  `components/arcade/fx.ts`; theme-aware via scoped `--ag-*` vars honoring
+  the class-based dark mode. Full EN/ES/UK i18n (`messages/*/arcade.json`,
+  new `arcade` namespace); sidebar nav entry with new GamepadIcon.
+- Verified: tsc + eslint clean, production build green
+  (`/dashboard/arcade` in route list), all three games played start-to-finish
+  in headless Chromium (DBP scoring+timer, sock full-board solve → Laundry
+  Legend, stain full clear → Spotless!/Miracle Worker), zero JS errors.
+
+
 ### Fixed
 
 - **Billing tier display**: the billing page read the raw stored plan from the

@@ -21,6 +21,7 @@ import {
   ChartIcon,
   DownloadIcon,
   PlugIcon,
+  GamepadIcon,
 } from "@/components/ui/icons";
 import { LogoMark } from "@/components/ui/logo";
 import { hasFeature, type PlanFeature } from "@/lib/plans";
@@ -67,6 +68,7 @@ const nav: NavItem[] = [
   { href: "/dashboard/import", labelKey: "import", icon: DownloadIcon, roles: STAFF },
   { href: "/dashboard/integrations", labelKey: "integrations", icon: PlugIcon, feature: "integrations", roles: ["owner"] },
   { href: "/dashboard/audit", labelKey: "audit", icon: BellIcon, roles: ["owner"] },
+  { href: "/dashboard/arcade", labelKey: "arcade", icon: GamepadIcon },
 ];
 
 async function NavLinks({ onNavigate, plan, role }: { onNavigate?: () => void; plan: PlanId; role: Role }) {

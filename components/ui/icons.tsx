@@ -279,3 +279,14 @@ export function PlugIcon(props: SVGProps<SVGSVGElement>) {
     </Base>
   );
 }
+
+export function GamepadIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Base {...props}>
+      <rect x="2.5" y="7" width="19" height="11" rx="5.5" />
+      <path d="M7.5 10.5v4M5.5 12.5h4" />
+      <circle cx="15.5" cy="11.3" r="1.1" fill="currentColor" stroke="none" />
+      <circle cx="18" cy="13.8" r="1.1" fill="currentColor" stroke="none" />
+    </Base>
+  );
+}
