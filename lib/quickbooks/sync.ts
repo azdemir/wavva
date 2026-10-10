@@ -29,3 +29,18 @@ export async function getInvoiceSyncStatus(
   void invoice;
   return "not_connected";
 }
+
+/**
+ * Badge statuses for a page of invoices with a single round trip.
+ * Real logic lands with the OAuth integration (needs the
+ * quickbooks_connections / quickbooks_sync_log tables from migration 0012);
+ * until then this guarded no-op returns null so the caller renders no badges.
+ */
+export async function getQboBadgeMap(
+  companyId: string,
+  invoices: { id: string; qbo_id: string | null }[],
+): Promise<Map<string, Exclude<InvoiceSyncStatus, "not_connected">> | null> {
+  void companyId;
+  void invoices;
+  return null;
+}
