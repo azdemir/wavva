@@ -9,13 +9,10 @@ import { one } from "@/lib/relations";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { type JobStatus, type QuoteStatus } from "@/components/ui/badge";
-import { TJobStatusPill, TQuoteStatusPill } from "@/components/ui/translated-status-pill";
+import { type QuoteStatus, statusLabel } from "@/components/ui/badge";
+import { TQuoteStatusPill } from "@/components/ui/translated-status-pill";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PlusIcon, CalendarIcon, QuoteIcon, UsersIcon, CardIcon } from "@/components/ui/icons";
-
-// Authenticated dashboard data is loaded per request, not during prefetching.
-export const instant = false;
 
 export default async function DashboardPage() {
   const { membership, company } = await requireCompany();
@@ -52,6 +49,13 @@ export default async function DashboardPage() {
     ]);
 
   const todaysJobs = jobs ?? [];
+
+  // Same colorful visit pills as the week schedule view (matches marketing).
+  const todayPillStyles: Record<string, string> = {
+    scheduled: "bg-brand-600 hover:bg-brand-700 dark:bg-brand-500 dark:hover:bg-brand-400",
+    in_progress: "bg-amber-500 hover:bg-amber-600 dark:bg-amber-500 dark:hover:bg-amber-400",
+    completed: "bg-accent-600 hover:bg-accent-700 dark:bg-accent-500 dark:hover:bg-accent-400",
+  };
   const openQuotes = quotes ?? [];
   const stat = (stats as unknown as {
     jobs_today: number;
@@ -124,23 +128,22 @@ export default async function DashboardPage() {
                 icon={<CalendarIcon className="h-10 w-10" />}
               />
             ) : (
-              <ul className="divide-y divide-slate-100 dark:divide-slate-800 dark:divide-slate-800">
-                {todaysJobs.map((job) => (
-                  <li key={job.id} className="flex items-center justify-between gap-3 py-3">
-                    <div className="min-w-0">
-                      <p className="truncate font-medium text-slate-900 dark:text-slate-100 dark:text-slate-100">
-                        {one(job.customers)?.name ?? t("quotes.unknownCustomer")}
-                      </p>
-                      <p className="truncate text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-500">
-                        {formatTime(job.scheduled_start, tz)} – {formatTime(job.scheduled_end, tz)}
-                        {" · "}
-                        {one(job.service_addresses)?.address_line1}
-                      </p>
-                    </div>
-                    <TJobStatusPill status={job.status as JobStatus} className="shrink-0" />
-                  </li>
-                ))}
-              </ul>
+              <div className="space-y-2">
+                {todaysJobs.map((job) => {
+                  const customerName = one(job.customers)?.name ?? t("quotes.unknownCustomer");
+                  const addr = one(job.service_addresses);
+                  return (
+                    <Link
+                      key={job.id}
+                      href={`/dashboard/jobs/${job.id}`}
+                      title={`${formatTime(job.scheduled_start, tz)} – ${formatTime(job.scheduled_end, tz)} · ${customerName}${addr ? ` · ${addr.address_line1}, ${addr.city}` : ""} · ${statusLabel(job.status)}`}
+                      className={`block truncate rounded-lg px-3 py-2 text-xs font-semibold text-white shadow-sm transition-colors ${todayPillStyles[job.status] ?? todayPillStyles.scheduled}`}
+                    >
+                      {formatTime(job.scheduled_start, tz)} · {addr?.address_line1 || customerName}
+                    </Link>
+                  );
+                })}
+              </div>
             )}
           </CardContent>
         </Card>
