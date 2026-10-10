@@ -2,7 +2,12 @@ import { cache } from "react";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { connection } from "next/server";
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import {
+  createClient,
+  createServiceClient,
+  isSupabaseConfigured,
+} from "@/lib/supabase/server";
+import { hasAllAccess, isPlanId } from "@/lib/plans";
 import { one } from "@/lib/relations";
 
 export type Membership = {
@@ -105,16 +110,53 @@ export async function requireUser() {
 }
 
 /**
+ * Whether a company's tier was ever changed explicitly in Studio
+ * (/studio/tiers). Used to decide if the founder all-access grant still
+ * applies. Never throws: any failure (e.g. the 0018 migration was never
+ * run) means "not managed", so the grant stands.
+ */
+export async function isCompanyTierManaged(companyId: string): Promise<boolean> {
+  try {
+    const svc = await createServiceClient();
+    const { data, error } = await svc
+      .from("tier_change_log")
+      .select("id")
+      .eq("company_id", companyId)
+      .limit(1)
+      .maybeSingle();
+    return !error && !!data;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Require a signed-in user with an onboarded company.
  * - No user -> /signin
  * - User without company -> /onboarding
  * - Company without completed onboarding -> /onboarding
+ *
+ * Founder / platform-admin accounts get every tier's features: their
+ * company reports as Pro regardless of the stored plan — UNLESS the tier
+ * was changed explicitly in Studio (/studio/tiers). An explicit change
+ * always wins, so the owner can move their own company to any tier,
+ * up or down, and the new tier's features and limits apply consistently.
  */
 export async function requireCompany() {
   const user = await requireUser();
   const active = await getActiveMembership();
   if (!active) redirect("/onboarding");
   if (!active.company.onboarding_completed) redirect("/onboarding");
+  if (hasAllAccess(user.email)) {
+    let plan = "pro";
+    if (
+      (await isCompanyTierManaged(active.company.id).catch(() => false)) &&
+      isPlanId(active.company.plan)
+    ) {
+      plan = active.company.plan;
+    }
+    return { user, ...active, company: { ...active.company, plan } };
+  }
   return { user, ...active };
 }
 

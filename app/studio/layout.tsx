@@ -17,6 +17,7 @@ const NAV = [
   { href: "/studio/website", label: "Website" },
   { href: "/studio/crm", label: "CRM" },
   { href: "/studio/users", label: "Users" },
+  { href: "/studio/tiers", label: "Tiers" },
 ];
 
 /**

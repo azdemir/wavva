@@ -413,6 +413,50 @@ export async function studioUpdateUserEmail(
   return { ok: true };
 }
 
+// ---------------------------------------------------------------------------
+// Studio subscription-tier management (platform admin only)
+// ---------------------------------------------------------------------------
+
+const studioTierSchema = z.object({
+  companyId: z.string().uuid("Invalid company."),
+  tier: z.enum(["basic", "starter", "growth", "pro"]),
+});
+
+export type TierChangeResult = ActionResult & {
+  previousTier?: string;
+  newTier?: string;
+};
+
+/**
+ * Change a company's subscription tier and record it in the audit log.
+ * Works for any company, including the acting admin's own — an explicit
+ * change overrides the founder all-access grant for that company.
+ * Permission is enforced here on the backend (requirePlatformAdmin),
+ * never just in the UI.
+ */
+export async function studioSetCompanyTier(
+  companyId: string,
+  tier: string,
+): Promise<TierChangeResult> {
+  const admin = await requirePlatformAdmin();
+  const rl = await rateLimit(
+    `studio-tiers:${admin.id}`,
+    limits.mutation.max,
+    limits.mutation.windowMs,
+  );
+  if (!rl.allowed) return rateLimitError(rl.resetIn);
+  const parsed = studioTierSchema.safeParse({ companyId, tier });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input." };
+  }
+  const { setCompanyTier } = await import("./tiers");
+  const res = await setCompanyTier(parsed.data.companyId, parsed.data.tier);
+  if ("error" in res) return { error: res.error };
+  revalidatePath("/studio/tiers");
+  revalidatePath("/studio");
+  return { ok: true, previousTier: res.previousTier, newTier: res.newTier };
+}
+
 /** Delete a user entirely (memberships + login). Cannot delete yourself. */
 export async function studioDeleteUser(userId: string): Promise<ActionResult> {
   const admin = await requirePlatformAdmin();

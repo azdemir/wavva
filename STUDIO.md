@@ -9,6 +9,7 @@ site and the founder's sales pipeline. Two tools in one place:
 | CRM | `/studio/crm` | Track leads from first touch to paying customer |
 | Analytics | `/studio/analytics` | Growth, MRR, plan mix, and pipeline analytics |
 | Users | `/studio/users` | Edit or delete any SaaS user's email, role, or account |
+| Tiers | `/studio/tiers` | Change any company's subscription tier, with audit log |
 
 Both live under `/studio`, which also shows an overview dashboard (companies,
 users, MRR estimate, pipeline value, latest leads).
@@ -137,7 +138,49 @@ admin-gated) with server actions `studioUpdateUserRole`,
 `studioUpdateUserEmail`, and `studioDeleteUser` in `lib/studio/actions.ts`
 (validated, rate-limited).
 
+## Tiers (`/studio/tiers`)
+
+Platform-admin subscription-tier management for the SaaS itself:
+
+- **Find** — search companies by name, owner email, or any member email.
+  Each row shows the company, owner, member count, and current (effective)
+  tier.
+- **Change** — pick a company, choose any of the four tiers (upgrade or
+  downgrade — including your own company), then confirm on the review step.
+  The review shows the previous → new tier, features gained/lost, seat-limit
+  and customer-cap warnings, and flags when the change overrides the founder
+  all-access grant. Saving shows a clear success or error message.
+- **Audit log** — every change records the acting admin's email, the
+  affected user (company owner), the company, previous tier, new tier, and
+  timestamp. Append-only; listed in a table on the same page.
+
+How it works:
+
+- The tier is stored on `companies.plan` — the same column every feature
+  gate and usage limit already reads, so the new tier applies consistently
+  across the app with no per-feature wiring.
+- Permission is enforced on the backend: `studioSetCompanyTier` (and the
+  list/log queries in `lib/studio/tiers.ts`) call `requirePlatformAdmin()`
+  before touching the database. The Studio layout gate is UI-only defense
+  in depth.
+- Founder all-access vs. explicit changes: `requireCompany()` reports Pro
+  for founder / platform-admin accounts **unless** the company's tier was
+  explicitly changed in Studio — an explicit change always wins, so the
+  owner can move their own account to any tier and see it take effect.
+  (`isCompanyTierManaged()` in `lib/auth.ts` checks the audit log.)
+- If migration `0018_tier_change_log.sql` was never run, the tier change is
+  reverted and the admin is told exactly what to run — a tier is never
+  changed without its audit entry.
+
 ## Database
+
+Migration `supabase/migrations/0018_tier_change_log.sql` (idempotent — safe
+to re-run):
+
+- **`tier_change_log`** — one row per tier change: company, company name,
+  affected user id/email (company owner), previous tier, new tier, admin
+  email, timestamp. RLS enabled with no public policies — service-role
+  client inside platform-admin-gated server actions only.
 
 Migration `supabase/migrations/0009_studio.sql` (idempotent — safe to re-run):
 
@@ -158,7 +201,8 @@ the service-role client after `requirePlatformAdmin()`.
 For Studio to work on a deployment:
 
 1. Run `supabase/migrations/0009_studio.sql` in the Supabase SQL editor
-   (after migrations 0001–0008).
+   (after migrations 0001–0008), plus `supabase/migrations/0018_tier_change_log.sql`
+   for the tier-change audit log (the Tiers page tells you if it's missing).
 2. Set `PLATFORM_ADMIN_EMAILS` to the founder/developer login email(s).
 3. Ensure `SUPABASE_SERVICE_ROLE_KEY` is set (server-only; already used by
    other admin features).
@@ -180,12 +224,15 @@ app/studio/
   crm/page.tsx          Pipeline board
   crm/new/page.tsx      Manual lead entry
   crm/[id]/page.tsx     Lead detail + activity timeline
+  tiers/page.tsx        Subscription-tier management + audit log
 components/studio/
   website-editor.tsx    Auto-generated editor UI (driven by the registry)
+  tier-manager.tsx      Tier search/select/picker/confirm + audit-log table
 lib/studio/
   registry.ts           Content definitions, defaults, validation  ← edit here
   content.ts            getContent() — cached merge of overrides + defaults
   actions.ts            saveSiteContent / resetSiteContent (admin-gated)
+  tiers.ts              Tier queries + setCompanyTier (admin-gated, audited)
   crm.ts                CRM stages, types, client-safe helpers
   crm-server.ts         CRM database queries (admin-gated)
   lib/admin.ts          requirePlatformAdmin() + PLATFORM_ADMIN_EMAILS
