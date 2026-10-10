@@ -4,6 +4,21 @@ All notable changes to TidyPro. Dates are in America/New_York.
 
 ## 2026-10-10
 
+### Changed
+
+- **Reports page rebuilt (comprehensive)**: the old 3-KPI page is now a full
+  reporting suite — date-range presets (7/30/90 days, this month, last month,
+  this year, custom); 6 KPI cards (revenue paid, outstanding, jobs completed,
+  hours worked, avg invoice, quote win rate); per-employee hours table (jobs,
+  hours, share of total; actual clock times when recorded, otherwise the
+  scheduled duration); revenue by month/customer/service; jobs by
+  status/service with completion rate and avg duration; quotes funnel with
+  win rate. New owner-only Excel exports per section
+  (`/api/exports/reports/[type]`), honoring the date filter. New
+  `lib/reports.ts` data layer and `components/reports/report-filters.tsx`;
+  full EN/ES/UK translations.
+
+
 ### Removed
 
 - **Homepage proof band**: removed the headline stats ($10 / 0 / 14 / 30m)
