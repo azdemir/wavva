@@ -203,64 +203,6 @@ export const CONTENT_REGISTRY: ContentDef[] = [
     paths: HOME,
   },
   {
-    key: "home.proofs",
-    page: "home",
-    section: "Proof points",
-    label: "Why-us cards",
-    help: "The four checkmark cards under the hero.",
-    field: {
-      kind: "list",
-      maxItems: 6,
-      minItems: 1,
-      item: [
-        { key: "title", label: "Title", kind: "text", max: 80 },
-        { key: "body", label: "Body", kind: "textarea", rows: 2, max: 300 },
-      ],
-    },
-    default: [
-      {
-        title: "Flat pricing, no per-user fees",
-        body: "Jobber and Housecall Pro charge per seat as you grow. TidyPro plans include your whole crew.",
-      },
-      {
-        title: "Quote follow-up built in",
-        body: "Most platforms make you chase quotes by hand or pay for add-ons. TidyPro follows up automatically.",
-      },
-      {
-        title: "Made for cleaners, not plumbers",
-        body: "Generalist tools force per-job workflows onto recurring maid routes. TidyPro is cleaning-first.",
-      },
-      {
-        title: "Everything included",
-        body: "No $79/mo marketing add-ons or gated essentials. Every plan gets the full toolkit.",
-      },
-    ],
-    paths: HOME,
-  },
-  {
-    key: "home.stats.items",
-    page: "home",
-    section: "Proof points",
-    label: "Headline stats",
-    help: "The four big numbers directly under the hero.",
-    field: {
-      kind: "list",
-      maxItems: 4,
-      minItems: 1,
-      item: [
-        { key: "value", label: "Value", kind: "text", max: 12 },
-        { key: "label", label: "Label", kind: "text", max: 60 },
-      ],
-    },
-    default: [
-      { value: "$10", label: "Flat monthly starting price" },
-      { value: "0", label: "Per-user fees, ever" },
-      { value: "14", label: "Day free trial, no card needed" },
-      { value: "30m", label: "To finish your whole setup" },
-    ],
-    paths: HOME,
-  },
-  {
     key: "home.features.eyebrow",
     page: "home",
     section: "Features",

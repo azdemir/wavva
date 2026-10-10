@@ -4,6 +4,15 @@ All notable changes to TidyPro. Dates are in America/New_York.
 
 ## 2026-10-10
 
+### Removed
+
+- **Homepage proof band**: removed the headline stats ($10 / 0 / 14 / 30m)
+  and the four why-us cards from the landing page —
+  `components/marketing/proof-strip.tsx` now renders only the service-area
+  marquee. Their Studio CMS entries (`home.proofs`, `home.stats.items`)
+  were removed from the content registry as well.
+
+
 ### Fixed (build)
 
 - **QuickBooks invoice wiring**: `app/dashboard/invoices/[id]/page.tsx`
