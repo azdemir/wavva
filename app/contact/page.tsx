@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { site } from "@/lib/site";
 import { Navbar } from "@/components/marketing/navbar";
 import { Footer } from "@/components/marketing/footer";
 import { PageHero } from "@/components/marketing/page-hero";
@@ -24,14 +23,12 @@ export default async function ContactPage() {
     heroDescription,
     pilotTitle,
     pilotBody,
-    siteEmail,
   ] = await Promise.all([
     getContent<string>("contact.hero.eyebrow"),
     getContent<string>("contact.hero.title"),
     getContent<string>("contact.hero.description"),
     getContent<string>("contact.pilot.title"),
     getContent<string>("contact.pilot.body"),
-    getContent<string>("site.email"),
   ]);
   return (
     <>
@@ -48,22 +45,6 @@ export default async function ContactPage() {
           <Container>
             <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-2">
               <div className="space-y-6">
-                <Card>
-                  <CardContent>
-                    <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                      Email us
-                    </h2>
-                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-                      The fastest way to reach a human.
-                    </p>
-                    <a
-                      href={`mailto:${siteEmail}`}
-                      className="mt-2 inline-flex min-h-11 items-center text-base font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
-                    >
-                      {siteEmail}
-                    </a>
-                  </CardContent>
-                </Card>
                 <Card>
                   <CardContent>
                     <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
