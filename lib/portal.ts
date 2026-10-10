@@ -10,6 +10,7 @@ export type PortalContext = {
     phone: string | null;
     email: string | null;
     timezone: string;
+    logo_url: string | null;
     stripe_account_id: string | null;
     stripe_onboarded: boolean;
   };
@@ -34,7 +35,7 @@ export async function getPortalContext(token: string): Promise<PortalContext | n
   const svc = await createServiceClient();
   const { data } = await svc
     .from("portal_tokens")
-    .select("token, expires_at, companies(id, name, phone, email, timezone, stripe_account_id, stripe_onboarded), customers(id, name, email, phone)")
+    .select("token, expires_at, companies(id, name, phone, email, timezone, logo_url, stripe_account_id, stripe_onboarded), customers(id, name, email, phone)")
     .eq("token", token)
     .maybeSingle();
 
