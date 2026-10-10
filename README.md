@@ -35,6 +35,8 @@ need secrets, copy `.env.example` to `.env.local` and fill in test-mode keys.
   labeled as not collecting submissions yet
 - `/signin`, `/signup` — real email/password auth backed by Supabase Auth
   (requires Supabase env vars; see `.env.example`)
+- `/compare` — colorful comparison overviews for Jobber, Housecall Pro,
+  ZenMaid, and BookingKoala, with official sources and plan-limit caveats
 - `/onboarding` — 4-step company setup wizard (profile → services →
   service area → team invites), shown to signed-in users without a company
 - `/dashboard` — authenticated workspace: dashboard home (today's jobs, open
