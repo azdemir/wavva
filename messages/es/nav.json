@@ -22,5 +22,10 @@
   "signOut": "Cerrar sesión",
   "soon": "Pronto",
   "team": "Equipo",
-  "websiteHome": "Sitio web"
+  "websiteHome": "Sitio web",
+  "userMenu": {
+    "account": "Cuenta",
+    "mainNav": "Navegación principal",
+    "openMenu": "Abrir menú"
+  }
 }

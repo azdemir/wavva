@@ -22,5 +22,10 @@
   "signOut": "Вийти",
   "soon": "Скоро",
   "team": "Команда",
-  "websiteHome": "Сайт"
+  "websiteHome": "Сайт",
+  "userMenu": {
+    "account": "Обліковий запис",
+    "mainNav": "Головна навігація",
+    "openMenu": "Відкрити меню"
+  }
 }

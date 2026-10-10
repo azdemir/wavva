@@ -22,5 +22,10 @@
   "signOut": "Sign out",
   "soon": "Soon",
   "team": "Team",
-  "websiteHome": "Website home"
+  "websiteHome": "Website home",
+  "userMenu": {
+    "account": "Account",
+    "mainNav": "Main navigation",
+    "openMenu": "Open menu"
+  }
 }

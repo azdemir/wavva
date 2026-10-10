@@ -6,6 +6,14 @@ All notable changes to TidyPro. Dates are in America/New_York.
 
 ### Added (unpushed)
 
+- **Dashboard top navigation bar** — the desktop sidebar is replaced by a
+  sticky top bar: logo, horizontally scrollable primary nav with active
+  states, and the user controls on the right — language switcher,
+  dark/light toggle, and a profile menu (company avatar with initials,
+  company name, email, role + plan badges, website-home link, sign out).
+  On mobile the nav collapses into a hamburger menu. Role/plan gating of
+  nav items is unchanged. New `nav.userMenu.*` strings in EN/ES/UK.
+
 - **Schedule month view + Week/Month toggle** — the Schedule page now has a
   Month option next to Week (segmented control in the header). The month
   grid shows the full 6-week calendar with the same colorful status pills
