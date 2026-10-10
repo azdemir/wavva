@@ -166,7 +166,7 @@ export function BookingForm({
       </Button>
       {!pending && customerId && !addressId && (
         <p className="text-xs text-amber-700 dark:text-amber-300">
-          Add an address to this customer to enable booking creation.
+          {t("form.noAddresses")}
         </p>
       )}
     </div>
