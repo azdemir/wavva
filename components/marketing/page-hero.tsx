@@ -1,5 +1,5 @@
 import { Container } from "@/components/ui/container";
-import { Breadcrumbs } from "@/components/marketing/breadcrumbs";
+import { BreadcrumbJsonLd } from "@/components/marketing/breadcrumbs";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://tidy-pro.vercel.app";
@@ -21,17 +21,15 @@ export function PageHero({ eyebrow, title, description, crumbs, badge }: PageHer
       <Container>
         <div className="mx-auto max-w-3xl py-16 text-center sm:py-20">
           {crumbs && crumbs.length > 0 && (
-            <div className="mb-6 flex justify-center">
-              <Breadcrumbs
-                items={[
-                  { label: "Home", href: `${SITE_URL}/` },
-                  ...crumbs.map((c) => ({
-                    label: c.label,
-                    href: `${SITE_URL}${c.href}`,
-                  })),
-                ]}
-              />
-            </div>
+            <BreadcrumbJsonLd
+              items={[
+                { label: "Home", href: `${SITE_URL}/` },
+                ...crumbs.map((c) => ({
+                  label: c.label,
+                  href: `${SITE_URL}${c.href}`,
+                })),
+              ]}
+            />
           )}
           <p className="text-sm font-semibold tracking-wide text-brand-600 dark:text-brand-400 uppercase">
             {eyebrow}

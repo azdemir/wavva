@@ -1,14 +1,12 @@
-import Link from "next/link";
-import { Fragment } from "react";
-
 export type Crumb = { label: string; href?: string };
 
 /**
- * Breadcrumb trail for marketing subpages. Renders a visible nav and
- * BreadcrumbList JSON-LD so Google can show breadcrumbs in results
- * instead of the raw URL.
+ * BreadcrumbList JSON-LD for marketing subpages — invisible to visitors,
+ * so Google can show breadcrumbs in search results instead of the raw URL.
+ * (The visible breadcrumb trail was removed from the page hero per the
+ * founder's request; this keeps the SEO benefit without the visual.)
  */
-export function Breadcrumbs({ items }: { items: Crumb[] }) {
+export function BreadcrumbJsonLd({ items }: { items: Crumb[] }) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -21,44 +19,9 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <nav aria-label="Breadcrumb">
-        <ol className="flex flex-wrap items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
-          {items.map((item, i) => {
-            const last = i === items.length - 1;
-            return (
-              <Fragment key={item.label}>
-                {i > 0 && (
-                  <li aria-hidden="true" className="text-slate-300 dark:text-slate-600">
-                    /
-                  </li>
-                )}
-                <li>
-                  {item.href && !last ? (
-                    <Link
-                      href={item.href}
-                      className="inline-flex min-h-10 items-center hover:text-slate-700 dark:hover:text-slate-200"
-                    >
-                      {item.label}
-                    </Link>
-                  ) : (
-                    <span
-                      aria-current={last ? "page" : undefined}
-                      className="inline-flex min-h-10 items-center"
-                    >
-                      {item.label}
-                    </span>
-                  )}
-                </li>
-              </Fragment>
-            );
-          })}
-        </ol>
-      </nav>
-    </>
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+    />
   );
 }
