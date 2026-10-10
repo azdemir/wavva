@@ -27,5 +27,7 @@
     "account": "Account",
     "mainNav": "Main navigation",
     "openMenu": "Open menu"
-  }
+  },
+  "availability": "Availability",
+  "integrations": "Integrations"
 }

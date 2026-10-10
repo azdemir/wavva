@@ -6,13 +6,49 @@ All notable changes to TidyPro. Dates are in America/New_York.
 
 ### Added (unpushed)
 
-- **Dashboard top navigation bar** — the desktop sidebar is replaced by a
-  sticky top bar: logo, horizontally scrollable primary nav with active
-  states, and the user controls on the right — language switcher,
-  dark/light toggle, and a profile menu (company avatar with initials,
-  company name, email, role + plan badges, website-home link, sign out).
-  On mobile the nav collapses into a hamburger menu. Role/plan gating of
-  nav items is unchanged. New `nav.userMenu.*` strings in EN/ES/UK.
+- **Integrations (Pro)** — new dashboard page at /dashboard/integrations
+  (sidebar entry, owner-only, Pro-gated with upgrade prompt). **Mailchimp**:
+  connect with an API key (validated live against Mailchimp Marketing API
+  v3; the key's `-<dc>` suffix picks the data center), choose a target
+  audience (live member counts), and push customers with "Sync customers
+  now" — idempotent upserts via `PUT /lists/{id}/members/{md5}` with
+  `status_if_new: "subscribed"` so nobody who unsubscribed is ever
+  re-added. Manual one-way push, stated honestly in the UI. **Webhooks
+  (Zapier, Make, n8n)**: add up to 10 HTTPS catch-hook URLs with per-event
+  subscriptions, pause/resume, test with a sample payload, and
+  last-triggered timestamps; numbered setup guide walks through Zapier's
+  "Webhooks by Zapier → Catch Hook" flow. Events fire from
+  booking.created/cancelled, quote.approved, job.completed, and
+  invoice.paid (manual + Stripe webhook) via a never-throwing dispatcher.
+  Secrets are AES-256-GCM encrypted (`integration_connections`,
+  `integration_webhooks`; migration `0016_integrations.sql`, reuses
+  `IMPORT_ENCRYPTION_KEY`). Advertised on the Pro tier ("Mailchimp &
+  Zapier integrations"). Setup notice instead of a crash until migration
+  0016 is run. Note: `customer.created` is defined in the event catalog
+  but not yet wired (its hook lives in the QuickBooks worker's
+  in-flight `lib/actions/customers.ts`).
+
+- **Cleaner availability & paid-time-off tracking (all tiers)** — new
+  dashboard page at /dashboard/availability (sidebar entry, no tier gate).
+  Cleaners set their own weekly availability (per-weekday time windows;
+  a day with no windows = unavailable) and request time off (date range +
+  reason); owners/managers edit anyone's availability, approve/deny the
+  request inbox, log time off directly for a member (auto-approved), and
+  see an upcoming-time-off summary. Job detail pages show an amber
+  conflict block under the crew card when an assigned cleaner has approved
+  PTO covering the job date or the job time falls outside their weekly
+  windows. New `cleaner_availability` + `time_off_requests` tables
+  (migration `0017_availability_pto.sql`, RLS, service-role access only),
+  new `availability` i18n namespace (EN/ES/UK), schema-drift fallback
+  until migration 0017 is run.
+
+- **Dashboard navigation revision** — the left sidebar stays as the
+  primary dashboard navigation (role/plan gating unchanged); the top bar
+  is slimmed down to user controls only — profile menu (company avatar
+  with initials, company name, email, role + plan badges, website-home
+  link, sign out), language switcher, and light/dark toggle. On mobile the
+  sidebar becomes a hamburger menu in the top bar. New `nav.userMenu.*`
+  strings in EN/ES/UK.
 
 - **Schedule month view + Week/Month toggle** — the Schedule page now has a
   Month option next to Week (segmented control in the header). The month

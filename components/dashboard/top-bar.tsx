@@ -9,21 +9,21 @@ import { LocaleSwitcher } from "@/components/i18n/locale-switcher";
 import { Badge } from "@/components/ui/badge";
 import { signOut } from "@/lib/actions/auth";
 
-export type TopBarNavItem = {
+export type UserBarNavItem = {
   href: string;
   label: string;
   icon: ReactNode;
   soon?: boolean;
 };
 
-export type TopBarUser = {
+export type UserBarUser = {
   companyName: string;
   email: string;
   roleLabel: string;
   planName: string;
 };
 
-export type TopBarLabels = {
+export type UserBarLabels = {
   account: string;
   signOut: string;
   websiteHome: string;
@@ -35,18 +35,18 @@ export type TopBarLabels = {
 };
 
 /**
- * Dashboard top navigation bar: logo, primary nav, and the user controls
- * (theme, language, profile menu with sign out) on the right. Sticky, and
- * collapses to a hamburger menu on small screens.
+ * Slim dashboard top bar: user controls only — profile menu, language
+ * switcher, and light/dark toggle. Primary navigation lives in the left
+ * sidebar; on small screens the hamburger button opens it as a menu.
  */
-export function DashboardTopBar({
+export function DashboardUserBar({
   items,
   user,
   labels,
 }: {
-  items: TopBarNavItem[];
-  user: TopBarUser;
-  labels: TopBarLabels;
+  items: UserBarNavItem[];
+  user: UserBarUser;
+  labels: UserBarLabels;
 }) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -88,11 +88,11 @@ export function DashboardTopBar({
 
   const initials = user.companyName.trim().slice(0, 2).toUpperCase() || "TP";
 
-  const renderItem = (item: TopBarNavItem, fullWidth = false) => {
+  const renderItem = (item: UserBarNavItem) => {
     const content = (
       <>
         {item.icon}
-        <span className={fullWidth ? "flex-1" : undefined}>{item.label}</span>
+        <span className="flex-1">{item.label}</span>
         {item.soon && (
           <Badge tone="slate" className="text-[10px]">
             {labels.soon}
@@ -100,7 +100,7 @@ export function DashboardTopBar({
         )}
       </>
     );
-    const cls = `${linkCls(isActive(item.href))} ${fullWidth ? "w-full" : ""}`;
+    const cls = `${linkCls(isActive(item.href))} w-full`;
     return item.soon ? (
       <span key={item.href} className={`${cls} cursor-not-allowed opacity-60`} title={labels.comingSoon}>
         {content}
@@ -114,10 +114,10 @@ export function DashboardTopBar({
 
   return (
     <header className="no-print sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95">
-      <div className="mx-auto flex h-16 max-w-6xl items-center gap-1 px-4 md:px-8">
+      <div className="flex h-16 items-center gap-1 px-4 md:px-8">
         <button
           type="button"
-          className="mr-1 inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 lg:hidden"
+          className="mr-1 inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 md:hidden"
           aria-label={labels.openMenu}
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((o) => !o)}
@@ -130,12 +130,9 @@ export function DashboardTopBar({
             )}
           </svg>
         </button>
-        <Link href="/dashboard" className="flex shrink-0 items-center" aria-label={labels.mainNav}>
+        <Link href="/dashboard" className="flex shrink-0 items-center md:hidden" aria-label={labels.mainNav}>
           <Logo />
         </Link>
-        <nav className="hidden min-w-0 flex-1 items-center gap-0.5 overflow-x-auto px-3 lg:flex" aria-label={labels.mainNav}>
-          {items.map((item) => renderItem(item))}
-        </nav>
         <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
           <LocaleSwitcher />
           <ThemeToggle className="h-9 w-9" />
@@ -206,9 +203,9 @@ export function DashboardTopBar({
         </div>
       </div>
       {menuOpen && (
-        <nav className="border-t border-slate-200 dark:border-slate-800 lg:hidden" aria-label={labels.mainNav}>
-          <div className="mx-auto max-w-6xl space-y-0.5 px-4 py-3">
-            {items.map((item) => renderItem(item, true))}
+        <nav className="border-t border-slate-200 dark:border-slate-800 md:hidden" aria-label={labels.mainNav}>
+          <div className="space-y-0.5 px-4 py-3">
+            {items.map((item) => renderItem(item))}
           </div>
         </nav>
       )}
