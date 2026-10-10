@@ -4,6 +4,19 @@ All notable changes to TidyPro. Dates are in America/New_York.
 
 ## 2026-10-09
 
+### Added
+
+- **Cinematic cursor-driven dashboard tour (hero)** — the marketing hero's
+  product tour is now a cursor-driven walkthrough: a visible cursor glides
+  with film-style easing through a real user narrative (dashboard stats →
+  open a job → tick the checklist → peek at before/after photos → approve a
+  quote → drop a job into the schedule → send an invoice and watch it get
+  paid → meet the crew → end card), with click ripples, hover highlights,
+  and sidebar-nav clicks advancing scenes. Cursor targets resolve via
+  getBoundingClientRect so clicks always land. Mobile, reduced-motion, and
+  no-hover fall back to the timer-driven tour. Preserves the redesign's
+  caption bar, overflow-hidden stage, and 40px touch targets.
+
 ### Added (unpushed)
 
 - **Schedule week view now matches the advertised colorful calendar** —
