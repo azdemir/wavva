@@ -6,8 +6,7 @@ import { one } from "@/lib/relations";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {type JobStatus} from "@/components/ui/badge";
-import { TJobStatusPill } from "@/components/ui/translated-status-pill";
+import { statusLabel } from "@/components/ui/badge";
 import { UpgradePrompt } from "@/components/billing/upgrade-prompt";
 import { CrewFilter } from "@/components/schedule/crew-filter";
 import { hasFeature, isPlanId } from "@/lib/plans";
@@ -101,6 +100,14 @@ export default async function SchedulePage({
   const fmtDay = (d: Date) =>
     new Intl.DateTimeFormat("en-US", { timeZone: tz, weekday: "short", month: "numeric", day: "numeric" }).format(d);
   const monthLabel = new Intl.DateTimeFormat("en-US", { timeZone: tz, month: "long", year: "numeric" }).format(start);
+  const todayKey = dayKey(new Date());
+
+  // Pill colors mirror the advertised week view: status drives the color.
+  const jobPillStyles: Record<string, string> = {
+    scheduled: "bg-brand-600 hover:bg-brand-700 dark:bg-brand-500 dark:hover:bg-brand-400",
+    in_progress: "bg-amber-500 hover:bg-amber-600 dark:bg-amber-500 dark:hover:bg-amber-400",
+    completed: "bg-accent-600 hover:bg-accent-700 dark:bg-accent-500 dark:hover:bg-accent-400",
+  };
 
   return (
     <div className="space-y-6">
@@ -127,11 +134,13 @@ export default async function SchedulePage({
       </div>
 
       <div className="grid gap-4 xl:grid-cols-7 lg:grid-cols-4 md:grid-cols-2">
-        {days.map(({ date, jobs: dayJobs }) => (
-          <Card key={date.toISOString()}>
+        {days.map(({ date, jobs: dayJobs }) => {
+          const isToday = dayKey(date) === todayKey;
+          return (
+          <Card key={date.toISOString()} className={isToday ? "ring-2 ring-brand-500 dark:ring-brand-400" : ""}>
             <CardContent className="p-0">
               <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 px-4 py-3">
-                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                <p className={`text-sm font-semibold ${isToday ? "text-brand-700 dark:text-brand-300" : "text-slate-700 dark:text-slate-300"}`}>
                   {fmtDay(date)}
                 </p>
                 {!isCleaner && (
@@ -145,41 +154,33 @@ export default async function SchedulePage({
                   </Link>
                 )}
               </div>
-              <ul className="divide-y divide-slate-100 dark:divide-slate-800">
+              <div className="space-y-2 p-3">
                 {dayJobs.length === 0 && (
-                  <li className="px-4 py-3 text-xs text-slate-400 dark:text-slate-500">{t("noVisits")}</li>
+                  <p className="px-1 py-2 text-xs text-slate-400 dark:text-slate-500">{t("noVisits")}</p>
                 )}
                 {dayJobs.map((job) => {
                   const assigned: string[] = job.assigned_user_ids ?? [];
                   if (isCleaner && !assigned.includes(membership.user_id)) return null;
+                  const customerName = one(job.customers)?.name ?? t("unknownCustomer");
+                  const addr = one(job.service_addresses);
+                  const shortLabel = addr?.address_line1 || customerName;
+                  const time = formatTime(job.scheduled_start, tz);
                   return (
-                    <li key={job.id}>
-                      <Link href={`/dashboard/jobs/${job.id}`} className="block px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-900">
-                        <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                          {formatTime(job.scheduled_start, tz)} · {one(job.customers)?.name}
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">
-                          {one(job.service_addresses)?.address_line1}, {one(job.service_addresses)?.city}
-                        </p>
-                        <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                          <TJobStatusPill status={job.status as JobStatus} />
-                          {assigned.slice(0, 2).map((uid) => (
-                            <span key={uid} className="text-[11px] text-slate-500 dark:text-slate-400 dark:text-slate-500">
-                              {emailOf(uid).split("@")[0]}
-                            </span>
-                          ))}
-                          {assigned.length > 2 && (
-                            <span className="text-[11px] text-slate-500 dark:text-slate-400 dark:text-slate-500">+{assigned.length - 2}</span>
-                          )}
-                        </div>
-                      </Link>
-                    </li>
+                    <Link
+                      key={job.id}
+                      href={`/dashboard/jobs/${job.id}`}
+                      title={`${time} · ${customerName}${addr ? ` · ${addr.address_line1}, ${addr.city}` : ""} · ${statusLabel(job.status)}${assigned.length > 0 ? ` · ${assigned.map(emailOf).join(", ")}` : ""}`}
+                      className={`block truncate rounded-lg px-3 py-2 text-xs font-semibold text-white shadow-sm transition-colors ${jobPillStyles[job.status] ?? jobPillStyles.scheduled}`}
+                    >
+                      {time} · {shortLabel}
+                    </Link>
                   );
                 })}
-              </ul>
+              </div>
             </CardContent>
           </Card>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

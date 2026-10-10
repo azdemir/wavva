@@ -6,6 +6,14 @@ All notable changes to TidyPro. Dates are in America/New_York.
 
 ### Added (unpushed)
 
+- **Schedule week view now matches the advertised colorful calendar** —
+  each visit renders as a solid color pill (blue = scheduled, amber = in
+  progress, green = completed) showing time + address/customer, like the
+  marketing hero. Hover tooltips carry the full details (customer, address,
+  status, crew); today's column is highlighted with a ring. The per-day "+"
+  add-booking button, crew filter, and week navigation are unchanged. New
+  `schedule.unknownCustomer` string in EN/ES/UK.
+
 - **Company logo** — onboarding (step 1) and Settings → company profile now
   ask for an optional logo (PNG/JPG/WebP, ≤2 MB, uploaded to object
   storage). It appears on quote/invoice print documents and in the customer
