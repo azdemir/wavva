@@ -5,6 +5,7 @@ import { getTranslations } from "next-intl/server";
 export const instant = false;
 import { headers } from "next/headers";
 import { requireUser, getActiveMembership } from "@/lib/auth";
+import { getLogoViewUrl } from "@/lib/storage";
 import { Container } from "@/components/ui/container";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Logo } from "@/components/ui/logo";
@@ -43,6 +44,7 @@ export default async function OnboardingPage({
   const h = await headers();
   const proto = h.get("x-forwarded-proto") ?? "http";
   const baseUrl = `${proto}://${h.get("host")}`;
+  const logoPreviewUrl = await getLogoViewUrl(active?.company.logo_url ?? null);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
@@ -60,7 +62,7 @@ export default async function OnboardingPage({
               <CardDescription>{stepMeta[step - 1].description}</CardDescription>
             </CardHeader>
             <CardContent>
-              {step === 1 && <CompanyStep company={active?.company ?? null} />}
+              {step === 1 && <CompanyStep company={active?.company ?? null} logoPreviewUrl={logoPreviewUrl} />}
               {step === 2 && <ServicesStep />}
               {step === 3 && <AreasStep />}
               {step === 4 && <TeamStep baseUrl={baseUrl} />}

@@ -4,7 +4,29 @@ All notable changes to TidyPro. Dates are in America/New_York.
 
 ## 2026-10-09
 
+### Added (unpushed)
+
+- **Company logo** — onboarding (step 1) and Settings → company profile now
+  ask for an optional logo (PNG/JPG/WebP, ≤2 MB, uploaded to object
+  storage). It appears on quote/invoice print documents and in the customer
+  portal header; when no logo is set, print documents show the TidyPro logo
+  and the portal keeps the TidyPro mark. New `lib/company-logo.ts` upload
+  helper (`company-logos/{companyId}/logo.{ext}`); `companies.logo_url`
+  column already existed.
+
 ### Fixed (unpushed)
+
+- **Import page badges unified** — ZenMaid, BookingKoala, and Generic CSV
+  cards now show the same "CSV" badge as Jobber and Housecall Pro (was
+  "CSV upload" on those three).
+
+- **Customer portal card on quote and invoice detail pages** — both pages
+  now have the same "Customer portal" card as the customer profile ("Share
+  a private link so this customer can approve quotes, see upcoming visits,
+  and pay invoices — no login needed." + Get portal link / copy / email /
+  text / revoke), reusing `PortalLinkButton`. New
+  `quotes.detail.portalTitle/portalDescription` and
+  `invoices.detail.portalTitle/portalDescription` strings in EN/ES/UK.
 
 - **Services page no longer blocks instant navigation** — the two uncached
   Supabase reads (`services` + `addons`) moved out of the page body into a

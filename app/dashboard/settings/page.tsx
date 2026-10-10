@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { requireOwner } from "@/lib/auth";
+import { getLogoViewUrl } from "@/lib/storage";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent } from "@/components/ui/card";
 import { SettingsForm } from "@/components/settings/settings-form";
@@ -9,6 +10,7 @@ import { QuickBooksCard } from "@/components/settings/quickbooks-card";
 export default async function SettingsPage() {
   const { company } = await requireOwner();
   const t = await getTranslations("settings");
+  const logoPreviewUrl = await getLogoViewUrl(company.logo_url);
 
   return (
     <div className="max-w-3xl space-y-8">
@@ -44,7 +46,7 @@ export default async function SettingsPage() {
       </Link>
       <Card>
         <CardContent className="pt-6">
-          <SettingsForm company={company} />
+          <SettingsForm company={company} logoPreviewUrl={logoPreviewUrl} />
         </CardContent>
       </Card>
       <QuickBooksCard />

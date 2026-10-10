@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getPortalContext } from "@/lib/portal";
 import { createServiceClient } from "@/lib/supabase/server";
 import { PortalShell, PortalInvalid } from "@/components/portal/portal-shell";
+import { getLogoViewUrl } from "@/lib/storage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InvoiceStatusPill, type InvoiceStatus } from "@/components/ui/badge";
 import { PayButton } from "@/components/portal/pay-button";
@@ -23,6 +24,7 @@ export default async function PortalInvoicePage({
   const { paid } = await searchParams;
   const ctx = await getPortalContext(token);
   if (!ctx) return <PortalInvalid />;
+  const logoUrl = await getLogoViewUrl(ctx.company.logo_url);
 
   const svc = await createServiceClient();
   const { data: invoice } = await svc
@@ -46,7 +48,7 @@ export default async function PortalInvoicePage({
   const payable = ["sent", "overdue"].includes(invoice.status) && due > 0;
 
   return (
-    <PortalShell companyName={ctx.company.name} customerName={ctx.customer.name}>
+    <PortalShell companyName={ctx.company.name} customerName={ctx.customer.name} logoUrl={logoUrl}>
       <div className="space-y-6">
         <div className="flex items-start justify-between gap-4">
           <div>

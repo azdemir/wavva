@@ -4,6 +4,7 @@ import { getPortalContext } from "@/lib/portal";
 import { createServiceClient } from "@/lib/supabase/server";
 import { portalSetQuoteStatus } from "@/lib/actions/portal";
 import { PortalShell, PortalInvalid } from "@/components/portal/portal-shell";
+import { getLogoViewUrl } from "@/lib/storage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { QuoteStatusPill, type QuoteStatus } from "@/components/ui/badge";
@@ -20,6 +21,7 @@ export default async function PortalQuotePage({
   const { token, id } = await params;
   const ctx = await getPortalContext(token);
   if (!ctx) return <PortalInvalid />;
+  const logoUrl = await getLogoViewUrl(ctx.company.logo_url);
 
   const svc = await createServiceClient();
   const { data: quote } = await svc
@@ -38,7 +40,7 @@ export default async function PortalQuotePage({
     .order("sort", { ascending: true });
 
   return (
-    <PortalShell companyName={ctx.company.name} customerName={ctx.customer.name}>
+    <PortalShell companyName={ctx.company.name} customerName={ctx.customer.name} logoUrl={logoUrl}>
       <div className="space-y-6">
         <div className="flex items-start justify-between gap-4">
           <div>

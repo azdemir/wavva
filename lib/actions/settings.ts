@@ -6,6 +6,19 @@ import { createClient } from "@/lib/supabase/server";
 import { requireOwner } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
 import { settingsSchema } from "@/lib/validation";
+import {
+  uploadCompanyLogo,
+  deleteCompanyLogo,
+  hasLogoFile,
+  type LogoUploadError,
+} from "@/lib/company-logo";
+
+const logoErrorKeys: Record<LogoUploadError, string> = {
+  storage_not_configured: "errors.logoNoStorage",
+  invalid_type: "errors.logoInvalidType",
+  too_large: "errors.logoTooLarge",
+  upload_failed: "errors.logoUploadFailed",
+};
 
 export async function updateCompanySettings(formData: FormData) {
   const ctx = await requireOwner();
@@ -69,6 +82,25 @@ export async function updateCompanySettings(formData: FormData) {
     })
     .eq("id", ctx.company.id);
   if (error) return { error: error.message };
+
+  // Optional logo upload / removal. A new upload wins over the remove checkbox.
+  const logoValue = formData.get("logo");
+  if (hasLogoFile(logoValue)) {
+    const up = await uploadCompanyLogo(ctx.company.id, logoValue, ctx.company.logo_url);
+    if (up.error) return { error: t(logoErrorKeys[up.error]) };
+    const { error: logoErr } = await supabase
+      .from("companies")
+      .update({ logo_url: up.key })
+      .eq("id", ctx.company.id);
+    if (logoErr) return { error: logoErr.message };
+  } else if (formData.get("remove_logo") === "1" && ctx.company.logo_url) {
+    await deleteCompanyLogo(ctx.company.logo_url);
+    const { error: logoErr } = await supabase
+      .from("companies")
+      .update({ logo_url: null })
+      .eq("id", ctx.company.id);
+    if (logoErr) return { error: logoErr.message };
+  }
 
   await logAudit(supabase, {
     company_id: ctx.company.id,

@@ -7,10 +7,13 @@ import { LogoMark } from "@/components/ui/logo";
 export function PortalShell({
   companyName,
   customerName,
+  logoUrl,
   children,
 }: {
   companyName: string;
   customerName: string;
+  /** Resolved company logo URL; falls back to the TidyPro mark when null. */
+  logoUrl: string | null;
   children: ReactNode;
 }) {
   return (
@@ -19,7 +22,15 @@ export function PortalShell({
         <Container>
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center gap-2.5">
-              <LogoMark className="h-8 w-8" />
+              {logoUrl ? (
+                <img
+                  src={logoUrl}
+                  alt={`${companyName} logo`}
+                  className="h-8 w-auto max-w-32 object-contain"
+                />
+              ) : (
+                <LogoMark className="h-8 w-8" />
+              )}
               <div>
                 <p className="text-sm font-bold text-slate-900 dark:text-slate-100">{companyName}</p>
                 <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">powered by {site.name}</p>

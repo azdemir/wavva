@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getPortalContext } from "@/lib/portal";
 import { createServiceClient } from "@/lib/supabase/server";
 import { PortalShell, PortalInvalid } from "@/components/portal/portal-shell";
+import { getLogoViewUrl } from "@/lib/storage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -19,6 +20,7 @@ export default async function PortalHomePage({
   const { token } = await params;
   const ctx = await getPortalContext(token);
   if (!ctx) return <PortalInvalid />;
+  const logoUrl = await getLogoViewUrl(ctx.company.logo_url);
 
   const svc = await createServiceClient();
   const now = new Date().toISOString();
@@ -54,7 +56,7 @@ export default async function PortalHomePage({
   const tz = ctx.company.timezone;
 
   return (
-    <PortalShell companyName={ctx.company.name} customerName={ctx.customer.name}>
+    <PortalShell companyName={ctx.company.name} customerName={ctx.customer.name} logoUrl={logoUrl}>
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">

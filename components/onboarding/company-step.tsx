@@ -4,10 +4,17 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/input";
+import { LogoField } from "@/components/company/logo-field";
 import { saveCompanyProfile } from "@/lib/actions/onboarding";
 import type { Company } from "@/lib/auth";
 
-export function CompanyStep({ company }: { company?: Company | null }) {
+export function CompanyStep({
+  company,
+  logoPreviewUrl,
+}: {
+  company?: Company | null;
+  logoPreviewUrl: string | null;
+}) {
   const t = useTranslations("onboarding");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -60,6 +67,14 @@ export function CompanyStep({ company }: { company?: Company | null }) {
         label={t("company.website")}
         placeholder={t("company.websitePlaceholder")}
         defaultValue={company?.website ?? ""}
+      />
+      <LogoField
+        inputId="ob-logo"
+        label={t("company.logo")}
+        optionalLabel={t("company.optional")}
+        hint={t("company.logoHint")}
+        previewUrl={logoPreviewUrl}
+        previewAlt={t("company.logoPreviewAlt")}
       />
       <Button type="submit" className="w-full" disabled={pending}>
         {pending ? t("common.saving") : t("common.continue")}

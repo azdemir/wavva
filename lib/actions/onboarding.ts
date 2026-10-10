@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { requireUser, getActiveMembership } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
+import { uploadCompanyLogo, hasLogoFile, type LogoUploadError } from "@/lib/company-logo";
 import {
   companySchema,
   serviceSchema,
@@ -19,6 +20,13 @@ export type ActionResult = { error?: string; ok?: boolean };
 function err(message: string): ActionResult {
   return { error: message };
 }
+
+const logoErrorKeys: Record<LogoUploadError, string> = {
+  storage_not_configured: "errors.logoNoStorage",
+  invalid_type: "errors.logoInvalidType",
+  too_large: "errors.logoTooLarge",
+  upload_failed: "errors.logoUploadFailed",
+};
 
 /** Step 1: create the company (or update it when resuming onboarding). */
 export async function saveCompanyProfile(
@@ -46,6 +54,10 @@ export async function saveCompanyProfile(
     website: parsed.data.website || null,
     timezone: parsed.data.timezone,
   };
+  // Client used for company writes below. In the bootstrap path this may
+  // become the service-role fallback when the user-scoped insert hits RLS.
+  let db = supabase;
+  let newCompany: { id: string } | null = null;
 
   if (active) {
     const { error } = await supabase
@@ -61,8 +73,6 @@ export async function saveCompanyProfile(
     // service_role client — authentication was already verified via
     // requireUser() above, and we create exactly one company + one owner
     // membership for that verified user.
-    let db = supabase;
-    let company: { id: string } | null = null;
     const attempt = await supabase
       .from("companies")
       .insert(data)
@@ -82,25 +92,46 @@ export async function saveCompanyProfile(
         return err(retry.error?.message ?? t("errors.couldNotCreateCompany"));
       }
       db = svc;
-      company = retry.data;
+      newCompany = retry.data;
     } else {
-      company = attempt.data;
+      newCompany = attempt.data;
     }
 
     const { error: mErr } = await db.from("memberships").insert({
       user_id: user.id,
-      company_id: company.id,
+      company_id: newCompany!.id,
       email: user.email ?? "",
       role: "owner",
     });
     if (mErr) return err(mErr.message);
 
     await logAudit(db, {
-      company_id: company.id,
+      company_id: newCompany!.id,
       action: "company.created",
       entity_type: "company",
-      entity_id: company.id,
+      entity_id: newCompany!.id,
     });
+  }
+
+  // Optional logo: upload after the company exists so the storage key can
+  // include the company id.
+  const companyId = active ? active.company.id : newCompany!.id;
+  const logoValue = formData.get("logo");
+  if (hasLogoFile(logoValue)) {
+    const up = await uploadCompanyLogo(
+      companyId,
+      logoValue,
+      active?.company.logo_url ?? null,
+    );
+    if (up.error) return err(t(logoErrorKeys[up.error]));
+    // In the bootstrap path `db` may be the service-role fallback client
+    // when the user-scoped insert hit RLS; reuse it for the logo update.
+    const logoDb = active ? supabase : db;
+    const { error: logoErr } = await logoDb
+      .from("companies")
+      .update({ logo_url: up.key })
+      .eq("id", companyId);
+    if (logoErr) return err(logoErr.message);
   }
 
   redirect("/onboarding?step=2");

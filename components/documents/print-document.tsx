@@ -6,12 +6,15 @@
  */
 
 import { getTranslations } from "next-intl/server";
+import { getLogoViewUrl } from "@/lib/storage";
+import { Logo } from "@/components/ui/logo";
 
 export type PrintCompany = {
   name: string;
   phone: string | null;
   email: string | null;
   website: string | null;
+  logo_url: string | null;
 };
 
 export type PrintCustomer = {
@@ -59,11 +62,23 @@ export async function PrintDocument({
 }) {
   const t = await getTranslations("quotes");
   const contact = [company.phone, company.email, company.website].filter(Boolean).join(" · ");
+  const logoUrl = await getLogoViewUrl(company.logo_url);
   return (
     <div className="mx-auto max-w-3xl bg-white px-8 py-10 text-slate-900 print:max-w-none print:px-0 print:py-0">
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-6 border-b-2 border-slate-900 pb-6">
         <div>
+          {logoUrl ? (
+            <img
+              src={logoUrl}
+              alt={`${company.name} logo`}
+              className="mb-3 h-12 w-auto max-w-56 object-contain"
+            />
+          ) : (
+            <div className="mb-3">
+              <Logo />
+            </div>
+          )}
           <p className="text-2xl font-bold tracking-tight">{company.name}</p>
           {contact && <p className="mt-1 text-sm text-slate-600">{contact}</p>}
         </div>

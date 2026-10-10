@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Field, SelectField, TextareaField } from "@/components/ui/input";
+import { LogoField } from "@/components/company/logo-field";
 import { updateCompanySettings } from "@/lib/actions/settings";
 import type { Company } from "@/lib/auth";
 
@@ -16,7 +17,13 @@ const timezones = [
   "Pacific/Honolulu",
 ];
 
-export function SettingsForm({ company }: { company: Company }) {
+export function SettingsForm({
+  company,
+  logoPreviewUrl,
+}: {
+  company: Company;
+  logoPreviewUrl: string | null;
+}) {
   const t = useTranslations("settings");
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -57,6 +64,15 @@ export function SettingsForm({ company }: { company: Company }) {
       <section className="space-y-4">
         <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">{t("form.profile")}</h3>
         <Field id="set-name" name="name" label={t("fields.businessName")} defaultValue={company.name} required />
+        <LogoField
+          inputId="set-logo"
+          label={t("fields.logo")}
+          optionalLabel={t("fields.optional")}
+          hint={t("fields.logoHint")}
+          previewUrl={logoPreviewUrl}
+          previewAlt={t("fields.logoPreviewAlt")}
+          removeLabel={t("fields.removeLogo")}
+        />
         <div className="grid gap-4 sm:grid-cols-2">
           <Field id="set-phone" name="phone" label={t("fields.phone")} type="tel" defaultValue={company.phone ?? ""} />
           <Field id="set-email" name="email" label={t("fields.email")} type="email" defaultValue={company.email ?? ""} hint={t("fields.emailHint")} />
