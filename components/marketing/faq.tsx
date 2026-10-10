@@ -28,7 +28,7 @@ export async function Faq() {
 
         <Reveal
           delay={80}
-          className="mt-14 overflow-hidden rounded-2xl border border-line bg-surface"
+          className="mt-14 overflow-hidden rounded-2xl bg-surface shadow-[0_24px_60px_-34px_rgba(15,23,42,0.3)]"
         >
           {faqs.map((f, i) => (
             <details

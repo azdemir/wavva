@@ -59,7 +59,7 @@ export async function CompareBand() {
 
         <Reveal
           delay={90}
-          className="mx-auto mt-14 max-w-4xl overflow-hidden rounded-3xl border border-line bg-surface shadow-[0_30px_80px_-40px_rgba(15,23,42,0.35)]"
+          className="mx-auto mt-14 max-w-4xl overflow-hidden rounded-3xl bg-surface shadow-[0_30px_80px_-40px_rgba(15,23,42,0.35)]"
         >
           {/* Header ------------------------------------------------------- */}
           <div className="grid grid-cols-[1fr_5.5rem_5.5rem] items-end border-b border-line bg-surface-2 sm:grid-cols-[1fr_9rem_9rem]">

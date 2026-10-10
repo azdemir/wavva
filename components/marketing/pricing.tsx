@@ -19,7 +19,7 @@ export function PlanCards() {
             className={`group/plan relative flex h-full flex-col overflow-hidden rounded-2xl p-7 transition-all duration-300 ${
               plan.featured
                 ? "bg-night text-white shadow-[0_28px_70px_-30px_rgba(7,8,12,0.9)] ring-1 ring-white/10"
-                : "border border-line bg-surface hover:-translate-y-0.5 hover:border-line-strong hover:shadow-[0_20px_50px_-30px_rgba(15,23,42,0.4)]"
+                : "bg-surface shadow-[0_18px_50px_-28px_rgba(15,23,42,0.35)] hover:-translate-y-0.5 hover:shadow-[0_20px_50px_-30px_rgba(15,23,42,0.4)]"
             }`}
           >
             {plan.featured && (

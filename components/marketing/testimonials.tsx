@@ -76,7 +76,7 @@ export async function Testimonials() {
               // min-w-0: grid items default to min-width:auto, so a long
               // nowrap line inside can dictate the track width and blow out
               // the page on small screens.
-              className="min-w-0 rounded-2xl border border-line bg-surface p-7 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_24px_60px_-34px_rgba(15,23,42,0.45)]"
+              className="min-w-0 rounded-2xl bg-surface p-7 shadow-[0_18px_50px_-30px_rgba(15,23,42,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_24px_60px_-34px_rgba(15,23,42,0.45)]"
             >
               <Stars />
               <blockquote className="text-sm leading-relaxed text-pretty text-ink-2">

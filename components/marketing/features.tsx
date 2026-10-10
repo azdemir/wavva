@@ -51,7 +51,7 @@ function Panel({
 }) {
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl border border-line p-7 ${className}`}
+      className={`relative overflow-hidden rounded-2xl p-7 ${className}`}
     >
       {children}
     </div>
@@ -207,7 +207,7 @@ function MiniPortal() {
 
 function MiniInvoice() {
   return (
-    <div className="mt-7 flex items-center gap-3 rounded-2xl border border-line bg-surface-2 p-4 shadow-sm">
+    <div className="mt-7 flex items-center gap-3 rounded-2xl bg-surface-2 p-4 shadow-sm">
       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-100 text-accent-700 dark:bg-accent-950 dark:text-accent-400">
         <CheckIcon className="h-4 w-4" />
       </span>
@@ -276,7 +276,7 @@ export async function Features() {
             const showVisual = LEAD_VISUALS.has(f.icon) && i < 2;
             return (
               <Reveal key={f.title} delay={i * 70} className={`min-w-0 ${span}`}>
-                <SpotlightCard className="rounded-2xl border border-line">
+                <SpotlightCard className="rounded-2xl shadow-[0_24px_60px_-30px_rgba(15,23,42,0.3)]">
                   <div className="flex h-full flex-col p-7 sm:p-8">
                     <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600 transition-transform duration-300 group-hover/card:scale-105 dark:bg-brand-950 dark:text-brand-400">
                       {ICONS[f.icon] ?? <CalendarIcon />}
