@@ -5,8 +5,8 @@ onboard, add customers, quote → book → schedule → complete a job → invoi
 get paid online, with automated reminders firing and the owner seeing reports.
 Everything below is what's still missing or undecided to get there.
 
-**Regression #2 is running now** — the bug list below is from run #1 (2026-10-10
-morning); it will be updated when #2 lands.
+**Regression #2 is running now** — the bug list below was audited in code on
+2026-10-11 and is now closed out (section 2).
 
 ---
 
@@ -38,20 +38,23 @@ These are all on the founder (you), not buildable by the agent:
 - [ ] **Google OAuth verification paperwork** (homepage, privacy policy, domain
       confirmation) — only needed for the Google Calendar import
 
-## 2. Known bugs — AGENT WORK (from regression run #1)
+## 2. Known bugs — all resolved (audited 2026-10-11)
 
-Re-verifying in run #2; anything still broken gets fixed after:
+Re-verified bug-by-bug in code on 2026-10-11. Seven of the eight were already
+fixed by regression run #1's batch; the table below records where each fix
+actually lives, so the next run doesn't re-investigate them.
 
-| # | Bug | Severity |
-|---|-----|----------|
-| 1 | Past-dated bookings accepted | major |
-| 2 | Delete-customer button does nothing | major |
-| 3 | Paid invoices can't be deleted/voided | major |
-| 4 | CSV import misses within-file duplicate emails (UI form allows silent dupes too) | major |
-| 5 | `?next=` deep-link ignored after sign-in | major |
-| 6 | $0 quotes accepted | minor |
-| 7 | Wrong balances shown on paid invoices | minor |
-| 8 | Template with empty subject silently flagged "Customized" | minor |
+| # | Bug | Severity | Status | Fix |
+|---|-----|----------|--------|-----|
+| 1 | Past-dated bookings accepted | major | done | `lib/actions/bookings.ts:56` (create), `:228` (reschedule) |
+| 2 | Delete-customer button does nothing | major | done | `app/dashboard/customers/[id]/page.tsx:196` — confirm dialog + per-table count explaining why a customer with history can't be deleted |
+| 3 | Paid invoices can't be deleted/voided | major | done | `lib/actions/invoices.ts:119` — `paid → ["void"]`; void keeps the record for audit |
+| 4 | CSV import misses within-file duplicate emails | major | done | `lib/actions/import.ts:170` `findWithinFileDuplicateEmails` |
+| 4b | UI customer form allows silent duplicate emails | major | **fixed 2026-10-11** | `lib/actions/customers.ts` — new `checkDuplicateEmail` guard on create + update. `customers` has NO unique constraint on `(company_id, email)` (the one in `0001_init.sql:50` is on `invites`), so the form silently created dupes. |
+| 5 | `?next=` deep-link ignored after sign-in | major | done | `lib/actions/auth.ts:57` `safeNextPath` — honors the deep link, rejects protocol-relative/backslash redirects |
+| 6 | $0 quotes accepted | minor | done | `lib/validation.ts:109` — requires ≥1 line item priced above $0 |
+| 7 | Wrong balances shown on paid invoices | minor | done | `lib/actions/invoices.ts:313` `markInvoicePaid` records the payment, so "Balance due $0.00" stays truthful |
+| 8 | Template with empty subject silently flagged "Customized" | minor | done | `lib/actions/communications.ts:85` — rejects empty email subject on save |
 
 Blocked (not bugs, need setup): Schedule/crew/checklists/photos + integrations
 are plan-gated on the live Starter test account; cross-role and non-admin
