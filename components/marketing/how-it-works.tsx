@@ -3,6 +3,7 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { Reveal } from "@/components/marketing/reveal";
 import { Button } from "@/components/ui/button";
 import { CheckIcon } from "@/components/ui/icons";
+import { DemoVideo } from "@/components/marketing/demo-video";
 import { getContent } from "@/lib/studio/content";
 
 export type HowStep = { title: string; description: string };
@@ -28,6 +29,18 @@ export async function HowItWorks() {
       className="scroll-mt-24 border-y border-line bg-surface-2 py-24 sm:py-28 lg:py-32"
     >
       <Container>
+        {/* Product demo — the hero's "See how it works" CTA scrolls here, so
+            this is the section that has to actually show the product. */}
+        <Reveal className="mb-16 lg:mb-20">
+          <DemoVideo
+            src="/videos/tidypro-demo.mp4"
+            poster="/videos/tidypro-demo-poster.jpg"
+            captions="/videos/tidypro-demo.vtt"
+            duration="3:03"
+            title="TidyPro product demo"
+          />
+        </Reveal>
+
         <div className="grid gap-14 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
           {/* Sticky rail ------------------------------------------------- */}
           <Reveal className="lg:sticky lg:top-28 lg:self-start">
