@@ -22,6 +22,7 @@ import {
   DownloadIcon,
   PlugIcon,
   GamepadIcon,
+  PhoneIcon,
 } from "@/components/ui/icons";
 import { LogoMark } from "@/components/ui/logo";
 import { hasFeature, type PlanFeature } from "@/lib/plans";
@@ -57,6 +58,7 @@ const nav: NavItem[] = [
   { href: "/dashboard/bookings", labelKey: "bookings", icon: CalendarIcon, roles: STAFF },
   { href: "/dashboard/jobs", labelKey: "jobs", icon: ClockIcon, roles: STAFF },
   { href: "/dashboard/schedule", labelKey: "schedule", icon: CalendarIcon, feature: "schedule", roles: STAFF },
+  { href: "/dashboard/front-office", labelKey: "frontOffice", icon: PhoneIcon, roles: STAFF },
   { href: "/dashboard/checklists", labelKey: "checklists", icon: CheckIcon, feature: "checklists", roles: ["owner"] },
   { href: "/dashboard/availability", labelKey: "availability", icon: ClockIcon },
   { href: "/dashboard/my-jobs", labelKey: "myJobs", icon: ClockIcon },
