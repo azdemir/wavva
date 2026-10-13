@@ -137,3 +137,17 @@ export const settingsSchema = z.object({
   followup_enabled: z.coerce.boolean().default(true),
   followup_days: z.string().max(30).default("2, 5"),
 });
+
+/** Front Office founding-client application (public form, server-validated). */
+export const foundingApplicationSchema = z.object({
+  company_name: z.string().trim().min(2, "Company name is required.").max(120),
+  owner_name: z.string().trim().min(2, "Your name is required.").max(120),
+  phone: z.string().trim().min(7, "Enter a valid phone number.").max(32),
+  email: email,
+  city: z.string().trim().min(2, "City is required.").max(120),
+  crew_count: z.coerce.number().int().min(0).max(500),
+  current_tools: z.string().trim().max(500).default(""),
+  plan_interest: z.enum(["front_desk", "full_office"], {
+    error: "Choose a plan.",
+  }),
+});
