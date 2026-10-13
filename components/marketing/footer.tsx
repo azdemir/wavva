@@ -7,9 +7,11 @@ const columns = [
   {
     title: "Product",
     links: [
+      { label: "Front Office Service", href: "/front-office" },
+      { label: "Claim a founding spot", href: "/founding-client" },
       { label: "Features", href: "/features" },
-      { label: "How it works", href: "/#how-it-works" },
-      { label: "Pricing", href: "/pricing" },
+      { label: "How it works", href: "/front-office#how-it-works" },
+      { label: "Pricing", href: "/#pricing" },
       { label: "Compare", href: "/compare" },
       { label: "FAQ", href: "/faq" },
     ],

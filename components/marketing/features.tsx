@@ -248,7 +248,12 @@ const VISUALS: Record<string, React.ReactNode> = {
 /** Only the two lead cards get a mini-UI — six of them would be noise. */
 const LEAD_VISUALS = new Set(["quote", "calendar", "users"]);
 
-export async function Features() {
+/**
+ * `titleOverride` lets the homepage reframe the section (e.g. "The software
+ * behind your front office") without changing the registry default used by
+ * the features pages.
+ */
+export async function Features({ titleOverride }: { titleOverride?: string } = {}) {
   const [eyebrow, title, description, features] = await Promise.all([
     getContent<string>("home.features.eyebrow"),
     getContent<string>("home.features.title"),
@@ -265,7 +270,7 @@ export async function Features() {
         <Reveal>
           <SectionHeading
             eyebrow={eyebrow}
-            title={title}
+            title={titleOverride ?? title}
             description={description}
           />
         </Reveal>

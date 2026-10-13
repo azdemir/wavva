@@ -622,6 +622,22 @@ export const CONTENT_REGISTRY: ContentDef[] = [
         q: "Can my cleaners use it on their phones?",
         a: "Yes. Job views are designed mobile-first: cleaners see their day's jobs, tap into job details, work through checklists, upload before-and-after photos, and mark jobs complete — all from a phone browser.",
       },
+      {
+        q: "What is the Front Office Service?",
+        a: "It's our done-for-you tier: an AI assistant answers every call, text, web form and email in your company's name, sends quotes from your price list and follows up, books visits into your schedule, and — on Full Office — invoices and collects. Front Desk is $300/month, Full Office is $600/month, both month to month with no per-call charges.",
+      },
+      {
+        q: "What happens when the AI assistant can't answer?",
+        a: "Anything it can't handle comes straight to you by text — including anything unusual, or any quote outside your price list. It never guesses on your behalf.",
+      },
+      {
+        q: "Does my phone number change with the Front Office Service?",
+        a: "No. Your business line and enquiry inbox forward to your AI assistant, and your number stays yours. Everything goes out under your company's name.",
+      },
+      {
+        q: "Who gets paid when customers pay by card?",
+        a: "You do. Card payments go straight to your own account; we never hold your money.",
+      },
     ],
     paths: ["/", "/faq"],
   },

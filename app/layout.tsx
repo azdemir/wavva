@@ -35,28 +35,28 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default:
-      "Cleaning Business Software — Scheduling, Quotes & Invoicing | TidyPro",
+      "We run your front office. You run the cleaning. | TidyPro",
     template: "%s | TidyPro",
   },
   description:
-    "TidyPro is cleaning business software for scheduling, quotes, crew management, invoicing, and payments. Built for Upstate NY cleaners. Flat pricing from $10/mo — no per-user fees. Start free for 14 days.",
+    "TidyPro's done-for-you Front Office Service: an AI assistant answers every call, text and email in your company's name, books your schedule, and follows up every unpaid invoice. From $300/mo, month to month. Self-serve software from $10/mo.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
     siteName: "TidyPro",
-    title: "TidyPro — Operations software for cleaning businesses",
+    title: "TidyPro — We run your front office. You run the cleaning.",
     description:
-      "Quotes, scheduling, teams, invoicing, and customers in one simple place for cleaning businesses.",
+      "Every new enquiry answered quickly, every quote followed up, every visit confirmed and every unpaid invoice followed up, under your company's name.",
     url: "/",
     images: [{ url: "/og-image.jpg", width: 1000, height: 525, alt: "TidyPro" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "TidyPro — Operations software for cleaning businesses",
+    title: "TidyPro — We run your front office. You run the cleaning.",
     description:
-      "Quotes, scheduling, teams, invoicing, and customers in one simple place for cleaning businesses.",
+      "Every new enquiry answered quickly, every quote followed up, every visit confirmed and every unpaid invoice followed up, under your company's name.",
     images: ["/og-image.jpg"],
   },
   robots: {

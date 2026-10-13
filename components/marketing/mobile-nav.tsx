@@ -9,8 +9,9 @@ const linkClass =
   "block rounded-xl px-3.5 py-3 text-sm font-medium text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600";
 
 const otherLinks = [
-  { label: "How it works", href: "/#how-it-works" },
-  { label: "Pricing", href: "/pricing" },
+  { label: "Front Office", href: "/front-office" },
+  { label: "How it works", href: "/front-office#how-it-works" },
+  { label: "Pricing", href: "/#pricing" },
   { label: "Compare", href: "/compare" },
   { label: "FAQ", href: "/faq" },
 ];
