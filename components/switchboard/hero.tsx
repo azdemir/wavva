@@ -41,21 +41,17 @@ export function Hero() {
           className="sb-reveal sb-hero-rise mx-auto max-w-5xl font-sb text-[clamp(48px,7.2vw,96px)] font-extrabold leading-[1.04] tracking-tight text-sb-ink"
           style={{ transitionDelay: "0.1s" }}
         >
+          Every call answered.
+          <br />
           <span className="sb-headline-stack">
             <span className="sb-headline-phrase animate-sb-headline" style={{ animationDelay: "0s" }}>
-              Every call answered.
-              <br />
               Every job <Grad>booked.</Grad>
             </span>
             <span className="sb-headline-phrase animate-sb-headline" style={{ animationDelay: "4s" }} aria-hidden="true">
-              The <Grad>exchange</Grad>
-              <br />
-              your business runs on.
+              The <Grad>exchange</Grad> your business runs on.
             </span>
             <span className="sb-headline-phrase animate-sb-headline" style={{ animationDelay: "8s" }} aria-hidden="true">
-              The AI <Grad>front office</Grad>
-              <br />
-              for every business.
+              The AI <Grad>front office</Grad> for every business.
             </span>
           </span>
         </h1>

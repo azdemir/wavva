@@ -30,11 +30,13 @@ const OUTCOMES = [
   "Owner notified by text",
 ];
 
-const AUDIO_SRC = "/sample-call.mp3";
 /** Measured start time (seconds) of each turn in the audio file. */
 const TURN_STARTS = [0.0, 7.55, 13.01, 18.16, 20.84, 24.48, 30.95, 37.13, 39.16];
 /** Fallback pacing when the audio file isn't available. */
 const STEP_MS = 2600;
+/** The MP3 ships as base64 text chunks (binaries can't ride the push tool). */
+const CHUNK_COUNT = 12;
+const chunkUrl = (i: number) => `/call-audio/c${String(i + 1).padStart(2, "0")}.txt`;
 
 /** The player card alone — used inside the hero. */
 export function CallDemoPlayer() {
@@ -42,13 +44,58 @@ export function CallDemoPlayer() {
   const [playing, setPlaying] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [duration, setDuration] = useState(0);
-  /** Assume the audio file exists until an error proves otherwise. */
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [audioLoading, setAudioLoading] = useState(true);
+  /** Assume audio works until proven otherwise — then fall back to the timer. */
   const [useAudio, setUseAudio] = useState(true);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const pendingPlay = useRef(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const done = step >= SCRIPT.length;
   /** Derived: actually advancing. No effect-syncing of setState needed. */
   const active = playing && !done;
+
+  // Reassemble the MP3 from its base64 text chunks.
+  useEffect(() => {
+    let alive = true;
+    let url: string | null = null;
+    (async () => {
+      try {
+        const parts = await Promise.all(
+          Array.from({ length: CHUNK_COUNT }, (_, i) =>
+            fetch(chunkUrl(i)).then((r) => {
+              if (!r.ok) throw new Error(`chunk ${i} missing`);
+              return r.text();
+            })
+          )
+        );
+        const bin = atob(parts.join("").trim());
+        const bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        url = URL.createObjectURL(new Blob([bytes], { type: "audio/mpeg" }));
+        if (alive) setAudioUrl(url);
+      } catch {
+        if (alive) {
+          setUseAudio(false);
+          setAudioLoading(false);
+        }
+      } finally {
+        if (alive) setAudioLoading(false);
+      }
+    })();
+    return () => {
+      alive = false;
+      if (url) URL.revokeObjectURL(url);
+    };
+  }, []);
+
+  // If the user hit play while chunks were still loading, start once ready.
+  useEffect(() => {
+    if (audioUrl && pendingPlay.current) {
+      pendingPlay.current = false;
+      audioRef.current?.play().catch(() => setUseAudio(false));
+    }
+  }, [audioUrl]);
 
   // ---- audio-driven mode ----
   useEffect(() => {
@@ -76,9 +123,9 @@ export function CallDemoPlayer() {
       a.removeEventListener("loadedmetadata", onMeta);
       a.removeEventListener("error", onErr);
     };
-  }, [useAudio]);
+  }, [useAudio, audioUrl]);
 
-  // ---- timer fallback mode (audio file missing) ----
+  // ---- timer fallback mode (audio chunks missing) ----
   useEffect(() => {
     if (useAudio || !active) return;
     const t = setTimeout(() => setStep((s) => s + 1), STEP_MS);
@@ -98,20 +145,30 @@ export function CallDemoPlayer() {
 
   const play = () => {
     setPlaying(true);
-    if (useAudio) {
+    if (!useAudio) return; // timer fallback drives itself
+    if (audioUrl) {
       audioRef.current?.play().catch(() => setUseAudio(false));
+    } else if (audioLoading) {
+      pendingPlay.current = true; // start as soon as chunks land
+    } else {
+      setUseAudio(false);
     }
   };
   const pause = () => {
     setPlaying(false);
+    pendingPlay.current = false;
     audioRef.current?.pause();
   };
   const restart = () => {
     setSeconds(0);
-    if (useAudio && audioRef.current) {
+    if (useAudio && audioRef.current && audioUrl) {
       audioRef.current.currentTime = 0;
       audioRef.current.play().catch(() => setUseAudio(false));
       setPlaying(true);
+    } else if (useAudio && audioLoading) {
+      pendingPlay.current = true;
+      setPlaying(true);
+      setStep(0);
     } else {
       setStep(0);
       setPlaying(true);
@@ -121,11 +178,12 @@ export function CallDemoPlayer() {
   const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
   const ss = String(seconds % 60).padStart(2, "0");
   const progress = useAudio && duration > 0 ? Math.min(seconds / duration, 1) : step / SCRIPT.length;
+  const playLabel = audioLoading && !audioUrl && useAudio ? "Loading audio…" : "▶  Play sample call";
 
   return (
     <Reveal className="mx-auto max-w-[680px]">
       <div id="chatdemo" className="scroll-mt-28 overflow-hidden rounded-[28px] border border-sb-ink/10 bg-white text-left shadow-[0_30px_70px_rgba(20,20,43,0.12)]">
-            <audio ref={audioRef} src={AUDIO_SRC} preload="auto" className="hidden" />
+            {audioUrl && <audio ref={audioRef} src={audioUrl} preload="auto" className="hidden" />}
             {/* call header */}
             <div className="flex items-center justify-between bg-sb-ink px-6 py-4 text-white">
               <div className="flex items-center gap-3">
@@ -201,7 +259,7 @@ export function CallDemoPlayer() {
                   onClick={play}
                   className="rounded-full bg-sb-violet px-8 py-3 font-sb text-[15px] font-extrabold text-white transition-transform hover:scale-[1.03]"
                 >
-                  ▶&nbsp; Play sample call
+                  {playLabel}
                 </button>
               )}
               {active && (
