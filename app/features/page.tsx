@@ -1,194 +1,118 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Navbar } from "@/components/marketing/navbar";
-import { Footer } from "@/components/marketing/footer";
-import { Cta } from "@/components/marketing/cta";
-import { PageHero } from "@/components/marketing/page-hero";
-import { FEATURE_LINKS } from "@/components/marketing/feature-links";
-import { Container } from "@/components/ui/container";
-import { SectionHeading } from "@/components/ui/section-heading";
-import { Card, CardContent, CardIcon } from "@/components/ui/card";
-import {
-
-  BellIcon,
-  CalendarIcon,
-  CardIcon as CardPayIcon,
-  CheckIcon,
-  PortalIcon,
-  QuoteIcon,
-  UsersIcon,
-} from "@/components/ui/icons";
-import { getContent } from "@/lib/studio/content";
+import { PillNav } from "@/components/switchboard/pill-nav";
+import { Footer } from "@/components/switchboard/footer";
+import { Reveal } from "@/components/switchboard/reveal";
+import { Eyebrow, Grad } from "@/components/switchboard/section-head";
+import { SbButton } from "@/components/switchboard/buttons";
+import { TrialBand } from "@/components/switchboard/contact";
 
 export const metadata: Metadata = {
-  title: "Cleaning Business Software Features",
+  title: "Features",
   description:
-    "Cleaning business software features: scheduling without double-bookings, quotes that convert to bookings, crew mobile tools, invoicing with online payments, customer portal, and automated reminders.",
+    "Everything Switchboard does: live call answering, texts and emails in minutes, quotes from your price list, booking, reminders, invoicing, collections, and a weekly report.",
   alternates: { canonical: "/features" },
 };
 
-type DeepDive = {
-  icon: string;
-  title: string;
-  description: string;
-  bullets: string[];
-};
+const FEATURES = [
+  {
+    icon: "📞",
+    bg: "linear-gradient(160deg,#f1edff,#ffffff)",
+    title: "Every call answered live",
+    body: "Nights, weekends, holidays — every caller reaches your business's AI assistant in seconds, and is told exactly that. No hold music, no voicemail black hole.",
+    points: ["Answers in your business's name", "Discloses it's an AI assistant", "Takes messages when you're the right person"],
+  },
+  {
+    icon: "💬",
+    bg: "linear-gradient(160deg,#ffeef3,#ffffff)",
+    title: "Texts, emails & forms in minutes",
+    body: "Web enquiries, DMs, and emails get a real answer within minutes — not tomorrow morning. 67% of prospects hire whoever responds first.",
+    points: ["Website chat and contact forms", "SMS and email replies", "After-hours coverage included"],
+  },
+  {
+    icon: "🧾",
+    bg: "linear-gradient(160deg,#e9f2ff,#ffffff)",
+    title: "Quotes from your price list",
+    body: "Switchboard quotes from your prices — never guesses. Then it follows up by text and email until the customer books or says no.",
+    points: ["Price-list-only quoting", "Automatic follow-ups", "Never quotes outside your list"],
+  },
+  {
+    icon: "📅",
+    bg: "linear-gradient(160deg,#e7f8ec,#ffffff)",
+    title: "Booking, confirmations & reminders",
+    body: "Appointments booked straight into your schedule, confirmed instantly, reminded the day before. Reschedules and cancellations handled too.",
+    points: ["Real-time availability", "Instant confirmations", "Day-before reminders"],
+  },
+  {
+    icon: "💳",
+    bg: "linear-gradient(160deg,#fff3e2,#ffffff)",
+    title: "Invoicing & collections",
+    body: "Invoices sent, cards charged automatically, reminders until paid — straight to your own account. We never hold your money.",
+    points: ["Automatic card charges", "Polite reminders until paid", "Paid to your account, not ours"],
+  },
+  {
+    icon: "📊",
+    bg: "linear-gradient(160deg,#f1edff,#ffffff)",
+    title: "Weekly report & instant alerts",
+    body: "One page every week: enquiries, bookings, open quotes, money collected, overdue. Anything unusual texts you the moment it happens.",
+    points: ["Monday report in your inbox", "Instant text for exceptions", "Full export any time"],
+  },
+];
 
-type Audience = { title: string; description: string };
-
-const ICONS: Record<string, React.ReactNode> = {
-  calendar: <CalendarIcon />,
-  quote: <QuoteIcon />,
-  users: <UsersIcon />,
-  card: <CardPayIcon />,
-  portal: <PortalIcon />,
-  bell: <BellIcon />,
-};
-
-/** Deep-dive cards link out to the dedicated feature pages. */
-const DEEP_DIVE_LINKS: Record<string, string> = {
-  calendar: "/features/scheduling",
-  quote: "/features/online-booking",
-  users: "/features/cleaner-checklist",
-  card: "/features/invoicing-billing",
-  portal: "/features/online-booking",
-  bell: "/features/automated-communications",
-};
-
-export default async function FeaturesPage() {
-  const [
-    heroEyebrow,
-    heroTitle,
-    heroDescription,
-    deepDives,
-    audEyebrow,
-    audTitle,
-    audDescription,
-    audiences,
-  ] = await Promise.all([
-    getContent<string>("features.hero.eyebrow"),
-    getContent<string>("features.hero.title"),
-    getContent<string>("features.hero.description"),
-    getContent<DeepDive[]>("features.deep_dives"),
-    getContent<string>("features.audiences.eyebrow"),
-    getContent<string>("features.audiences.title"),
-    getContent<string>("features.audiences.description"),
-    getContent<Audience[]>("features.audiences.items"),
-  ]);
-
+export default function FeaturesPage() {
   return (
-    <>
-      <Navbar />
+    <div className="bg-white font-sb text-sb-ink antialiased">
+      <PillNav />
       <main>
-        <PageHero
-          eyebrow={heroEyebrow}
-          title={heroTitle}
-          description={heroDescription}
-          crumbs={[{ label: "Features", href: "/features" }]}
-        />
-
-        <section className="bg-white py-16 sm:py-20 dark:bg-slate-950">
-          <Container>
-            <div className="grid gap-6 md:grid-cols-2">
-              {deepDives.map((f) => (
-                <Card key={f.title} className="flex flex-col">
-                  <CardContent className="flex flex-1 flex-col">
-                    <CardIcon>{ICONS[f.icon] ?? <CalendarIcon />}</CardIcon>
-                    <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-                      {f.title}
-                    </h2>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                      {f.description}
-                    </p>
-                    <ul className="mt-4 space-y-2.5">
-                      {f.bullets.map((b) => (
-                        <li
-                          key={b}
-                          className="flex items-start gap-2.5 text-sm text-slate-600 dark:text-slate-400"
-                        >
-                          <CheckIcon className="mt-0.5 h-5 w-5 shrink-0 text-accent-600" />
-                          {b}
-                        </li>
-                      ))}
-                    </ul>
-                    {DEEP_DIVE_LINKS[f.icon] && (
-                      <Link
-                        href={DEEP_DIVE_LINKS[f.icon]}
-                        className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
-                      >
-                        Learn more →
-                      </Link>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </Container>
+        <section className="relative overflow-hidden pt-40 pb-16 text-center">
+          <div aria-hidden className="animate-sb-drift pointer-events-none absolute -left-32 -top-24 h-[420px] w-[420px] rounded-full bg-[#d9cfff] opacity-60 blur-[70px]" />
+          <div aria-hidden className="animate-sb-drift pointer-events-none absolute -right-32 top-20 h-[380px] w-[380px] rounded-full bg-[#ffd9e4] opacity-60 blur-[70px] [animation-delay:-6s]" />
+          <div className="relative mx-auto max-w-[1200px] px-7">
+            <Reveal><Eyebrow>Features</Eyebrow></Reveal>
+            <Reveal delay={1}>
+              <h1 className="mx-auto max-w-3xl text-5xl font-extrabold tracking-tight sm:text-6xl">
+                Everything a front office <Grad>does.</Grad>
+              </h1>
+            </Reveal>
+            <Reveal delay={2}>
+              <p className="mx-auto mt-5 max-w-xl text-lg text-sb-ink2">
+                Six jobs, one flat fee. Here&rsquo;s what Switchboard handles while you run the business.
+              </p>
+            </Reveal>
+          </div>
         </section>
 
-        <section className="bg-slate-50 dark:bg-slate-900 py-16 sm:py-20">
-          <Container>
-            <SectionHeading
-              eyebrow="Feature index"
-              title="Explore every feature"
-              description="Deep dives on each part of TidyPro — how it works, why it matters, and the questions owners ask."
-            />
-            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {FEATURE_LINKS.map((f) => (
-                <Link
-                  key={f.slug}
-                  href={f.href}
-                  className="group flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-5 transition-shadow hover:shadow-md dark:border-slate-800 dark:bg-slate-950"
+        <section className="bg-white pb-24">
+          <div className="mx-auto grid max-w-[1200px] gap-5 px-7 md:grid-cols-2 lg:grid-cols-3">
+            {FEATURES.map((f, i) => (
+              <Reveal key={f.title} delay={(i % 3) as 0 | 1 | 2} className="h-full">
+                <div
+                  className="flex h-full flex-col rounded-[26px] border border-white p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_30px_60px_rgba(20,20,43,0.14)]"
+                  style={{ background: f.bg }}
                 >
-                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-950 dark:text-brand-400">
-                    <f.icon className="h-5 w-5" />
+                  <span className="mb-5 grid h-14 w-14 place-items-center rounded-[18px] bg-white text-2xl shadow-[0_10px_24px_rgba(20,20,43,0.1)]">
+                    {f.icon}
                   </span>
-                  <span>
-                    <span className="block text-sm font-semibold text-slate-900 group-hover:text-brand-700 dark:text-slate-100 dark:group-hover:text-brand-300">
-                      {f.title} →
-                      {f.slug === "mobile-app" && (
-                        <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 align-middle text-[11px] font-semibold text-amber-800 dark:bg-amber-950 dark:text-amber-300">
-                          Coming soon
-                        </span>
-                      )}
-                    </span>
-                    <span className="mt-1 block text-[13px] leading-snug text-slate-500 dark:text-slate-400">
-                      {f.blurb}
-                    </span>
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </Container>
+                  <h3 className="mb-2.5 font-sb text-[22px] font-extrabold">{f.title}</h3>
+                  <p className="mb-5 font-sb text-[15px] text-sb-ink2">{f.body}</p>
+                  <ul className="mt-auto space-y-2">
+                    {f.points.map((p) => (
+                      <li key={p} className="relative pl-6 font-sb text-sm font-semibold text-sb-ink before:absolute before:left-0 before:font-extrabold before:text-sb-violet before:content-['✓']">
+                        {p}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+          <Reveal className="mt-12 text-center">
+            <SbButton href="/#trial" size="lg">Start free 7-day trial</SbButton>
+          </Reveal>
         </section>
 
-        <section className="bg-white dark:bg-slate-950 py-16 sm:py-20">
-          <Container>
-            <SectionHeading
-              eyebrow={audEyebrow}
-              title={audTitle}
-              description={audDescription}
-            />
-            <div className="mt-10 grid gap-6 md:grid-cols-3">
-              {audiences.map((a) => (
-                <Card key={a.title}>
-                  <CardContent>
-                    <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                      {a.title}
-                    </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                      {a.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </Container>
-        </section>
-
-        <Cta />
+        <TrialBand />
       </main>
       <Footer />
-    </>
+    </div>
   );
 }

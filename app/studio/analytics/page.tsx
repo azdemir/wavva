@@ -19,7 +19,7 @@ export const instant = false;
 
 export const metadata = {
   title: "Analytics",
-  description: "TidyPro Studio — SaaS growth, revenue, and pipeline analytics.",
+  description: "Switchboard Studio — SaaS growth, revenue, and pipeline analytics.",
 };
 
 function Kpi({ label, value, sub }: { label: string; value: string; sub?: string }) {
@@ -52,7 +52,7 @@ export default async function StudioAnalyticsPage({
   } catch {
     return (
       <div className="space-y-6">
-        <Heading title="Analytics" description="Growth, revenue, and pipeline for the TidyPro SaaS itself." />
+        <Heading title="Analytics" description="Growth, revenue, and pipeline for the Switchboard SaaS itself." />
         <Card>
           <CardContent className="pt-6 text-sm text-slate-600 dark:text-slate-300">
             Analytics needs the Supabase connection. Set the Supabase environment
@@ -74,7 +74,7 @@ export default async function StudioAnalyticsPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <Heading
           title="Analytics"
-          description="Growth, revenue, and pipeline for the TidyPro SaaS itself."
+          description="Growth, revenue, and pipeline for the Switchboard SaaS itself."
         />
         <Button
           variant="outline"

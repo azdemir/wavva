@@ -1,31 +1,41 @@
-import { Navbar } from "@/components/marketing/navbar";
-import { Hero } from "@/components/marketing/hero";
-import { ProofStrip } from "@/components/marketing/proof-strip";
-import { Features } from "@/components/marketing/features";
-import { CompareBand } from "@/components/marketing/compare-band";
-import { HowItWorks } from "@/components/marketing/how-it-works";
-import { Pricing } from "@/components/marketing/pricing";
-import { Testimonials } from "@/components/marketing/testimonials";
-import { Faq } from "@/components/marketing/faq";
-import { Cta } from "@/components/marketing/cta";
-import { Footer } from "@/components/marketing/footer";
+import type { Metadata } from "next";
+import { PillNav } from "@/components/switchboard/pill-nav";
+import { Hero } from "@/components/switchboard/hero";
+import { Marquee } from "@/components/switchboard/marquee";
+import { HowItWorks } from "@/components/switchboard/how-it-works";
+import { Benefits } from "@/components/switchboard/benefits";
+import { Pricing } from "@/components/switchboard/pricing";
+import { Faq } from "@/components/switchboard/faq";
+import { Contact, TrialBand } from "@/components/switchboard/contact";
+import { Footer } from "@/components/switchboard/footer";
 
+export const metadata: Metadata = {
+  title: "Every call answered. Every business.",
+  description:
+    "Switchboard is the AI front office for every business: every call answered in your business's name, appointments booked, quotes followed up, invoices collected. Flat $299/mo. Free 7-day trial.",
+  alternates: { canonical: "/" },
+};
+
+/**
+ * Switchboard homepage — option-Q design.
+ * Marketing surface is Switchboard's; the backend (auth, dashboard,
+ * APIs, data) is TidyPro's.
+ */
 export default function HomePage() {
   return (
-    <>
-      <Navbar />
-      <main id="top">
+    <div className="bg-white font-sb text-sb-ink antialiased">
+      <PillNav />
+      <main>
         <Hero />
-        <ProofStrip />
-        <Features />
-        <CompareBand />
+        <Marquee />
         <HowItWorks />
+        <Benefits />
         <Pricing />
-        <Testimonials />
-        <Faq />
-        <Cta />
+        <Faq limit={6} />
+        <Contact />
+        <TrialBand />
       </main>
       <Footer />
-    </>
+    </div>
   );
 }

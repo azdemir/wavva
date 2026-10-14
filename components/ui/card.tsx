@@ -10,7 +10,7 @@ export function Card({ className, ...rest }: DivProps) {
   return (
     <div
       className={cx(
-        "rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900",
+        "rounded-[20px] border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900",
         className,
       )}
       {...rest}

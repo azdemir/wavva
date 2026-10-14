@@ -12,19 +12,19 @@ import { isSupabaseConfigured } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Sign in",
-  description: "Sign in to your TidyPro workspace.",
+  description: "Sign in to your Switchboard workspace.",
   robots: { index: false, follow: false },
 };
 
 export default async function SignInPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string; reason?: string }>;
+  searchParams: Promise<{ next?: string }>;
 }) {
   // Already signed in? Skip the form.
   const user = await getSessionUser();
   if (user) redirect("/dashboard");
-  const { next, reason } = await searchParams;
+  const next = (await searchParams).next;
 
   return (
     <AuthCard
@@ -32,7 +32,7 @@ export default async function SignInPage({
       description="Sign in to your cleaning business workspace."
       footer={
         <>
-          New to TidyPro?{" "}
+          New to Switchboard?{" "}
           <Link
             href={next ? `/signup?next=${encodeURIComponent(next)}` : "/signup"}
             className="font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400"
@@ -42,11 +42,6 @@ export default async function SignInPage({
         </>
       }
     >
-      {reason === "inactivity" && (
-        <p role="status" className="mb-4 rounded-lg bg-brand-50 p-3 text-sm text-brand-700 dark:bg-brand-950 dark:text-brand-300">
-          You were signed out after 15 minutes of inactivity. Sign in to continue.
-        </p>
-      )}
       {isSupabaseConfigured() ? (
         <AuthForm
           action={signIn}

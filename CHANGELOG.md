@@ -2,9 +2,28 @@
 
 All notable changes to TidyPro. Dates are in America/New_York.
 
+## 2026-10-13
+
+### Switchboard: full marketing site in option-Q design on TidyPro backend — PUSHED to `develop`
+
+- New `components/switchboard/` design system (violet/indigo, Plus Jakarta
+  Sans, floating pill nav, animated hero with "Mission control" dashboard
+  mock, verticals marquee, how-it-works accordion, pastel benefit cards,
+  pricing toggle, FAQ, contact, dark footer).
+- Pages: home, features, pricing, FAQ, contact, about, privacy, terms;
+  `/front-office` and `/founding-client` rebranded (Founding 50,
+  every-business copy; application form + backend unchanged).
+- Brand config: Switchboard name/tagline/metadata/JSON-LD, plans renamed
+  Essential $299 / Complete $599 (single config drives marketing, forms,
+  dashboard), founding spots 50, plug logo mark.
+- Dashboard + Studio reskinned in the same UI (violet pill sidebar nav,
+  Mission-control hero, pastel stat cards, Jakarta type).
+- Backend untouched: auth, dashboard, APIs, migrations, crons, STOP/HELP
+  compliance. `tsc`, `eslint`, `next build` all green.
+
 ## 2026-10-10
 
-### Arcade: 3 cleaning mini-games on the dashboard — PUSHED `26f72f5`/`23debe8`/`dc4f151`/`63b6030`
+### Arcade: 3 cleaning mini-games on the dashboard — PUSHED `26f72f5`/`23debe8`/`dc4f151`/`63b6030` (+ changelog marker `cb63f9b`)
 
 - New `/dashboard/arcade` route (all roles, all tiers — it's just for fun),
   with a game-picker shell and per-game best scores in localStorage.
@@ -27,52 +46,181 @@ All notable changes to TidyPro. Dates are in America/New_York.
   in headless Chromium (DBP scoring+timer, sock full-board solve → Laundry
   Legend, stain full clear → Spotless!/Miracle Worker), zero JS errors.
 
+### Marketing: professional icon redesign for comms feature page (unpushed)
 
-### Fixed
+- The Templates / Triggers / Channels capability cards on
+  /features/automated-communications used weak metaphors (bell, clock,
+  checkmark). Designed three bespoke Apple-style icons in
+  components/ui/icons.tsx, drawn on the 24-grid with the set's stroke
+  conventions: TemplateIcon (speech bubble with text lines — these are
+  message templates), BoltIcon (solid lightning bolt — "fires
+  automatically"), SendIcon (paper plane — email/SMS delivery channels).
+  Swapped into the three blocks; benefits row keeps the (correct) bell,
+  quote, and clock icons. Verified desktop + mobile in headless Chromium;
+  tsc + eslint clean.
 
-- **Billing tier display**: the billing page read the raw stored plan from the
-  database, so founders on the all-access grant saw "Starter" while every
-  other page treated them as Pro. `getBillingState()` now uses the effective
-  plan from `requireCompany()` (founder grant / Studio tier override), so the
-  displayed tier matches the feature gates.
+### Marketing: restore surface/ink/night design tokens — PUSHED `cce61d8`
 
+- User reported the footer invisible, black borders across the page, and the
+  Features dropdown rendering transparent with a black border on hover.
+- Root cause: the deployed CSS was missing the entire marketing token system
+  (`--color-surface/2/3`, `--color-ink/2/3`, `--color-line/line-strong`,
+  `--color-night/night-soft/night-line`, `--font-display`, `--ease-expo`,
+  `--animate-drift`, `--animate-marquee-slow`) plus the `.grain` and `.reveal`
+  styles — 25 utilities used across the marketing pages compiled to nothing.
+  A 2026-10-10 push overwrote remote `app/globals.css` with the older
+  token-less copy (same clobber pattern as the `icons.tsx` incident).
+- Fix (local commit `80e2a27`): restored the token block, `drift`/`marquee`
+  keyframes, `.grain` noise overlay, and `.reveal` (hidden state gated on
+  `@media (scripting: enabled)` so no-JS/failed hydration never hides
+  content; reduced-motion always visible). Token values reconstructed from
+  the live design (ink `#10172a` sampled from the deployed nav).
+- Verified: production build green; all 25 previously-missing utilities
+  present in emitted CSS; footer/dropdown/borders confirmed visually in
+  headless Chromium.
+- NOT YET PUSHED — needs user approval; pusher must diff remote
+  `app/globals.css` against the pre-push state first.
 
-### Changed
+### Checklists: sidebar generator studio (Growth/Pro, owner) — PUSHED `7534a85`
 
-- **Reports page rebuilt (comprehensive)**: the old 3-KPI page is now a full
-  reporting suite — date-range presets (7/30/90 days, this month, last month,
-  this year, custom); 6 KPI cards (revenue paid, outstanding, jobs completed,
-  hours worked, avg invoice, quote win rate); per-employee hours table (jobs,
-  hours, share of total; actual clock times when recorded, otherwise the
-  scheduled duration); revenue by month/customer/service; jobs by
-  status/service with completion rate and avg duration; quotes funnel with
-  win rate. New owner-only Excel exports per section
-  (`/api/exports/reports/[type]`), honoring the date filter. New
-  `lib/reports.ts` data layer and `components/reports/report-filters.tsx`;
-  full EN/ES/UK translations.
+- New left-pane "Checklists" nav item (`/dashboard/checklists`), gated by the
+  `checklists` plan feature (Growth+) and owner role, matching the existing
+  template permissions. No API key needed: the user asked for a free option
+  without their key, so generation runs on a curated expert knowledge base
+  (`lib/checklists/generator.ts`) — room-by-room tasks for standard / deep /
+  move-out cleans, scaled by bedrooms/bathrooms, with pet & kid add-ons, plus
+  a "Surprise touches" section (hotel-fold toilet paper, thank-you note, …).
+  The output shape mirrors an LLM response so a model backend can be swapped
+  in later. (Tested Pollinations' free keyless API first — it failed three
+  ways in five minutes: ENOSPC 500s and an exhausted anonymous budget — so it
+  was rejected as too flaky to ship.)
+- `lib/actions/checklist-studio.ts`: owner-only server action, feature gate,
+  20/day per-company rate limit, zod-validated input (0–10 beds, 1–10 baths).
+- `components/checklists/checklist-studio.tsx`: generator form → editable
+  room-by-room preview (edit/add/remove tasks) with the surprise extras in a
+  highlighted card → one-click "Save as template" reusing the existing
+  `checklist_templates` table (flows into the booking checklist picker) →
+  saved-template list with delete.
+- Full i18n: new `checklists.ai` keys + `nav.checklists` in EN/ES/UK.
+  Generated task text itself is English-only for now.
+- Verified: tsc + eslint clean, production build green, generator output
+  spot-checked (3bd/2ba deep+pet = 87 items; 100-item cap holds), form and
+  editable preview screenshotted on desktop + mobile. Pushed as remote
+  7534a85 (11 files, all verified byte-identical on remote).
 
+- New left-pane "Checklists" nav item (`/dashboard/checklists`), gated by the
+  `checklists` plan feature (Growth+) and owner role, matching the existing
+  template permissions. No API key needed: the user asked for a free option
+  without their key, so generation runs on a curated expert knowledge base
+  (`lib/checklists/generator.ts`) — room-by-room tasks for standard / deep /
+  move-out cleans, scaled by bedrooms/bathrooms, with pet & kid add-ons, plus
+  a "Surprise touches" section (hotel-fold toilet paper, thank-you note, …).
+  The output shape mirrors an LLM response so a model backend can be swapped
+  in later. (Tested Pollinations' free keyless API first — it failed three
+  ways in five minutes: ENOSPC 500s and an exhausted anonymous budget — so it
+  was rejected as too flaky to ship.)
+- `lib/actions/checklist-studio.ts`: owner-only server action, feature gate,
+  20/day per-company rate limit, zod-validated input (0–10 beds, 1–10 baths).
+- `components/checklists/checklist-studio.tsx`: generator form → editable
+  room-by-room preview (edit/add/remove tasks) with the surprise extras in a
+  highlighted card → one-click "Save as template" reusing the existing
+  `checklist_templates` table (flows into the booking checklist picker) →
+  saved-template list with delete.
+- Full i18n: new `checklists.ai` keys + `nav.checklists` in EN/ES/UK.
+  Generated task text itself is English-only for now.
+- Verified: tsc + eslint clean, production build green, generator output
+  spot-checked (3bd/2ba deep+pet = 87 items; 100-item cap holds), form and
+  editable preview screenshotted on desktop + mobile.
 
-### Removed
+### Availability: 12-hour am/pm times in crew conflict warnings (pushed `71ad237`)
 
-- **Homepage proof band**: removed the headline stats ($10 / 0 / 14 / 30m)
-  and the four why-us cards from the landing page —
-  `components/marketing/proof-strip.tsx` now renders only the service-area
-  marquee. Their Studio CMS entries (`home.proofs`, `home.stats.items`)
-  were removed from the content registry as well.
+- The "Availability conflict" warning on the job page printed raw 24-hour
+  times ("17:50 – 17:50"). It now uses 12-hour am/pm ("5:50 PM"), and when
+  start and end are identical it renders a natural single-time message
+  ("is not available at this time (5:50 PM)") via a new
+  `conflict.outsideSingle` key in EN/ES/UK. Verified rendering in all three
+  locales; tsc + eslint clean.
 
+### Quotes + invoices: period filter with totals (unpushed)
 
-### Fixed (build)
+- Quotes and invoices lists now have a second filter row — All time / Today /
+  This week / This month — alongside the status pills and search. Bounds are
+  computed in the company's timezone (`lib/periods.ts` on top of
+  `lib/dates.ts`); week starts Sunday.
+- A summary card row above the list shows totals for the selected period with
+  the same filters applied: invoices show Total invoiced, Collected,
+  Outstanding, and invoice count; quotes show Total quoted, Approved value,
+  and quote count. Aggregation pages through the filtered set so totals stay
+  correct past 1000 rows.
+- The invoice Excel export honors the period filter too (`?period=` param).
+- New `period` / `summary` i18n keys in EN/ES/UK for both namespaces; the
+  filtered empty-state copy now mentions the period.
 
-- **QuickBooks invoice wiring**: `app/dashboard/invoices/[id]/page.tsx`
-  referenced `getInvoiceSyncStatus` and the `QboSyncBadge` component, which
-  hadn't been pushed with the QuickBooks batch — the production build
-  failed. Added a guarded `getInvoiceSyncStatus` stub (always reports
-  `not_connected` until the OAuth integration lands, so the badge renders
-  nothing) alongside the existing `pushInvoice` stub, plus the
-  `QboSyncBadge` component itself. The full QuickBooks implementation
-  (OAuth client, `0012_quickbooks.sql`, settings UI) is still in flight
-  locally and untouched.
+### Integrations: webhook event labels fixed (pushed `9ec6681`)
 
+- The "Events to send" picker on the integrations page was rendering raw
+  translation keys (`integrations.events.booking.created`) instead of labels.
+  Root cause: the component looked up `events.${event}` (e.g.
+  `events.booking.created`) but the locale files define camelCase keys
+  (`events.bookingCreated`); the missing-key guard compared against the wrong
+  fallback string so the raw key leaked through and broke the grid alignment.
+  Now uses the catalog's `descriptionKey` (matching EN/ES/UK locales) in both
+  the picker and the saved-webhook badges. Verified in headless Chromium:
+  desktop, mobile (single column), and dark mode.
+
+### Marketing: visible breadcrumb trail removed from page heroes (pushed `5f42c83`)
+
+- The "Home / Compare" style breadcrumb is gone from every marketing page
+  (/compare, /pricing, /faq, /about, /contact, /features and all 7 feature
+  pages) — all rendered through the shared `PageHero`, so one change covered
+  everything. `components/marketing/breadcrumbs.tsx` now exports only
+  `BreadcrumbJsonLd` (invisible structured data, so Google keeps the SEO
+  benefit without the visual trail). No page files needed changes.
+- Pre-push diff: remote `page-hero.tsx` matched the local base exactly;
+  remote `breadcrumbs.tsx` had a touch-target tweak (`min-h-10`) inside the
+  visible nav being deleted — no merge needed.
+
+### Marketing: iPhone-style mobile-app feature visual (pushed `ca12791a`)
+- Rebuilt `MobileAppVisual` on `/features/mobile-app` as a realistic iPhone
+  mockup: titanium frame with side buttons, Dynamic Island, iOS status bar,
+  and a full "Today's jobs" app screen (day summary card, three job cards with
+  blue/amber/green status pills, "Complete current job" CTA, bottom tab bar
+  with home indicator). A floating "New job assigned" notification card sits
+  over the top corner. Verified in headless Chromium: light, dark, and mobile.
+- Merged a remote-only type fix found during the pre-push diff
+  (`Pill color={j.c as "blue" | "amber" | "green"}` in the scheduling visual)
+  so it wasn't clobbered — same class of incident as the 2026-10-10 icons.tsx
+  clobber.
+
+### Studio: subscription-tier management (`/studio/tiers`, unpushed)
+
+- **Change any company's tier** — search companies by name or member email,
+  see the current (effective) tier, and assign Basic / Starter / Growth / Pro.
+  Works for upgrades, downgrades, and the owner's own company (no self-change
+  block).
+- **Confirmation first** — picking a tier opens a review step showing the
+  previous → new tier, features gained/lost, seat-limit and customer-cap
+  warnings, and a note when the founder all-access grant is being overridden.
+  Clear success / error messages after saving.
+- **Backend enforcement** — `studioSetCompanyTier` calls
+  `requirePlatformAdmin()` before anything else (plus rate limiting and zod
+  validation), so the capability can't be reached from the UI layer alone.
+- **Audit log** — every change records acting admin email, affected user
+  (company owner), company, previous tier, new tier, and timestamp in the new
+  `tier_change_log` table (append-only; RLS enabled, no public policies).
+  Shown as a table on the same page. Needs
+  `supabase/migrations/0018_tier_change_log.sql` run on Supabase — if it
+  hasn't been, the change is reverted with instructions instead of going
+  unlogged.
+- **Consistent application** — the tier is stored on `companies.plan`, which
+  every feature gate and limit already reads. New rule in `requireCompany()`:
+  an explicit Studio tier change overrides the founder all-access grant for
+  that company, so downgrading your own account actually takes effect (the UI
+  shows "via founder all-access grant" until you do).
+- **Build fix (pre-existing)** — `next build` was broken by the remote navbar
+  merge: `components/marketing/sticky-header.tsx` exists on remote main but
+  was never synced into this tree. Reconstructed locally from the inline
+  `<header>` it replaced; diff against the remote version before pushing.
 
 ### Fixed (regression run 2026-10-10 — 13 bugs found by the testing agent, all fixed)
 
@@ -495,3 +643,18 @@ All notable changes to TidyPro. Dates are in America/New_York.
 - `package-lock.json` is intentionally not committed (too large for the push
   tooling); run `npm install` after cloning to regenerate it.
 - Vercel auto-deploys from `main`.
+
+### Marketing: card borders removed site-wide — PUSHED `bf9373f`
+
+- User reported bordered cards everywhere (the three non-featured pricing
+  cards looked inconsistent next to the borderless "Most popular" one).
+- Removed `border border-line` from card containers in 5 remote-only
+  marketing files and replaced with soft resting shadows so cards keep
+  their definition: features.tsx (SpotlightCard cards, Panel mini-visuals,
+  MiniInvoice inset), pricing.tsx (plan cards), compare-band.tsx (comparison
+  table — already had a shadow), testimonials.tsx (quote cards), faq.tsx
+  (FAQ container). Small badge pills, checkbox squares, and `border-t`
+  divider lines were left untouched. Note: these files exist only on remote
+  (local tree has the older marketing design) — edited the remote versions
+  directly, diffed fresh remote right before pushing to rule out concurrent
+  edits. Pushed as remote bf9373f (5 files, all verified byte-identical).

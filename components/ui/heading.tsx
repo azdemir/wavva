@@ -7,11 +7,11 @@ type HeadingProps = {
 export function Heading({ title, description }: HeadingProps) {
   return (
     <div>
-      <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+      <h1 className="font-sb text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
         {title}
       </h1>
       {description && (
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{description}</p>
+        <p className="mt-1 font-sb text-sm text-slate-500 dark:text-slate-400">{description}</p>
       )}
     </div>
   );

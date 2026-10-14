@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { requireCompany } from "@/lib/auth";
-import { Badge } from "@/components/ui/badge";
 import { SubscriptionBanner } from "@/components/billing/subscription-banner";
 import { PLANS, isPlanId, type PlanId } from "@/lib/plans";
 import { getTranslations } from "next-intl/server";
@@ -22,8 +21,10 @@ import {
   DownloadIcon,
   PlugIcon,
   GamepadIcon,
+  PhoneIcon,
 } from "@/components/ui/icons";
 import { LogoMark } from "@/components/ui/logo";
+import { SidebarNav, type SidebarNavItem } from "@/components/dashboard/sidebar-nav";
 import { hasFeature, type PlanFeature } from "@/lib/plans";
 import { type Role } from "@/lib/permissions";
 
@@ -57,6 +58,7 @@ const nav: NavItem[] = [
   { href: "/dashboard/bookings", labelKey: "bookings", icon: CalendarIcon, roles: STAFF },
   { href: "/dashboard/jobs", labelKey: "jobs", icon: ClockIcon, roles: STAFF },
   { href: "/dashboard/schedule", labelKey: "schedule", icon: CalendarIcon, feature: "schedule", roles: STAFF },
+  { href: "/dashboard/front-office", labelKey: "frontOffice", icon: PhoneIcon, roles: STAFF },
   { href: "/dashboard/checklists", labelKey: "checklists", icon: CheckIcon, feature: "checklists", roles: ["owner"] },
   { href: "/dashboard/availability", labelKey: "availability", icon: ClockIcon },
   { href: "/dashboard/my-jobs", labelKey: "myJobs", icon: ClockIcon },
@@ -71,46 +73,24 @@ const nav: NavItem[] = [
   { href: "/dashboard/arcade", labelKey: "arcade", icon: GamepadIcon },
 ];
 
-async function NavLinks({ onNavigate, plan, role }: { onNavigate?: () => void; plan: PlanId; role: Role }) {
+async function NavLinks({ plan, role }: { plan: PlanId; role: Role }) {
   const t = await getTranslations("nav");
   const visible = nav.filter(
     (item) =>
       (!item.feature || hasFeature(plan, item.feature)) &&
       (!item.roles || item.roles.includes(role)),
   );
-  return (
-    <nav className="space-y-1" aria-label="Workspace">
-      {visible.map((item) => {
-        const Icon = item.icon;
-        const content = (
-          <>
-            <Icon className="h-5 w-5 shrink-0" />
-            <span className="flex-1">{t(item.labelKey)}</span>
-            {item.soon && (
-              <Badge tone="slate" className="text-[10px]">
-                {t("soon")}
-              </Badge>
-            )}
-          </>
-        );
-        const cls =
-          "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 hover:text-slate-900";
-        return item.soon ? (
-          <span
-            key={item.href}
-            className={`${cls} cursor-not-allowed opacity-60`}
-            title={t("comingSoon")}
-          >
-            {content}
-          </span>
-        ) : (
-          <Link key={item.href} href={item.href} className={cls} onClick={onNavigate}>
-            {content}
-          </Link>
-        );
-      })}
-    </nav>
-  );
+  const items: SidebarNavItem[] = visible.map((item) => {
+    const Icon = item.icon;
+    return {
+      href: item.href,
+      label: t(item.labelKey),
+      icon: <Icon className="h-5 w-5 shrink-0" />,
+      soon: item.soon,
+      soonLabel: t("soon"),
+    };
+  });
+  return <SidebarNav items={items} />;
 }
 
 export default async function DashboardLayout({
@@ -148,14 +128,22 @@ export default async function DashboardLayout({
 
   return (
     <DashboardIntlProvider>
-    <div className="min-h-screen bg-slate-50 md:flex dark:bg-slate-950">
+    <div className="min-h-screen bg-sb-bg2 font-sb md:flex dark:bg-slate-950">
       {/* Desktop sidebar: primary navigation */}
       <aside className="hidden w-64 shrink-0 border-r border-slate-200 bg-white md:block dark:border-slate-800 dark:bg-slate-900">
         <div className="flex h-full flex-col">
           <Link href="/dashboard" className="flex items-center gap-2.5 px-5 pb-5 pt-6">
             <LogoMark className="h-9 w-9" />
+            <span>
+              <span className="block font-sb text-[17px] font-extrabold tracking-tight text-slate-900 dark:text-white">
+                Switchboard
+              </span>
+              <span className="block font-sb text-[11px] font-semibold uppercase tracking-[0.14em] text-sb-violet-dark dark:text-sb-violet">
+                Mission control
+              </span>
+            </span>
           </Link>
-          <div className="flex-1 overflow-y-auto px-3">
+          <div className="flex-1 overflow-y-auto px-3 pb-6">
             <NavLinks plan={plan} role={membership.role} />
           </div>
         </div>

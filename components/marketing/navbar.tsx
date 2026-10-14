@@ -12,9 +12,9 @@ import { getSessionUser } from "@/lib/auth";
 import { getContent } from "@/lib/studio/content";
 
 const links = [
-  { label: "How it works", href: "/#how-it-works" },
-  { label: "Pricing", href: "/pricing" },
-  { label: "Compare", href: "/compare" },
+  { label: "Front Office", href: "/front-office" },
+  { label: "How it works", href: "/front-office#how-it-works" },
+  { label: "Pricing", href: "/#pricing" },
   { label: "FAQ", href: "/faq" },
 ];
 

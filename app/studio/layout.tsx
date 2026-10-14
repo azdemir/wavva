@@ -21,7 +21,7 @@ const NAV = [
 ];
 
 /**
- * TidyPro Studio — the founder/dev HQ. No-code website editor + CRM for the
+ * Switchboard Studio — the founder/dev HQ. No-code website editor + CRM for the
  * SaaS itself. Gated by the platform-admin email allowlist, deliberately
  * separate from both the company dashboard and the /admin ops view.
  */
@@ -33,14 +33,14 @@ export default async function StudioLayout({
   const user = await requirePlatformAdmin();
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-900">
-      <header className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-4">
+    <div className="min-h-screen bg-sb-bg2 font-sb dark:bg-slate-900">
+      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur dark:border-slate-800 dark:bg-slate-950/90">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3.5">
           <Link href="/studio" className="flex items-center gap-2.5">
             <LogoMark className="h-8 w-8" />
-            <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100">
-              TidyPro{" "}
-              <span className="font-normal text-slate-500 dark:text-slate-400">
+            <span className="font-sb text-lg font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
+              Switchboard{" "}
+              <span className="font-semibold text-sb-violet-dark dark:text-sb-violet">
                 Studio
               </span>
             </span>
@@ -50,14 +50,14 @@ export default async function StudioLayout({
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+                className="rounded-full px-3.5 py-2 font-sb text-sm font-semibold text-slate-600 transition-all hover:bg-sb-violet-soft hover:text-sb-violet-dark dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
               >
                 {item.label}
               </Link>
             ))}
             <Link
               href="/admin"
-              className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+              className="rounded-full px-3.5 py-2 font-sb text-sm font-semibold text-slate-600 transition-all hover:bg-sb-violet-soft hover:text-sb-violet-dark dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
             >
               Platform admin
             </Link>
@@ -69,7 +69,7 @@ export default async function StudioLayout({
             <form action={signOut}>
               <button
                 type="submit"
-                className="text-sm font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                className="rounded-full bg-sb-violet-soft px-4 py-2 font-sb text-sm font-bold text-sb-violet-dark transition-all hover:bg-sb-violet hover:text-white"
               >
                 Sign out
               </button>

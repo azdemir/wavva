@@ -12,7 +12,7 @@ import { isSupabaseConfigured } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Create account",
-  description: "Create your TidyPro account and set up your cleaning business.",
+  description: "Create your Switchboard account and set up your business.",
   robots: { index: false, follow: false },
 };
 
@@ -45,7 +45,7 @@ export default async function SignUpPage() {
           />
           <p className="mt-4 text-xs text-slate-500 dark:text-slate-400">
             By creating an account you agree to set up one workspace per
-            cleaning business. Each company&apos;s data stays private to that
+            business. Each company&apos;s data stays private to that
             company.
           </p>
         </>

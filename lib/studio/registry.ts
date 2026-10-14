@@ -82,13 +82,6 @@ const ICON_OPTIONS = [
   { value: "bell", label: "Bell" },
 ];
 
-/** yes / partial / no — rendered as the glyphs in the comparison table. */
-const VERDICT_OPTIONS = [
-  { value: "yes", label: "Yes" },
-  { value: "partial", label: "Partial" },
-  { value: "no", label: "No" },
-];
-
 export const CONTENT_REGISTRY: ContentDef[] = [
   // ------------------------------------------------------------------ Global
   {
@@ -203,6 +196,41 @@ export const CONTENT_REGISTRY: ContentDef[] = [
     paths: HOME,
   },
   {
+    key: "home.proofs",
+    page: "home",
+    section: "Proof points",
+    label: "Why-us cards",
+    help: "The four checkmark cards under the hero.",
+    field: {
+      kind: "list",
+      maxItems: 6,
+      minItems: 1,
+      item: [
+        { key: "title", label: "Title", kind: "text", max: 80 },
+        { key: "body", label: "Body", kind: "textarea", rows: 2, max: 300 },
+      ],
+    },
+    default: [
+      {
+        title: "Flat pricing, no per-user fees",
+        body: "Jobber and Housecall Pro charge per seat as you grow. TidyPro plans include your whole crew.",
+      },
+      {
+        title: "Quote follow-up built in",
+        body: "Most platforms make you chase quotes by hand or pay for add-ons. TidyPro follows up automatically.",
+      },
+      {
+        title: "Made for cleaners, not plumbers",
+        body: "Generalist tools force per-job workflows onto recurring maid routes. TidyPro is cleaning-first.",
+      },
+      {
+        title: "Everything included",
+        body: "No $79/mo marketing add-ons or gated essentials. Every plan gets the full toolkit.",
+      },
+    ],
+    paths: HOME,
+  },
+  {
     key: "home.features.eyebrow",
     page: "home",
     section: "Features",
@@ -288,67 +316,6 @@ export const CONTENT_REGISTRY: ContentDef[] = [
         description:
           "Automatic booking confirmations, reminders, and staff assignment notifications by email, with consent controls and notification preferences.",
       },
-    ],
-    paths: HOME,
-  },
-  {
-    key: "home.compare.eyebrow",
-    page: "home",
-    section: "Comparison",
-    label: "Section eyebrow",
-    field: { kind: "text", max: 40 },
-    default: "Why TidyPro",
-    paths: HOME,
-  },
-  {
-    key: "home.compare.title",
-    page: "home",
-    section: "Comparison",
-    label: "Section title",
-    field: { kind: "text", max: 120 },
-    default: "Built for cleaning, not repackaged for plumbing",
-    paths: HOME,
-  },
-  {
-    key: "home.compare.description",
-    page: "home",
-    section: "Comparison",
-    label: "Section description",
-    field: { kind: "textarea", rows: 2, max: 300 },
-    default:
-      "Generalist field-service software makes you pay per seat and bolt on the essentials. Here's the honest side-by-side.",
-    paths: HOME,
-  },
-  {
-    key: "home.compare.rows",
-    page: "home",
-    section: "Comparison",
-    label: "Comparison rows",
-    field: {
-      kind: "list",
-      maxItems: 12,
-      minItems: 1,
-      item: [
-        { key: "feature", label: "Feature", kind: "text", max: 80 },
-        { key: "us", label: "TidyPro", kind: "select", options: VERDICT_OPTIONS },
-        {
-          key: "them",
-          label: "Big platforms",
-          kind: "select",
-          options: VERDICT_OPTIONS,
-        },
-      ],
-    },
-    default: [
-      { feature: "Flat price as you grow", us: "yes", them: "no" },
-      { feature: "Crew seats included in the plan", us: "yes", them: "no" },
-      { feature: "Quotes that follow up automatically", us: "yes", them: "no" },
-      { feature: "Recurring cleaning routes built in", us: "yes", them: "partial" },
-      { feature: "Mobile checklists and job photos", us: "yes", them: "partial" },
-      { feature: "Customer portal with online payment", us: "yes", them: "partial" },
-      { feature: "Every essential included in the base price", us: "yes", them: "no" },
-      { feature: "Gates essentials behind paid add-ons", us: "no", them: "yes" },
-      { feature: "Steep learning curve for the owner", us: "no", them: "yes" },
     ],
     paths: HOME,
   },
@@ -493,7 +460,7 @@ export const CONTENT_REGISTRY: ContentDef[] = [
     help: "Shown under the stories while they are illustrative samples. Clear it once real customer stories are published.",
     field: { kind: "text", max: 200 },
     default:
-      "",
+      "Illustrative examples — real customer stories coming soon.",
     paths: HOME,
   },
   {
@@ -621,6 +588,22 @@ export const CONTENT_REGISTRY: ContentDef[] = [
       {
         q: "Can my cleaners use it on their phones?",
         a: "Yes. Job views are designed mobile-first: cleaners see their day's jobs, tap into job details, work through checklists, upload before-and-after photos, and mark jobs complete — all from a phone browser.",
+      },
+      {
+        q: "What is the Front Office Service?",
+        a: "It's our done-for-you tier: an AI assistant answers every call, text, web form and email in your company's name, sends quotes from your price list and follows up, books visits into your schedule, and — on Full Office — invoices and collects. Front Desk is $300/month, Full Office is $600/month, both month to month with no per-call charges.",
+      },
+      {
+        q: "What happens when the AI assistant can't answer?",
+        a: "Anything it can't handle comes straight to you by text — including anything unusual, or any quote outside your price list. It never guesses on your behalf.",
+      },
+      {
+        q: "Does my phone number change with the Front Office Service?",
+        a: "No. Your business line and enquiry inbox forward to your AI assistant, and your number stays yours. Everything goes out under your company's name.",
+      },
+      {
+        q: "Who gets paid when customers pay by card?",
+        a: "You do. Card payments go straight to your own account; we never hold your money.",
       },
     ],
     paths: ["/", "/faq"],
