@@ -1,139 +1,123 @@
 import type { Metadata } from "next";
-import { Navbar } from "@/components/marketing/navbar";
-import { Footer } from "@/components/marketing/footer";
-import { PageHero } from "@/components/marketing/page-hero";
-import { Container } from "@/components/ui/container";
-import { SectionHeading } from "@/components/ui/section-heading";
-import { ArrowRightIcon } from "@/components/ui/icons";
-import {
-  TakeOffYourPlate,
-  FrontOfficeHowItWorks,
-  FrontOfficeTrust,
-  FoundingClient,
-  FrontOfficePricing,
-} from "@/components/marketing/front-office-sections";
-import { TrackedCta } from "@/components/marketing/tracked-cta";
-import { FRONT_OFFICE } from "@/lib/front-office";
+import { PillNav } from "@/components/switchboard/pill-nav";
+import { Footer } from "@/components/switchboard/footer";
+import { Reveal } from "@/components/switchboard/reveal";
+import { Eyebrow, Grad } from "@/components/switchboard/section-head";
+import { SbButton } from "@/components/switchboard/buttons";
+import { HowItWorks } from "@/components/switchboard/how-it-works";
+import { Pricing } from "@/components/switchboard/pricing";
+import { Faq } from "@/components/switchboard/faq";
+import { TrialBand } from "@/components/switchboard/contact";
+import { FRONT_OFFICE, FRONT_OFFICE_PLANS } from "@/lib/front-office";
 
 export const metadata: Metadata = {
-  title: "Front Office Service — We run your front office. You run the cleaning.",
+  title: "The service — your AI front office, done for you",
   description:
-    "TidyPro's done-for-you Front Office Service: an AI assistant answers every call, text and email in your company's name, books your schedule, and follows up every unpaid invoice. From $300/mo, month to month.",
+    "Switchboard's done-for-you service: an AI assistant answers every call, text and email in your company's name, books appointments, follows up quotes, and collects invoices. From $299/mo, month to month.",
   alternates: { canonical: "/front-office" },
 };
 
-const FAQS = [
+const INCLUDED = [
   {
-    q: "What happens when the AI can't answer?",
-    a: "Anything the assistant can't handle comes straight to you by text — including anything unusual, or any quote outside your price list. It never guesses on your behalf.",
+    icon: "📞",
+    title: "Answered like you would",
+    body: "Trained on your services, prices, hours, and policies. Callers hear your business — and are told it's your AI assistant.",
   },
   {
-    q: "Does my number change?",
-    a: "No. Your business line and enquiry inbox forward to your AI assistant, and your number stays yours. Everything goes out under your company's name.",
+    icon: "🗓️",
+    title: "Booked without the back-and-forth",
+    body: "Appointments land straight in your schedule with confirmations and day-before reminders. Reschedules handled.",
   },
   {
-    q: "Can I export my data?",
-    a: "Yes. Your customers and data are yours, with a full export any time — customers, jobs, quotes, invoices and conversations.",
+    icon: "💰",
+    title: "Followed up until paid",
+    body: "Quotes chased until booked. Invoices sent, cards charged, reminders until paid — to your own account.",
   },
   {
-    q: "Who gets paid?",
-    a: "You do. Card payments go straight to your own account; we never hold your money.",
-  },
-  {
-    q: "What if a customer doesn't want texts?",
-    a: "Follow-ups go by text and email only to customers who agreed to receive them. If a customer replies STOP or unsubscribes, we stop immediately.",
-  },
-  {
-    q: "How fast is setup?",
-    a: "It's a short online setup: enter your services, prices, service area and policies, and upload your customer list. Founding clients get free setup, including moving your current customer list and schedule for you.",
+    icon: "🚨",
+    title: "You stay in control",
+    body: "Anything unusual texts you instantly. Anything outside your price list waits for your OK. Full export any time.",
   },
 ];
 
 export default function FrontOfficePage() {
   return (
-    <>
-      <Navbar />
+    <div className="bg-white font-sb text-sb-ink antialiased">
+      <PillNav />
       <main>
-        <PageHero
-          eyebrow={`${FRONT_OFFICE.BRAND} Front Office Service`}
-          title="We run your front office. You run the cleaning."
-          description="Every new enquiry answered quickly, every quote followed up, every visit confirmed and every unpaid invoice followed up, under your company's name, for one flat monthly fee."
-        />
-
-        {/* The pitch */}
-        <section className="bg-white py-16 dark:bg-slate-950">
-          <Container>
-            <div className="mx-auto max-w-3xl text-center">
-              <p className="text-lg leading-relaxed text-slate-700 dark:text-slate-300">
-                An AI assistant replies to your customers in your
-                company&apos;s name, books them into your schedule and makes
-                sure every visit gets paid. Anything it can&apos;t handle
-                comes straight to you by text.
+        <section className="relative overflow-hidden pt-40 pb-16 text-center">
+          <div aria-hidden className="animate-sb-drift pointer-events-none absolute -left-32 -top-24 h-[420px] w-[420px] rounded-full bg-[#d9cfff] opacity-60 blur-[70px]" />
+          <div aria-hidden className="animate-sb-drift pointer-events-none absolute -right-32 top-20 h-[380px] w-[380px] rounded-full bg-[#ffd9e4] opacity-60 blur-[70px] [animation-delay:-6s]" />
+          <div className="relative mx-auto max-w-[1200px] px-7">
+            <Reveal><Eyebrow>{FRONT_OFFICE.BRAND} service</Eyebrow></Reveal>
+            <Reveal delay={1}>
+              <h1 className="mx-auto max-w-3xl text-5xl font-extrabold tracking-tight sm:text-6xl">
+                Your front office, <Grad>done for you.</Grad>
+              </h1>
+            </Reveal>
+            <Reveal delay={2}>
+              <p className="mx-auto mt-5 max-w-xl text-lg text-sb-ink2">
+                Not software to learn — a service that runs. We set it up, train it on your
+                business, and it answers every call in your company&rsquo;s name from day one.
               </p>
-              <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                <TrackedCta
-                  href="/founding-client"
-                  cta="claim_founding_spot"
-                  page="front_office_page"
-                >
-                  Claim a founding spot
-                  <ArrowRightIcon className="h-5 w-5" />
-                </TrackedCta>
-                <TrackedCta
-                  href="/front-office#how-it-works"
-                  cta="see_how_it_works"
-                  page="front_office_page"
-                  variant="outline"
-                >
-                  See how it works
-                </TrackedCta>
-              </div>
-            </div>
-          </Container>
+            </Reveal>
+            <Reveal delay={3} className="mt-8 flex flex-wrap justify-center gap-3.5">
+              <SbButton href="/founding-client" size="lg">Claim a founding spot</SbButton>
+              <SbButton href="/pricing" size="lg" variant="light">See pricing</SbButton>
+            </Reveal>
+          </div>
         </section>
 
-        <TakeOffYourPlate />
-        <FrontOfficeHowItWorks />
-        <FrontOfficeTrust />
-        <FrontOfficePricing />
+        <section className="bg-sb-bg2 py-20">
+          <div className="mx-auto grid max-w-[1200px] gap-5 px-7 sm:grid-cols-2 lg:grid-cols-4">
+            {INCLUDED.map((f, i) => (
+              <Reveal key={f.title} delay={(i % 4) as 0 | 1 | 2 | 3}>
+                <div className="h-full rounded-[26px] border border-white bg-white p-7 shadow-[0_16px_40px_rgba(20,20,43,0.08)]">
+                  <span className="mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-sb-violet-soft text-2xl">
+                    {f.icon}
+                  </span>
+                  <h3 className="mb-2 text-lg font-extrabold">{f.title}</h3>
+                  <p className="text-[14.5px] text-sb-ink2">{f.body}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </section>
 
-        {/* FAQ */}
-        <section className="bg-slate-50 py-20 sm:py-24 dark:bg-slate-900">
-          <Container>
-            <SectionHeading
-              eyebrow="Questions"
-              title="Front Office questions, answered"
-              description="Straight answers about how the service works and what stays in your control."
-            />
-            <div className="mx-auto mt-12 max-w-3xl space-y-4">
-              {FAQS.map((f) => (
-                <details
-                  key={f.q}
-                  className="group rounded-xl border border-slate-200 bg-white px-6 py-4 open:shadow-sm dark:border-slate-800 dark:bg-slate-950"
-                >
-                  <summary className="cursor-pointer list-none text-base font-semibold text-slate-900 dark:text-slate-100 [&::-webkit-details-marker]:hidden">
-                    <span className="flex items-center justify-between gap-4">
-                      {f.q}
-                      <span
-                        aria-hidden="true"
-                        className="text-xl font-normal text-brand-600 transition-transform group-open:rotate-45 dark:text-brand-400"
-                      >
-                        +
+        <section className="bg-white py-20">
+          <div className="mx-auto max-w-[1200px] px-7">
+            <div className="grid gap-5 md:grid-cols-2">
+              {([FRONT_OFFICE_PLANS.front_desk, FRONT_OFFICE_PLANS.full_office] as const).map((p, i) => (
+                <Reveal key={p.id} delay={i as 0 | 1}>
+                  <div className="h-full rounded-[26px] border border-sb-ink/10 bg-white p-8">
+                    <div className="flex items-baseline justify-between">
+                      <h3 className="text-xl font-extrabold">{p.name}</h3>
+                      <span className="text-3xl font-extrabold">
+                        ${p.price}
+                        <small className="text-sm font-semibold text-sb-ink2">/mo</small>
                       </span>
-                    </span>
-                  </summary>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                    {f.a}
-                  </p>
-                </details>
+                    </div>
+                    <p className="mt-1.5 text-[15px] text-sb-ink2">{p.blurb}</p>
+                    <ul className="mt-5 space-y-2.5">
+                      {p.features.map((f) => (
+                        <li key={f} className="relative pl-6 text-[14.5px] text-sb-ink2 before:absolute before:left-0 before:font-extrabold before:text-sb-violet before:content-['✓']">
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </Reveal>
               ))}
             </div>
-          </Container>
+          </div>
         </section>
 
-        <FoundingClient />
+        <HowItWorks />
+        <Pricing />
+        <Faq limit={4} />
+        <TrialBand />
       </main>
       <Footer />
-    </>
+    </div>
   );
 }

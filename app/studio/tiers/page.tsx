@@ -8,7 +8,7 @@ export const instant = false;
 export const metadata = {
   title: "Subscription tiers",
   description:
-    "TidyPro Studio — change any company's subscription tier and review the audit log.",
+    "Switchboard Studio — change any company's subscription tier and review the audit log.",
 };
 
 /**

@@ -7,7 +7,7 @@ export const instant = false;
 
 export const metadata = {
   title: "Users",
-  description: "TidyPro Studio — manage every SaaS user: edit email and role, or delete accounts.",
+  description: "Switchboard Studio — manage every SaaS user: edit email and role, or delete accounts.",
 };
 
 /** Platform-admin user management across all companies. */
@@ -23,7 +23,7 @@ export default async function StudioUsersPage() {
     <div className="space-y-6">
       <Heading
         title="Users"
-        description="Everyone with a TidyPro login, across all companies. Edit emails and roles, or remove accounts."
+        description="Everyone with a Switchboard login, across all companies. Edit emails and roles, or remove accounts."
       />
       <UsersManager users={users} />
     </div>

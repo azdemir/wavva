@@ -1,23 +1,21 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Navbar } from "@/components/marketing/navbar";
-import { Footer } from "@/components/marketing/footer";
-import { PageHero } from "@/components/marketing/page-hero";
-import { Container } from "@/components/ui/container";
-import { SectionHeading } from "@/components/ui/section-heading";
-import { Card, CardContent } from "@/components/ui/card";
-import { CheckIcon } from "@/components/ui/icons";
+import { PillNav } from "@/components/switchboard/pill-nav";
+import { Footer } from "@/components/switchboard/footer";
+import { Reveal } from "@/components/switchboard/reveal";
+import { Eyebrow, Grad } from "@/components/switchboard/section-head";
 import { FoundingClientForm } from "@/components/marketing/founding-client-form";
+import { FRONT_OFFICE } from "@/lib/front-office";
 
 export const metadata: Metadata = {
-  title: "Claim a founding spot — Front Office Service",
+  title: "Claim a founding spot — Switchboard",
   description:
-    "Apply as a founding client of TidyPro's Front Office Service: free setup, founding price locked for 12 months, month to month. Five spots for Upstate New York cleaning companies.",
+    "Apply as a founding client of Switchboard: free white-glove setup, founding price locked for 12 months, month to month. 50 spots for local businesses.",
   alternates: { canonical: "/founding-client" },
 };
 
 const PERKS = [
-  "Free setup, including moving your current customer list and schedule",
+  "Free white-glove setup — we train Switchboard on your business and move your customer list",
   "Founding price locked for 12 months",
   "Month to month — cancel any month",
   "Your number stays yours; everything goes out under your company's name",
@@ -25,50 +23,57 @@ const PERKS = [
 
 export default function FoundingClientPage() {
   return (
-    <>
-      <Navbar />
+    <div className="bg-white font-sb text-sb-ink antialiased">
+      <PillNav />
       <main>
-        <PageHero
-          eyebrow="Founding clients"
-          title="Claim a founding spot"
-          description="Five cleaning companies in Upstate New York. Free setup. Founding price locked for 12 months. Tell us about your business and we'll take it from there."
-        />
-        <section className="bg-white py-16 sm:py-20 dark:bg-slate-950">
-          <Container>
-            <div className="mx-auto grid max-w-5xl gap-10 lg:grid-cols-[1fr_1.2fr]">
+        <section className="relative overflow-hidden pt-40 pb-14 text-center">
+          <div aria-hidden className="animate-sb-drift pointer-events-none absolute -left-32 -top-24 h-[420px] w-[420px] rounded-full bg-[#d9cfff] opacity-60 blur-[70px]" />
+          <div aria-hidden className="animate-sb-drift pointer-events-none absolute -right-32 top-20 h-[380px] w-[380px] rounded-full bg-[#ffd9e4] opacity-60 blur-[70px] [animation-delay:-6s]" />
+          <div className="relative mx-auto max-w-[1200px] px-7">
+            <Reveal><Eyebrow>Founding clients</Eyebrow></Reveal>
+            <Reveal delay={1}>
+              <h1 className="mx-auto max-w-3xl text-5xl font-extrabold tracking-tight sm:text-6xl">
+                Claim a <Grad>founding spot.</Grad>
+              </h1>
+            </Reveal>
+            <Reveal delay={2}>
+              <p className="mx-auto mt-5 max-w-xl text-lg text-sb-ink2">
+                {FRONT_OFFICE.FOUNDING_SPOTS_TOTAL} local businesses. Free setup. Founding price locked
+                for 12 months. Tell us about your business and we&rsquo;ll take it from there.
+              </p>
+            </Reveal>
+          </div>
+        </section>
+
+        <section className="bg-white pb-24">
+          <div className="mx-auto grid max-w-5xl gap-10 px-7 lg:grid-cols-[1fr_1.2fr]">
+            <Reveal>
               <div>
-                <SectionHeading
-                  align="left"
-                  eyebrow="What you get"
-                  title="As a founding client"
-                />
+                <Eyebrow>What you get</Eyebrow>
+                <h2 className="text-3xl font-extrabold tracking-tight">As a founding client</h2>
                 <ul className="mt-8 space-y-4">
                   {PERKS.map((p) => (
-                    <li key={p} className="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-300">
-                      <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent-100 text-accent-700 dark:bg-accent-950 dark:text-accent-400">
-                        <CheckIcon className="h-3.5 w-3.5" />
+                    <li key={p} className="flex items-start gap-3 text-[15px] text-sb-ink2">
+                      <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-sb-violet-soft font-extrabold text-sb-violet-dark">
+                        ✓
                       </span>
                       {p}
                     </li>
                   ))}
                 </ul>
               </div>
-              <Card>
-                <CardContent>
-                  <Suspense
-                    fallback={
-                      <p className="text-sm text-slate-500">Loading application form…</p>
-                    }
-                  >
-                    <FoundingClientForm />
-                  </Suspense>
-                </CardContent>
-              </Card>
-            </div>
-          </Container>
+            </Reveal>
+            <Reveal delay={1}>
+              <div className="rounded-[26px] border border-sb-ink/10 bg-white p-8 shadow-[0_24px_60px_rgba(20,20,43,0.1)]">
+                <Suspense>
+                  <FoundingClientForm />
+                </Suspense>
+              </div>
+            </Reveal>
+          </div>
         </section>
       </main>
       <Footer />
-    </>
+    </div>
   );
 }

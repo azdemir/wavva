@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import {
   ThemeProvider,
@@ -14,6 +14,12 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 const SITE_URL =
@@ -35,28 +41,28 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default:
-      "We run your front office. You run the cleaning. | TidyPro",
-    template: "%s | TidyPro",
+      "Every call answered. Every business. | Switchboard",
+    template: "%s | Switchboard",
   },
   description:
-    "TidyPro's done-for-you Front Office Service: an AI assistant answers every call, text and email in your company's name, books your schedule, and follows up every unpaid invoice. From $300/mo, month to month. Self-serve software from $10/mo.",
+    "Switchboard is the AI front office for every business: every call answered in your business's name, appointments booked, quotes followed up, invoices collected. Flat $299/mo, month to month. Free 7-day trial.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
-    siteName: "TidyPro",
-    title: "TidyPro — We run your front office. You run the cleaning.",
+    siteName: "Switchboard",
+    title: "Switchboard — Every call answered. Every business.",
     description:
-      "Every new enquiry answered quickly, every quote followed up, every visit confirmed and every unpaid invoice followed up, under your company's name.",
+      "The AI front office for any business that takes calls. Every call answered in your business's name, every appointment booked, one flat monthly fee.",
     url: "/",
-    images: [{ url: "/og-image.jpg", width: 1000, height: 525, alt: "TidyPro" }],
+    images: [{ url: "/og-image.jpg", width: 1000, height: 525, alt: "Switchboard" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "TidyPro — We run your front office. You run the cleaning.",
+    title: "Switchboard — Every call answered. Every business.",
     description:
-      "Every new enquiry answered quickly, every quote followed up, every visit confirmed and every unpaid invoice followed up, under your company's name.",
+      "The AI front office for any business that takes calls. Every call answered in your business's name, every appointment booked, one flat monthly fee.",
     images: ["/og-image.jpg"],
   },
   robots: {
@@ -70,30 +76,28 @@ const ORG_JSON_LD = {
   "@graph": [
     {
       "@type": "Organization",
-      name: "TidyPro",
+      name: "Switchboard",
       url: SITE_URL,
       description:
-        "Operations software for residential and commercial cleaning businesses.",
-      email: "hello@tidypro.app",
+        "AI-powered front office for every business: call answering, appointment booking, quoting, invoicing and collections.",
+      email: "hello@switchboard.example",
     },
     {
       "@type": "WebSite",
-      name: "TidyPro",
+      name: "Switchboard",
       url: SITE_URL,
     },
     {
-      "@type": "SoftwareApplication",
-      name: "TidyPro",
-      applicationCategory: "BusinessApplication",
-      operatingSystem: "Web",
+      "@type": "Service",
+      name: "Switchboard AI Front Office",
       url: SITE_URL,
       description:
-        "Quotes, scheduling, team management, invoicing, and customer portal for cleaning businesses.",
+        "Done-for-you AI front office: answers every call in your business's name, books appointments, follows up quotes, collects invoices.",
       offers: {
         "@type": "Offer",
-        price: "49",
+        price: "299",
         priceCurrency: "USD",
-        description: "Starter plan, billed monthly. 14-day free trial.",
+        description: "Essential plan, billed monthly. 7-day free trial.",
       },
     },
   ],
@@ -104,7 +108,7 @@ export default function RootLayout(props: LayoutProps<"/">) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${jakarta.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
