@@ -13,7 +13,7 @@ export type SidebarNavItem = {
   soonLabel?: string;
 };
 
-/** Switchboard sidebar nav — pill items with violet active state. */
+/** Wavva sidebar nav — pill items with violet active state. */
 export function SidebarNav({ items }: { items: SidebarNavItem[] }) {
   const pathname = usePathname();
   const isActive = (href: string) =>

@@ -8,7 +8,7 @@
 
 export const FRONT_OFFICE = {
   /** Brand name shown in every customer-facing surface. */
-  BRAND: "Switchboard",
+  BRAND: "Wavva",
   /** Canonical site URL (used in outbound links and emails). */
   SITE_URL: "https://tidy-pro.vercel.app",
   /**

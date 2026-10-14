@@ -72,7 +72,7 @@ export function Hero() {
         </div>
 
         {/* sample call player */}
-        <div className="sb-reveal mx-auto mt-16 max-w-[680px]" style={{ transitionDelay: "0.15s" }}>
+        <div className="sb-reveal sb-hero-rise mx-auto mt-16 max-w-[680px]" style={{ transitionDelay: "0.15s" }}>
           <CallDemoPlayer />
         </div>
       </div>

@@ -8,7 +8,7 @@ import { TrialBand } from "@/components/switchboard/contact";
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "Switchboard pricing: Essential $299/mo with 250 AI-answered minutes, Complete $599/mo with 600 minutes. Overage 30¢/min. Month to month, free 7-day trial with no card.",
+    "Wavva pricing: Essential $299/mo with 250 AI-answered minutes, Complete $599/mo with 600 minutes. Overage 30¢/min. Month to month, free 7-day trial with no card.",
   alternates: { canonical: "/pricing" },
 };
 

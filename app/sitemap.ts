@@ -4,7 +4,7 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://tidy-pro.vercel.app";
 
 /**
- * XML sitemap for the public Switchboard marketing pages.
+ * XML sitemap for the public Wavva marketing pages.
  * App/dashboard/portal routes are intentionally excluded (private, auth-gated).
  */
 export default function sitemap(): MetadataRoute.Sitemap {

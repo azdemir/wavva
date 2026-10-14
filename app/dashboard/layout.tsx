@@ -136,7 +136,7 @@ export default async function DashboardLayout({
             <LogoMark className="h-9 w-9" />
             <span>
               <span className="block font-sb text-[17px] font-extrabold tracking-tight text-slate-900 dark:text-white">
-                Switchboard
+                Wavva
               </span>
               <span className="block font-sb text-[11px] font-semibold uppercase tracking-[0.14em] text-sb-violet-dark dark:text-sb-violet">
                 Mission control

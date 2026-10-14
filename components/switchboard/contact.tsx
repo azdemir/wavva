@@ -6,7 +6,7 @@ import { Reveal } from "./reveal";
 import { Eyebrow, Grad } from "./section-head";
 import { SbButton } from "./buttons";
 const INFO = [
-  { icon: "✉️", t: "Email", s: "hello@switchboard.example" },
+  { icon: "✉️", t: "Email", s: "hello@wavva.example" },
   { icon: "📞", t: "Phone", s: "(315) 555-0147 · sample line" },
   { icon: "📍", t: "Office", s: "Syracuse, New York" },
 ];
@@ -135,7 +135,7 @@ export function TrialBand() {
               The first 50 businesses get <Grad>white-glove setup, free.</Grad>
             </h2>
             <p className="mx-auto mt-4 max-w-xl font-sb text-[#a9a9c9]">
-              We onboard you personally — train Switchboard on your business, move your customer list,
+              We onboard you personally — train Wavva on your business, move your customer list,
               connect your line. Founding rate locked for 12 months.
             </p>
             <div className="mt-8">
