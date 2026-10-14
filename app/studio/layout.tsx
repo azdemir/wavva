@@ -21,7 +21,7 @@ const NAV = [
 ];
 
 /**
- * Switchboard Studio — the founder/dev HQ. No-code website editor + CRM for the
+ * Wavva Studio — the founder/dev HQ. No-code website editor + CRM for the
  * SaaS itself. Gated by the platform-admin email allowlist, deliberately
  * separate from both the company dashboard and the /admin ops view.
  */
@@ -39,7 +39,7 @@ export default async function StudioLayout({
           <Link href="/studio" className="flex items-center gap-2.5">
             <LogoMark className="h-8 w-8" />
             <span className="font-sb text-lg font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
-              Switchboard{" "}
+              Wavva{" "}
               <span className="font-semibold text-sb-violet-dark dark:text-sb-violet">
                 Studio
               </span>

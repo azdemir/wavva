@@ -19,5 +19,5 @@ export function senderFor(company: {
     const name = company.name.trim() || "Your business";
     return `${name} <${email}>`;
   }
-  return process.env.EMAIL_FROM ?? "Switchboard <hello@switchboard.example>";
+  return process.env.EMAIL_FROM ?? "Wavva <hello@wavva.example>";
 }

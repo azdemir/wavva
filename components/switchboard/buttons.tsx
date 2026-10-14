@@ -26,7 +26,7 @@ const sizes: Record<string, string> = {
 };
 
 /**
- * Switchboard button — pill, magnetic hover, shine sweep.
+ * Wavva button — pill, magnetic hover, shine sweep.
  * Mirrors the tracked-cta analytics contract via data attributes.
  */
 export function SbButton({

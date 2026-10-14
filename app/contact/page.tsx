@@ -6,7 +6,7 @@ import { Contact } from "@/components/switchboard/contact";
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Get in touch with Switchboard — questions about plans, onboarding, or multi-location. We reply within one business day.",
+    "Get in touch with Wavva — questions about plans, onboarding, or multi-location. We reply within one business day.",
   alternates: { canonical: "/contact" },
 };
 

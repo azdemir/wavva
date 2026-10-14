@@ -8,14 +8,14 @@ import { FoundingClientForm } from "@/components/marketing/founding-client-form"
 import { FRONT_OFFICE } from "@/lib/front-office";
 
 export const metadata: Metadata = {
-  title: "Claim a founding spot — Switchboard",
+  title: "Claim a founding spot — Wavva",
   description:
-    "Apply as a founding client of Switchboard: free white-glove setup, founding price locked for 12 months, month to month. 50 spots for local businesses.",
+    "Apply as a founding client of Wavva: free white-glove setup, founding price locked for 12 months, month to month. 50 spots for local businesses.",
   alternates: { canonical: "/founding-client" },
 };
 
 const PERKS = [
-  "Free white-glove setup — we train Switchboard on your business and move your customer list",
+  "Free white-glove setup — we train Wavva on your business and move your customer list",
   "Founding price locked for 12 months",
   "Month to month — cancel any month",
   "Your number stays yours; everything goes out under your company's name",

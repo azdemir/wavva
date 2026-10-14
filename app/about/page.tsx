@@ -9,7 +9,7 @@ import { TrialBand } from "@/components/switchboard/contact";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Switchboard exists for one reason: no business should lose a customer to a missed call. The AI front office for every business.",
+    "Wavva exists for one reason: no business should lose a customer to a missed call. The AI front office for every business.",
   alternates: { canonical: "/about" },
 };
 
@@ -30,9 +30,9 @@ export default function AboutPage() {
             </Reveal>
             <Reveal delay={2}>
               <p className="mx-auto mt-6 max-w-2xl text-lg text-sb-ink2">
-                Switchboard is the AI front office for every business — the plumber on a roof, the
+                Wavva is the AI front office for every business — the plumber on a roof, the
                 dentist mid-procedure, the lawyer in court, the salon mid-appointment. While
-                you&rsquo;re doing the work, Switchboard answers, books, quotes, and collects.
+                you&rsquo;re doing the work, Wavva answers, books, quotes, and collects.
               </p>
             </Reveal>
           </div>

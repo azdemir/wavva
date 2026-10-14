@@ -349,10 +349,10 @@ export async function GET(
   };
 
   const wb = new ExcelJS.Workbook();
-  wb.creator = "Switchboard";
+  wb.creator = "Wavva";
   wb.created = new Date();
 
-  const filename = `switchboard-${t}`;
+  const filename = `wavva-${t}`;
   if (t === "full") {
     for (const sheet of FULL_SHEETS) {
       const rows = await fetchRows(sheet, { ...ctx, q: "", like: "%%", status: "all" });

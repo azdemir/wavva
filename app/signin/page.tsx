@@ -12,7 +12,7 @@ import { isSupabaseConfigured } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Sign in",
-  description: "Sign in to your Switchboard workspace.",
+  description: "Sign in to your Wavva workspace.",
   robots: { index: false, follow: false },
 };
 
@@ -32,7 +32,7 @@ export default async function SignInPage({
       description="Sign in to your business workspace."
       footer={
         <>
-          New to Switchboard?{" "}
+          New to Wavva?{" "}
           <Link
             href={next ? `/signup?next=${encodeURIComponent(next)}` : "/signup"}
             className="font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-400"

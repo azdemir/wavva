@@ -16,7 +16,7 @@ export default function NotFound() {
       <header className="border-b border-slate-200 dark:border-slate-800">
         <Container>
           <div className="flex h-16 items-center">
-            <Link href="/" aria-label="Switchboard home" className="inline-flex min-h-11 items-center">
+            <Link href="/" aria-label="Wavva home" className="inline-flex min-h-11 items-center">
               <Logo />
             </Link>
           </div>

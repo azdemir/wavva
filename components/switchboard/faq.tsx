@@ -77,7 +77,7 @@ export function Faq({ limit }: { limit?: number }) {
             />
             <h3 className="relative mb-2.5 font-sb text-[22px] font-extrabold">Still curious?</h3>
             <p className="relative mb-6 font-sb text-sm text-[#b9b9d9]">
-              Talk to a human about Switchboard — we answer our own phones too.
+              Talk to a human about Wavva — we answer our own phones too.
             </p>
             <SbButton href="/contact" variant="white" className="relative w-full" magnetic={false}>
               Contact us

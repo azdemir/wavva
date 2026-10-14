@@ -6,14 +6,14 @@ import { Eyebrow } from "@/components/switchboard/section-head";
 
 export const metadata: Metadata = {
   title: "Terms",
-  description: "The terms of using Switchboard.",
+  description: "The terms of using Wavva.",
   alternates: { canonical: "/terms" },
 };
 
 const SECTIONS = [
   {
     t: "The service",
-    b: "Switchboard provides an AI-powered front office: call answering, messaging, quoting, booking, invoicing, and reporting, in your business's name. You remain responsible for your prices, policies, and the work itself.",
+    b: "Wavva provides an AI-powered front office: call answering, messaging, quoting, booking, invoicing, and reporting, in your business's name. You remain responsible for your prices, policies, and the work itself.",
   },
   {
     t: "Billing",
@@ -21,7 +21,7 @@ const SECTIONS = [
   },
   {
     t: "Your responsibilities",
-    b: "Keep your price list, hours, and policies accurate — Switchboard quotes and books from what you tell it. Provide a working forwarding number and a way to reach you for exceptions.",
+    b: "Keep your price list, hours, and policies accurate — Wavva quotes and books from what you tell it. Provide a working forwarding number and a way to reach you for exceptions.",
   },
   {
     t: "AI limitations",

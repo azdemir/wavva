@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { SwitchboardLogo } from "./logo";
+import { WavvaLogo } from "./logo";
 import { SbButton } from "./buttons";
 
 const LINKS = [
@@ -35,8 +35,8 @@ export function PillNav() {
       }`}
     >
       <div className="pointer-events-auto flex items-center gap-7 rounded-full border border-white/90 bg-white/85 py-2.5 pl-6 pr-3 shadow-[0_18px_46px_rgba(20,20,43,0.13)] backdrop-blur-xl">
-        <Link href="/" aria-label="Switchboard home">
-          <SwitchboardLogo />
+        <Link href="/" aria-label="Wavva home">
+          <WavvaLogo />
         </Link>
         <nav className="hidden items-center gap-6 lg:flex">
           {LINKS.map((l) => (
