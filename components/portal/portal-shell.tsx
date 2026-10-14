@@ -12,7 +12,7 @@ export function PortalShell({
 }: {
   companyName: string;
   customerName: string;
-  /** Resolved company logo URL; falls back to the TidyPro mark when null. */
+  /** Resolved company logo URL; falls back to the Switchboard mark when null. */
   logoUrl: string | null;
   children: ReactNode;
 }) {
@@ -54,7 +54,7 @@ export function PortalInvalid() {
         <div className="mx-auto max-w-md py-24 text-center">
           <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">Link not valid</h1>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 dark:text-slate-500">
-            This portal link is invalid or has expired. Ask your cleaning company for a fresh link.
+            This portal link is invalid or has expired. Ask the business for a fresh link.
           </p>
         </div>
       </Container>

@@ -29,7 +29,7 @@ export default async function SignInPage({
   return (
     <AuthCard
       title="Welcome back"
-      description="Sign in to your cleaning business workspace."
+      description="Sign in to your business workspace."
       footer={
         <>
           New to Switchboard?{" "}

@@ -10,7 +10,6 @@ const SITE_URL =
 export default function sitemap(): MetadataRoute.Sitemap {
   const pages: { path: string; priority: number; changeFrequency: "weekly" | "monthly" }[] = [
     { path: "/", priority: 1.0, changeFrequency: "weekly" },
-    { path: "/features", priority: 0.9, changeFrequency: "monthly" },
     { path: "/front-office", priority: 0.9, changeFrequency: "monthly" },
     { path: "/pricing", priority: 0.9, changeFrequency: "monthly" },
     { path: "/founding-client", priority: 0.8, changeFrequency: "weekly" },

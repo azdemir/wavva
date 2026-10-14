@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Reveal } from "./reveal";
-import { Eyebrow, Grad } from "./section-head";
 
 type Turn = { who: "ai" | "caller"; text: string };
 
@@ -33,8 +32,8 @@ const OUTCOMES = [
 
 const STEP_MS = 2600;
 
-/** Interactive sample-call player: press play and watch the AI handle a call. */
-export function CallDemo() {
+/** The player card alone — used inside the hero. */
+export function CallDemoPlayer() {
   const [step, setStep] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [seconds, setSeconds] = useState(0);
@@ -69,25 +68,8 @@ export function CallDemo() {
   const ss = String(seconds % 60).padStart(2, "0");
 
   return (
-    <section id="chatdemo" className="scroll-mt-24 bg-white py-28">
-      <div className="mx-auto max-w-[1200px] px-7">
-        <div className="mx-auto mb-12 max-w-2xl text-center">
-          <Reveal><Eyebrow>Sample call</Eyebrow></Reveal>
-          <Reveal delay={1}>
-            <h2 className="font-sb text-4xl font-extrabold tracking-tight text-sb-ink sm:text-5xl">
-              Hear it <Grad>handle a call.</Grad>
-            </h2>
-          </Reveal>
-          <Reveal delay={2}>
-            <p className="mt-4 font-sb text-lg text-sb-ink2">
-              A scripted sample of what your callers hear — disclosure first, quote from your price
-              list, booking request to you by text.
-            </p>
-          </Reveal>
-        </div>
-
-        <Reveal className="mx-auto max-w-[680px]">
-          <div className="overflow-hidden rounded-[28px] border border-sb-ink/10 bg-white shadow-[0_30px_70px_rgba(20,20,43,0.12)]">
+    <Reveal className="mx-auto max-w-[680px]">
+      <div id="chatdemo" className="scroll-mt-28 overflow-hidden rounded-[28px] border border-sb-ink/10 bg-white text-left shadow-[0_30px_70px_rgba(20,20,43,0.12)]">
             {/* call header */}
             <div className="flex items-center justify-between bg-sb-ink px-6 py-4 text-white">
               <div className="flex items-center gap-3">
@@ -178,7 +160,5 @@ export function CallDemo() {
             </div>
           </div>
         </Reveal>
-      </div>
-    </section>
   );
 }

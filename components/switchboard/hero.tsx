@@ -3,9 +3,9 @@
 import { useEffect } from "react";
 import { SbButton } from "./buttons";
 import { Grad } from "./section-head";
-import { Counter } from "./counter";
+import { CallDemoPlayer } from "./call-demo";
 
-/** Option-Q hero: badges, giant headline, dual CTA, avatar arcs, dashboard mock. */
+/** Option-Q hero: giant headline, dual CTA, sample-call player. */
 export function Hero() {
   useEffect(() => {
     const t = requestAnimationFrame(() =>
@@ -71,82 +71,11 @@ export function Hero() {
           </span>
         </div>
 
-        {/* dashboard mock */}
-        <div className="sb-reveal mx-auto mt-16 max-w-[1020px]" style={{ transitionDelay: "0.15s" }}>
-          <DashboardMock />
+        {/* sample call player */}
+        <div className="sb-reveal mx-auto mt-16 max-w-[680px]" style={{ transitionDelay: "0.15s" }}>
+          <CallDemoPlayer />
         </div>
       </div>
     </header>
-  );
-}
-
-function DashboardMock() {
-  return (
-    <div className="overflow-hidden rounded-[32px] border border-sb-ink/10 bg-white text-left shadow-[0_50px_110px_rgba(20,20,43,0.16)]">
-      <div className="flex items-center gap-3.5 border-b border-sb-ink/10 px-6 py-4">
-        <div className="flex gap-1.5">
-          <i className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
-          <i className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
-          <i className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
-        </div>
-        <span className="font-sb text-[13px] font-bold">Switchboard · Mission control</span>
-        <span className="ml-auto font-sb text-xs italic text-sb-ink2">Sample data</span>
-      </div>
-      <div className="grid md:grid-cols-[200px_1fr]">
-        <div className="hidden flex-col gap-1 border-r border-sb-ink/10 bg-sb-bg2 p-4 md:flex">
-          {["◧ Dashboard", "◷ Calls", "▤ Bookings", "▦ Invoices", "◈ Reports"].map((l, i) => (
-            <span
-              key={l}
-              className={`rounded-xl px-3 py-2.5 font-sb text-[13px] font-semibold ${
-                i === 0 ? "bg-white text-sb-ink shadow-[0_4px_12px_rgba(20,20,43,0.07)]" : "text-sb-ink2"
-              }`}
-            >
-              {l}
-            </span>
-          ))}
-        </div>
-        <div className="p-6">
-          <h4 className="font-sb text-lg font-extrabold">Good morning, owner</h4>
-          <p className="mb-4 font-sb text-xs text-sb-ink2">Tuesday · your front office handled the night shift</p>
-          <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
-            {[
-              { l: "Calls answered", v: 48, d: "▲ 12%" },
-              { l: "Appointments booked", v: 31, d: "▲ 8%" },
-              { l: "Quotes sent", v: 12, d: "▲ 5%" },
-              { l: "AI answer rate", v: 94, s: "%", d: "▲ 2.1%" },
-            ].map((s) => (
-              <div key={s.l} className="rounded-2xl bg-sb-bg2 p-3.5">
-                <small className="mb-1 block font-sb text-[11px] font-semibold text-sb-ink2">{s.l}</small>
-                <b className="font-sb text-[21px] font-extrabold">
-                  <Counter to={s.v} suffix={s.s ?? ""} />
-                </b>
-                <div className="text-[11.5px] font-bold text-green-600">{s.d}</div>
-              </div>
-            ))}
-          </div>
-          <div className="rounded-2xl bg-sb-bg2 p-4">
-            <div className="mb-2.5 flex items-center gap-2.5">
-              <span className="grid h-7 w-7 place-items-center rounded-full bg-sb-ink2 text-[11px] font-extrabold text-white">C</span>
-              <span className="max-w-[75%] rounded-[4px_14px_14px_14px] border border-sb-ink/10 bg-white px-3.5 py-2 font-sb text-[13px]">
-                Hi — do you have anything Thursday?
-              </span>
-            </div>
-            <div className="mb-2.5 flex justify-end">
-              <span className="max-w-[75%] rounded-[14px_4px_14px_14px] bg-sb-violet px-3.5 py-2 font-sb text-[13px] text-white">
-                We have 2 PM or 4:30 PM — which works?
-              </span>
-            </div>
-            <div className="flex items-center gap-2.5">
-              <span className="grid h-7 w-7 place-items-center rounded-full bg-sb-violet text-[11px] font-extrabold text-white">S</span>
-              <span className="inline-flex gap-1.5 rounded-[4px_14px_14px_14px] border border-sb-ink/10 bg-white px-4 py-3">
-                <i className="animate-sb-typing h-[7px] w-[7px] rounded-full bg-sb-ink2" />
-                <i className="animate-sb-typing h-[7px] w-[7px] rounded-full bg-sb-ink2 [animation-delay:0.15s]" />
-                <i className="animate-sb-typing h-[7px] w-[7px] rounded-full bg-sb-ink2 [animation-delay:0.3s]" />
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   );
 }

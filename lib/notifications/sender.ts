@@ -16,8 +16,8 @@ export function senderFor(company: {
 }): string {
   const email = company.email?.trim() ?? "";
   if (email && emailSchema.safeParse(email).success) {
-    const name = company.name.trim() || "Your cleaning company";
+    const name = company.name.trim() || "Your business";
     return `${name} <${email}>`;
   }
-  return process.env.EMAIL_FROM ?? "TidyPro <hello@tidypro.example>";
+  return process.env.EMAIL_FROM ?? "Switchboard <hello@switchboard.example>";
 }

@@ -54,7 +54,7 @@ const BENEFITS = [
 /** Benefit cards + animated stat band. */
 export function Benefits() {
   return (
-    <section className="bg-sb-bg2 py-28">
+    <section id="features" className="scroll-mt-24 bg-sb-bg2 py-28">
       <div className="mx-auto max-w-[1200px] px-7">
         <div className="mx-auto mb-14 max-w-2xl text-center">
           <Reveal><Eyebrow>Benefits</Eyebrow></Reveal>

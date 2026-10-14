@@ -6,7 +6,7 @@ import { SwitchboardLogo } from "./logo";
 import { SbButton } from "./buttons";
 
 const LINKS = [
-  { href: "/features", label: "Features" },
+  { href: "#features", label: "Features" },
   { href: "#how", label: "How it works" },
   { href: "/pricing", label: "Pricing" },
   { href: "/faq", label: "FAQs" },
