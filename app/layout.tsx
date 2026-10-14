@@ -56,14 +56,14 @@ export const metadata: Metadata = {
     description:
       "The AI front office for any business that takes calls. Every call answered in your business's name, every appointment booked, one flat monthly fee.",
     url: "/",
-    images: [{ url: "/og-image.jpg", width: 1000, height: 525, alt: "Wavva" }],
+    // images come from app/opengraph-image.tsx (generated, always in sync)
   },
   twitter: {
     card: "summary_large_image",
     title: "Wavva — Every call answered. Every business.",
     description:
       "The AI front office for any business that takes calls. Every call answered in your business's name, every appointment booked, one flat monthly fee.",
-    images: ["/og-image.jpg"],
+    // images come from app/twitter-image.tsx (same generated artwork)
   },
   robots: {
     index: true,
