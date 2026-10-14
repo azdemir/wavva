@@ -5,13 +5,6 @@ import { SbButton } from "./buttons";
 import { Grad } from "./section-head";
 import { Counter } from "./counter";
 
-const BUBBLES = [
-  { init: "BD", bg: "#0f766e", style: { left: "15%", top: "300px" }, d: "-1s", label: "Dental" },
-  { init: "AH", bg: "#6d5cff", style: { right: "14%", top: "280px" }, d: "-2.5s", label: "HVAC" },
-  { init: "LP", bg: "#ff6b8b", style: { left: "9%", top: "560px" }, d: "-4s", label: "Plumbing" },
-  { init: "SR", bg: "#f5a623", style: { right: "8%", top: "580px" }, d: "-0.5s", label: "Salon" },
-] as const;
-
 /** Option-Q hero: badges, giant headline, dual CTA, avatar arcs, dashboard mock. */
 export function Hero() {
   useEffect(() => {
@@ -30,23 +23,16 @@ export function Hero() {
       <div aria-hidden className="animate-sb-drift pointer-events-none absolute -right-32 top-10 h-[460px] w-[460px] rounded-full bg-[#ffd9e4] opacity-60 blur-[70px] [animation-delay:-6s]" />
       <div aria-hidden className="animate-sb-drift pointer-events-none absolute left-[32%] top-[520px] h-[380px] w-[380px] rounded-full bg-[#d6f2e2] opacity-40 blur-[70px] [animation-delay:-3s]" />
 
-      {/* dotted arcs + floating business bubbles */}
+      {/* dotted arcs */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <div className="absolute left-1/2 top-[-260px] h-[900px] w-[900px] -translate-x-1/2 rounded-full border-[1.5px] border-dashed border-sb-violet/25" />
         <div className="absolute left-1/2 top-[-390px] h-[1150px] w-[1150px] -translate-x-1/2 rounded-full border-[1.5px] border-dashed border-sb-violet/20" />
-        {BUBBLES.map((b) => (
-          <div
-            key={b.init}
-            title={b.label}
-            className="animate-sb-float absolute grid h-14 w-14 place-items-center rounded-full border-[3px] border-white font-sb text-base font-extrabold text-white shadow-[0_12px_28px_rgba(20,20,43,0.18)]"
-            style={{ ...b.style, background: b.bg, animationDelay: b.d }}
-          >
-            {b.init}
-          </div>
-        ))}
       </div>
 
       <div className="relative z-[2] mx-auto max-w-[1200px] px-7">
+        <span className="sb-reveal sb-hero-rise mb-7 inline-flex items-center gap-2 rounded-full border border-white bg-gradient-to-r from-sb-lav to-sb-pink px-5 py-2.5 font-sb text-[13px] font-bold shadow-[0_8px_22px_rgba(109,92,255,0.14)]">
+          ✦&nbsp; AI front office for every business
+        </span>
         <h1
           className="sb-reveal sb-hero-rise mx-auto max-w-5xl font-sb text-[clamp(48px,7.2vw,96px)] font-extrabold leading-[1.04] tracking-tight text-sb-ink"
           style={{ transitionDelay: "0.1s" }}

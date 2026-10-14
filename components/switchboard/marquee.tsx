@@ -11,7 +11,7 @@ export function Marquee() {
             key={`${v}-${i}`}
             className="whitespace-nowrap rounded-full border border-sb-ink/10 bg-sb-bg2 px-6 py-3 font-sb text-sm font-bold text-sb-ink2"
           >
-            {v}
+            <b className="mr-1 text-sb-violet-dark">●</b> {v}
           </span>
         ))}
       </div>
