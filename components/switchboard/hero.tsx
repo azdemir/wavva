@@ -30,8 +30,12 @@ export function Hero() {
       </div>
 
       <div className="relative z-[2] mx-auto max-w-[1200px] px-7">
-        <span className="sb-reveal sb-hero-rise mb-7 inline-flex items-center gap-2 rounded-full border border-white bg-gradient-to-r from-sb-lav to-sb-pink px-5 py-2.5 font-sb text-[13px] font-bold shadow-[0_8px_22px_rgba(109,92,255,0.14)]">
-          ✦&nbsp; AI front office for every business
+        {/* hidden eyebrow — keeps its vertical space so the hero does not shift */}
+        <span
+          aria-hidden
+          className="invisible mb-7 inline-flex items-center gap-2 rounded-full border border-white bg-gradient-to-r from-sb-lav to-sb-pink px-5 py-2.5 font-sb text-[13px] font-bold shadow-[0_8px_22px_rgba(109,92,255,0.14)]"
+        >
+          &nbsp;
         </span>
         <h1
           className="sb-reveal sb-hero-rise mx-auto max-w-5xl font-sb text-[clamp(48px,7.2vw,96px)] font-extrabold leading-[1.04] tracking-tight text-sb-ink"
