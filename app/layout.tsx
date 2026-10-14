@@ -41,26 +41,26 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default:
-      "Every call answered. Every business. | Switchboard",
-    template: "%s | Switchboard",
+      "Every call answered. Every business. | Wavva",
+    template: "%s | Wavva",
   },
   description:
-    "Switchboard is the AI front office for every business: every call answered in your business's name, appointments booked, quotes followed up, invoices collected. Flat $299/mo, month to month. Free 7-day trial.",
+    "Wavva is the AI front office for every business: every call answered in your business's name, appointments booked, quotes followed up, invoices collected. Flat $299/mo, month to month. Free 7-day trial.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
-    siteName: "Switchboard",
-    title: "Switchboard — Every call answered. Every business.",
+    siteName: "Wavva",
+    title: "Wavva — Every call answered. Every business.",
     description:
       "The AI front office for any business that takes calls. Every call answered in your business's name, every appointment booked, one flat monthly fee.",
     url: "/",
-    images: [{ url: "/og-image.jpg", width: 1000, height: 525, alt: "Switchboard" }],
+    images: [{ url: "/og-image.jpg", width: 1000, height: 525, alt: "Wavva" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Switchboard — Every call answered. Every business.",
+    title: "Wavva — Every call answered. Every business.",
     description:
       "The AI front office for any business that takes calls. Every call answered in your business's name, every appointment booked, one flat monthly fee.",
     images: ["/og-image.jpg"],
@@ -76,20 +76,20 @@ const ORG_JSON_LD = {
   "@graph": [
     {
       "@type": "Organization",
-      name: "Switchboard",
+      name: "Wavva",
       url: SITE_URL,
       description:
         "AI-powered front office for every business: call answering, appointment booking, quoting, invoicing and collections.",
-      email: "hello@switchboard.example",
+      email: "hello@wavva.example",
     },
     {
       "@type": "WebSite",
-      name: "Switchboard",
+      name: "Wavva",
       url: SITE_URL,
     },
     {
       "@type": "Service",
-      name: "Switchboard AI Front Office",
+      name: "Wavva AI Front Office",
       url: SITE_URL,
       description:
         "Done-for-you AI front office: answers every call in your business's name, books appointments, follows up quotes, collects invoices.",

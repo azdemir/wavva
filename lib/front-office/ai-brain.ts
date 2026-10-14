@@ -211,7 +211,7 @@ async function runTool(
     const smsSent = await textOwner(
       supabase,
       tctx,
-      `${ctx.companyName} Switchboard: booking request — ${detail}. Confirm in your dashboard.`,
+      `${ctx.companyName} Wavva: booking request — ${detail}. Confirm in your dashboard.`,
     );
     return {
       result: `Booking request saved for the owner to confirm${smsSent ? " (owner texted)" : ""}. Tell the caller their request is in and the owner will confirm the slot shortly.`,
@@ -230,7 +230,7 @@ async function runTool(
     const smsSent = await textOwner(
       supabase,
       tctx,
-      `${ctx.companyName} Switchboard: ${args.reason}. ${args.summary ?? ""} — from ${tctx.fromNumber}.`,
+      `${ctx.companyName} Wavva: ${args.reason}. ${args.summary ?? ""} — from ${tctx.fromNumber}.`,
     );
     await supabase
       .from("front_office_ai_calls")

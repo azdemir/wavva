@@ -1,4 +1,4 @@
-/** Shared Switchboard marketing copy — every business, never cleaning-only. */
+/** Shared Wavva marketing copy — every business, never cleaning-only. */
 
 export const VERTICALS = [
   "Plumbers",
@@ -36,7 +36,7 @@ export const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "Does my number change?",
-    a: "No. Your business line forwards to Switchboard; your number stays yours. Everything goes out in your business's name.",
+    a: "No. Your business line forwards to Wavva; your number stays yours. Everything goes out in your business's name.",
   },
   {
     q: "What kinds of businesses is this for?",
@@ -52,7 +52,7 @@ export const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "What if a customer doesn't want texts?",
-    a: "They don't get them. Follow-ups only go to people who agreed — and Switchboard never makes automated sales calls.",
+    a: "They don't get them. Follow-ups only go to people who agreed — and Wavva never makes automated sales calls.",
   },
   {
     q: "How does the free trial work?",
@@ -67,7 +67,7 @@ export const FAQS: { q: string; a: string }[] = [
 export const HOW_STEPS: { title: string; body: string }[] = [
   {
     title: "Tell it about your business",
-    body: "Services, prices, hours, policies — or just point it at your website. Switchboard trains on how you work.",
+    body: "Services, prices, hours, policies — or just point it at your website. Wavva trains on how you work.",
   },
   {
     title: "Connect your line",

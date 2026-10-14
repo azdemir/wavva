@@ -6,7 +6,7 @@ import { Eyebrow } from "@/components/switchboard/section-head";
 
 export const metadata: Metadata = {
   title: "Privacy",
-  description: "How Switchboard handles your data.",
+  description: "How Wavva handles your data.",
   alternates: { canonical: "/privacy" },
 };
 

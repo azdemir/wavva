@@ -1,19 +1,28 @@
 /**
- * Switchboard marketing components — option-Q design system.
- * Self-contained: violet/indigo, Plus Jakarta Sans, pill radii.
- * Backend (auth, dashboard, APIs, data) stays TidyPro's.
+ * Wavva marketing mark — waveform bars tracing a W (option-Q design system).
+ * Self-contained: violet gradient, Plus Jakarta Sans wordmark.
  */
-export function SwitchboardMark({ className = "h-8 w-8" }: { className?: string }) {
+export function WavvaMark({ className = "h-8 w-8" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 40 40" className={className} aria-hidden="true">
-      <circle cx="19" cy="20" r="15" fill="none" stroke="#6d5cff" strokeWidth="3.4" />
-      <rect x="13.5" y="16.5" width="11" height="7" rx="3.5" fill="#6d5cff" />
-      <path d="M24.5 18.2h7M24.5 21.8h7" stroke="#6d5cff" strokeWidth="3.4" strokeLinecap="round" />
+    <svg viewBox="0 0 137 96" className={className} aria-hidden="true">
+      <defs>
+        <linearGradient id="wavva-sw-g" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#8b7cff" />
+          <stop offset="1" stopColor="#5b3df0" />
+        </linearGradient>
+      </defs>
+      <rect x="6" y="14" width="11" height="68" rx="5.5" fill="url(#wavva-sw-g)" />
+      <rect x="25" y="25" width="11" height="46" rx="5.5" fill="url(#wavva-sw-g)" />
+      <rect x="44" y="33" width="11" height="30" rx="5.5" fill="url(#wavva-sw-g)" />
+      <rect x="63" y="21" width="11" height="54" rx="5.5" fill="url(#wavva-sw-g)" />
+      <rect x="82" y="33" width="11" height="30" rx="5.5" fill="url(#wavva-sw-g)" />
+      <rect x="101" y="25" width="11" height="46" rx="5.5" fill="url(#wavva-sw-g)" />
+      <rect x="120" y="14" width="11" height="68" rx="5.5" fill="url(#wavva-sw-g)" />
     </svg>
   );
 }
 
-export function SwitchboardLogo({
+export function WavvaLogo({
   className = "",
   markClassName = "h-8 w-8",
   light = false,
@@ -24,13 +33,13 @@ export function SwitchboardLogo({
 }) {
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
-      <SwitchboardMark className={markClassName} />
+      <WavvaMark className={markClassName} />
       <span
         className={`font-sb text-xl font-extrabold tracking-tight ${
           light ? "text-white" : "text-sb-ink"
         }`}
       >
-        Switchboard
+        Wavva
       </span>
     </span>
   );

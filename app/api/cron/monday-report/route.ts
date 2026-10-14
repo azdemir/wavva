@@ -208,7 +208,7 @@ export async function GET(request: Request) {
       const resend = new Resend(resendKey);
       const html = reportHtml(companyName, `Week ending ${local.date}`, stats);
       const { error: sendError } = await resend.emails.send({
-        from: `Switchboard <no-reply@${new URL(FRONT_OFFICE.SITE_URL).hostname}>`,
+        from: `Wavva <no-reply@${new URL(FRONT_OFFICE.SITE_URL).hostname}>`,
         to: ownerEmail,
         subject: `Your Monday front-office report — ${companyName}`,
         html,

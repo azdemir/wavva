@@ -12,7 +12,7 @@ export function PortalShell({
 }: {
   companyName: string;
   customerName: string;
-  /** Resolved company logo URL; falls back to the Switchboard mark when null. */
+  /** Resolved company logo URL; falls back to the Wavva mark when null. */
   logoUrl: string | null;
   children: ReactNode;
 }) {

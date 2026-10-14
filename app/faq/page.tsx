@@ -7,7 +7,7 @@ import { TrialBand } from "@/components/switchboard/contact";
 export const metadata: Metadata = {
   title: "FAQs",
   description:
-    "Frequently asked questions about Switchboard: AI disclosure, what happens when it can't help, your number, pricing, data export, and the free trial.",
+    "Frequently asked questions about Wavva: AI disclosure, what happens when it can't help, your number, pricing, data export, and the free trial.",
   alternates: { canonical: "/faq" },
 };
 
