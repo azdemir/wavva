@@ -15,7 +15,7 @@
     "clientEvent": "CLIENT'S HOME EARLY!",
     "combo": "COMBO x{mult}",
     "endTitle": "Time's up!",
-    "foot": "A very serious training simulator for cleaning pros.",
+    "foot": "A very serious training simulator for pros.",
     "golden": "Golden caught",
     "goldenTaunts": [
       "catch me!",
@@ -45,7 +45,7 @@
     "rule3": "Do NOT wake the cat. The cat remembers.",
     "rule4": "Chain hits for a combo multiplier.",
     "score": "Score",
-    "start": "Start cleaning",
+    "start": "Start",
     "startTitle": "Ready?",
     "taunts": [
       "rent-free!",

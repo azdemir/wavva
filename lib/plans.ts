@@ -24,7 +24,7 @@ export const PLANS: Record<PlanId, Plan> = {
     name: "Basic",
     priceCents: 1000,
     seats: 1,
-    blurb: "For solo cleaners getting started.",
+    blurb: "For solo operators getting started.",
     features: [
       "1 user",
       "Up to 50 active customers",

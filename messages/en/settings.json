@@ -1,6 +1,6 @@
 {
   "billingCard": {
-    "description": "Your TidyPro subscription, team seats, and invoices from us.",
+    "description": "Your Switchboard subscription, team seats, and invoices from us.",
     "manage": "Manage →",
     "title": "Billing & plan"
   },
@@ -36,7 +36,7 @@
   },
   "form": {
     "followups": "Automatic quote follow-ups",
-    "followupsDescription": "When you send a quote, TidyPro automatically nudges the customer if they go quiet — only the big expensive tools do this. Sending stops the moment they approve, decline, or the quote expires.",
+    "followupsDescription": "When you send a quote, Switchboard automatically nudges the customer if they go quiet — only the big expensive tools do this. Sending stops the moment they approve, decline, or the quote expires.",
     "followupsEnable": "Send automatic follow-ups",
     "multipliersDescription": "1 = full price, 0.95 = 5% off. Applied when quoting recurring work.",
     "multipliersTitle": "Recurring-visit price multipliers",
@@ -54,7 +54,7 @@
   },
   "quickbooks": {
     "title": "QuickBooks Online",
-    "description": "Sync customers, invoices, and payments with QuickBooks Online. TidyPro stays the operational source of truth.",
+    "description": "Sync customers, invoices, and payments with QuickBooks Online. Switchboard stays the operational source of truth.",
     "connected": "Connected",
     "setupPending": "Setup pending",
     "bulletCustomers": "Push customers to QuickBooks",

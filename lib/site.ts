@@ -19,55 +19,27 @@ export const site = {
   ],
 } as const;
 
-import { PLANS, PLAN_IDS } from "./plans";
-
-export type Plan = {
-  name: string;
-  price: number;
-  blurb: string;
-  cta: string;
-  featured?: boolean;
-  features: string[];
-};
-
-/**
- * Marketing plans, derived from the single source of truth in lib/plans.ts
- * (which also drives the dashboard billing page, seat limits, and feature
- * gating) so the landing page can never drift from the dashboard again.
- */
-export const plans: Plan[] = PLAN_IDS.map((id) => {
-  const p = PLANS[id];
-  return {
-    name: p.name,
-    price: p.priceCents / 100,
-    blurb: p.blurb,
-    cta: id === "pro" ? "Talk to us" : "Start free trial",
-    featured: id === "growth",
-    features: p.features,
-  };
-});
-
 export type Faq = { q: string; a: string };
 
 export const faqs: Faq[] = [
   {
-    q: "Is TidyPro only for cleaning businesses in Upstate New York?",
-    a: "We designed TidyPro with Upstate cleaners in mind — service areas by city, county, ZIP code, or radius, Eastern Time scheduling, and USD pricing. But any residential or commercial cleaning business in the US can use it.",
+    q: "Will my callers know it's an AI?",
+    a: "Yes — every caller is told they're speaking with your business's AI assistant. We never claim it's human.",
+  },
+  {
+    q: "How many call minutes are included?",
+    a: "Essential includes 250 AI-answered minutes a month, Complete includes 600. Minutes reset monthly, and anything beyond is 30¢ a minute — tracked live in your dashboard.",
+  },
+  {
+    q: "What happens when it can't handle something?",
+    a: "You get a text immediately. Anything unusual — or outside your price list — waits for your OK. It never guesses on your behalf.",
   },
   {
     q: "I'm not technical. Is it hard to set up?",
-    a: "No. A guided setup walks you through your business profile, services, pricing, and service area, then helps you invite your team. Most owners finish in under 30 minutes, and there's no software to install.",
+    a: "No. A guided setup walks you through your services, prices, hours and policies, then you forward your business line. Most owners are live the same day.",
   },
   {
     q: "How do my customers pay me?",
-    a: "You create and send invoices from TidyPro, and customers pay by card through their customer portal. Payments go directly to your business account — completely separate from your TidyPro subscription.",
-  },
-  {
-    q: "Does TidyPro handle sales tax for me?",
-    a: "You can configure tax rates on your invoices, but tax rules vary by location and situation. Have your accountant verify what's required for your business — we don't assume tax requirements on your behalf.",
-  },
-  {
-    q: "Can my cleaners use it on their phones?",
-    a: "Yes. Job views are designed mobile-first: cleaners see their day's jobs, tap into job details, work through checklists, upload before-and-after photos, and mark jobs complete — all from a phone browser.",
+    a: "Card payments go straight to your own account through Stripe. We never hold your money.",
   },
 ];
