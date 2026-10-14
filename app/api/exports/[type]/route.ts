@@ -349,10 +349,10 @@ export async function GET(
   };
 
   const wb = new ExcelJS.Workbook();
-  wb.creator = "TidyPro";
+  wb.creator = "Switchboard";
   wb.created = new Date();
 
-  const filename = `tidypro-${t}`;
+  const filename = `switchboard-${t}`;
   if (t === "full") {
     for (const sheet of FULL_SHEETS) {
       const rows = await fetchRows(sheet, { ...ctx, q: "", like: "%%", status: "all" });

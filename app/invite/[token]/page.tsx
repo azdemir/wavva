@@ -65,7 +65,7 @@ export default async function InvitePage({
         <CardHeader className="p-0 pb-4">
           <CardTitle>You&apos;re invited!</CardTitle>
           <CardDescription>
-            {invite.companies?.name ?? "A cleaning business"} invited{" "}
+            {invite.companies?.name ?? "A business"} invited{" "}
             <strong>{invite.email}</strong> to join as{" "}
             <strong>{invite.role}</strong>. Sign in (or create an account with
             that email) to accept.

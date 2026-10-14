@@ -48,7 +48,7 @@ const PCT_FMT = "0.0%";
 
 function buildWorkbook(data: AnalyticsData): ExcelJS.Workbook {
   const wb = new ExcelJS.Workbook();
-  wb.creator = "TidyPro Studio";
+  wb.creator = "Switchboard Studio";
   wb.created = new Date();
 
   const summary = addSheet(
@@ -199,7 +199,7 @@ export async function GET(req: Request) {
     headers: {
       "Content-Type":
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "Content-Disposition": `attachment; filename="tidypro-studio-analytics-${stamp}.xlsx"`,
+      "Content-Disposition": `attachment; filename="switchboard-studio-analytics-${stamp}.xlsx"`,
       "Content-Length": String(bytes.byteLength),
     },
   });

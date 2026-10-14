@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { Heading } from "@/components/ui/heading";
 import { ArcadeShell } from "@/components/arcade/arcade-shell";
 
-/** TidyPro Arcade — short, silly cleaning games. Every role, every tier. */
+/** Switchboard Arcade — short, silly games for the team. Every role, every tier. */
 export default async function ArcadePage() {
   const t = await getTranslations("arcade");
   return (

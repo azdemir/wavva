@@ -68,7 +68,7 @@ function monthLabel(key: string) {
 
 function buildWorkbook(t: ExportType, data: ReportData): ExcelJS.Workbook {
   const wb = new ExcelJS.Workbook();
-  wb.creator = "TidyPro";
+  wb.creator = "Switchboard";
   wb.created = new Date();
 
   if (t === "employee-hours") {
@@ -265,7 +265,7 @@ export async function GET(
     headers: {
       "Content-Type":
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "Content-Disposition": `attachment; filename="tidypro-report-${t}-${stamp}.xlsx"`,
+      "Content-Disposition": `attachment; filename="switchboard-report-${t}-${stamp}.xlsx"`,
       "Content-Length": String(bytes.byteLength),
     },
   });

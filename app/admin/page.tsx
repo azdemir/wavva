@@ -53,7 +53,7 @@ export default async function AdminPage() {
     <div className="space-y-8">
       <Heading
         title="Platform overview"
-        description="All companies on TidyPro. This view bypasses RLS via the service role — keep the admin allowlist tight."
+        description="All companies on Switchboard. This view bypasses RLS via the service role — keep the admin allowlist tight."
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">

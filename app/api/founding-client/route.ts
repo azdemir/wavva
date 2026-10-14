@@ -70,7 +70,7 @@ export async function POST(request: Request) {
       const resend = new Resend(resendKey);
       const plan = FRONT_OFFICE_PLANS[app.plan_interest];
       await resend.emails.send({
-        from: `TidyPro <no-reply@${new URL(FRONT_OFFICE.SITE_URL).hostname}>`,
+        from: `Switchboard <no-reply@${new URL(FRONT_OFFICE.SITE_URL).hostname}>`,
         to: FRONT_OFFICE.CONTACT_EMAIL,
         subject: `New founding-client application: ${app.company_name}`,
         text: [

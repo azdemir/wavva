@@ -23,7 +23,7 @@ export default async function AdminLayout({
       <header className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
           <Link href="/admin" className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100">
-            TidyPro <span className="font-normal text-slate-500 dark:text-slate-400 dark:text-slate-500">Platform Admin</span>
+            Switchboard <span className="font-normal text-slate-500 dark:text-slate-400 dark:text-slate-500">Platform Admin</span>
           </Link>
           <div className="flex items-center gap-4">
             <span className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">{user.email}</span>
