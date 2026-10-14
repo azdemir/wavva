@@ -36,7 +36,23 @@ const TURN_STARTS = [0.0, 7.55, 13.01, 18.16, 20.84, 24.48, 30.95, 37.13, 39.16]
 const STEP_MS = 2600;
 /** The MP3 ships as base64 text chunks (binaries can't ride the push tool). */
 const CHUNK_COUNT = 12;
-const chunkUrl = (i: number) => `/call-audio/c${String(i + 1).padStart(2, "0")}.txt`;
+const pad2 = (i: number) => String(i + 1).padStart(2, "0");
+/** Same-origin first, then GitHub raw as a fallback for stale checkouts. */
+const CHUNK_SOURCES = [
+  (i: number) => `/call-audio/c${pad2(i)}.txt`,
+  (i: number) => `https://raw.githubusercontent.com/azdemir/TidyPro/main/public/call-audio/c${pad2(i)}.txt`,
+];
+
+async function fetchChunks(base: (i: number) => string): Promise<string[]> {
+  return Promise.all(
+    Array.from({ length: CHUNK_COUNT }, (_, i) =>
+      fetch(base(i)).then((r) => {
+        if (!r.ok) throw new Error(`chunk ${i} -> ${r.status}`);
+        return r.text();
+      })
+    )
+  );
+}
 
 /** The player card alone — used inside the hero. */
 export function CallDemoPlayer() {
@@ -61,14 +77,16 @@ export function CallDemoPlayer() {
     let url: string | null = null;
     (async () => {
       try {
-        const parts = await Promise.all(
-          Array.from({ length: CHUNK_COUNT }, (_, i) =>
-            fetch(chunkUrl(i)).then((r) => {
-              if (!r.ok) throw new Error(`chunk ${i} missing`);
-              return r.text();
-            })
-          )
-        );
+        let parts: string[] | null = null;
+        for (const base of CHUNK_SOURCES) {
+          try {
+            parts = await fetchChunks(base);
+            break;
+          } catch {
+            /* try the next source */
+          }
+        }
+        if (!parts) throw new Error("no audio source available");
         const bin = atob(parts.join("").trim());
         const bytes = new Uint8Array(bin.length);
         for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);

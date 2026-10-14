@@ -34,7 +34,9 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob: https://*.supabase.co https://maps.gstatic.com https://maps.googleapis.com",
-              "connect-src 'self' https://*.supabase.co https://maps.googleapis.com wss://*.supabase.co",
+              "connect-src 'self' https://*.supabase.co https://maps.googleapis.com wss://*.supabase.co https://raw.githubusercontent.com",
+              // Sample-call audio is reassembled from base64 chunks into a blob: URL.
+              "media-src 'self' blob: data:",
               "frame-src https://js.stripe.com",
               "object-src 'none'",
               "base-uri 'self'",
