@@ -71,11 +71,6 @@
       "name": "Sock Match Madness",
       "tagline": "Every sock has a soulmate. Find them.",
       "bestLabel": "Fewest moves"
-    },
-    "stain": {
-      "name": "Stain Scrub Showdown",
-      "tagline": "Scrub the impossible stains before time runs out.",
-      "bestLabel": "Most time left"
     }
   },
   "play": "Play",
@@ -117,51 +112,6 @@
     "start": "Start matching",
     "startTitle": "Ready to reunite some socks?",
     "time": "Time"
-  },
-  "stain": {
-    "cleared": "Stains cleared",
-    "clearedQuips": [
-      "POOF. Gone.",
-      "Never happened.",
-      "The carpet forgives you.",
-      "Witnesses: zero.",
-      "Science can't explain it."
-    ],
-    "loseQuip": "The stains live to see another day.",
-    "loseTitle": "Time's up!",
-    "ranks": [
-      {
-        "name": "Miracle Worker",
-        "quip": "That stain told its friends about you."
-      },
-      {
-        "name": "Stain Slayer",
-        "quip": "No spill is safe."
-      },
-      {
-        "name": "Weekend Warrior",
-        "quip": "Elbow grease: applied."
-      },
-      {
-        "name": "It'll Buff Out",
-        "quip": "Probably. Eventually."
-      }
-    ],
-    "rule1": "Press and scrub each stain until it disappears.",
-    "rule2": "Clear all 5 stains before the timer runs out.",
-    "rule3": "Faster scrubbing earns a bigger time bonus.",
-    "stainNames": [
-      "Mystery Spaghetti",
-      "The Red Wine Incident",
-      "Coffee vs. Monday",
-      "Toddler Handprint",
-      "Unknown Brown (do not ask)"
-    ],
-    "start": "Start scrubbing",
-    "startTitle": "The stains are waiting.",
-    "timeLeft": "{s}s left",
-    "timeUsed": "Time used",
-    "winTitle": "Spotless!"
   },
   "title": "Arcade"
 }

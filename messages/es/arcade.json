@@ -71,11 +71,6 @@
       "name": "Locura de calcetines",
       "tagline": "Cada calcetín tiene su alma gemela. Encuéntralas.",
       "bestLabel": "Menos movimientos"
-    },
-    "stain": {
-      "name": "Duelo contra las manchas",
-      "tagline": "Frota las manchas imposibles antes de que se acabe el tiempo.",
-      "bestLabel": "Más tiempo restante"
     }
   },
   "play": "Jugar",
@@ -117,51 +112,6 @@
     "start": "Empezar",
     "startTitle": "¿Listo para reunir calcetines?",
     "time": "Tiempo"
-  },
-  "stain": {
-    "cleared": "Manchas eliminadas",
-    "clearedQuips": [
-      "¡PUF! Desapareció.",
-      "Nunca pasó.",
-      "La alfombra te perdona.",
-      "Testigos: cero.",
-      "La ciencia no puede explicarlo."
-    ],
-    "loseQuip": "Las manchas vivirán otro día.",
-    "loseTitle": "¡Se acabó el tiempo!",
-    "ranks": [
-      {
-        "name": "Milagrero",
-        "quip": "Esa mancha les contó a sus amigas de ti."
-      },
-      {
-        "name": "Cazador de manchas",
-        "quip": "Ninguna mancha está a salvo."
-      },
-      {
-        "name": "Guerrero de fin de semana",
-        "quip": "Codos en acción."
-      },
-      {
-        "name": "Ya saldrá",
-        "quip": "Probablemente. Algún día."
-      }
-    ],
-    "rule1": "Pulsa y frota cada mancha hasta que desaparezca.",
-    "rule2": "Elimina las 5 manchas antes de que se acabe el tiempo.",
-    "rule3": "Frotar más rápido da más bonus de tiempo.",
-    "stainNames": [
-      "Espagueti misterioso",
-      "El incidente del vino tinto",
-      "Café contra lunes",
-      "Manita de peque",
-      "Marrón desconocido (no preguntes)"
-    ],
-    "start": "Empezar a frotar",
-    "startTitle": "Las manchas esperan.",
-    "timeLeft": "quedan {s} s",
-    "timeUsed": "Tiempo usado",
-    "winTitle": "¡Impecable!"
   },
   "title": "Arcade"
 }

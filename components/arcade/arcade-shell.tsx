@@ -4,13 +4,11 @@ import { useCallback, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { DustBunnyPanic } from "./dust-bunny-panic";
 import { SockMatchMadness } from "./sock-match-madness";
-import { StainScrubShowdown } from "./stain-scrub-showdown";
 import { DBP_BEST_KEY } from "./dust-bunny-panic-game";
 import { SOCK_BEST_KEY } from "./sock-match-madness-game";
-import { STAIN_BEST_KEY } from "./stain-scrub-showdown-game";
 import { readBest } from "./fx";
 
-type GameId = "dbp" | "sock" | "stain";
+type GameId = "dbp" | "sock";
 
 function BunnyIcon() {
   return (
@@ -33,19 +31,9 @@ function SockIcon() {
   );
 }
 
-function StainIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8">
-      <path d="M12 3c3.2 4.2 6.2 7.4 6.2 10.6a6.2 6.2 0 1 1-12.4 0C5.8 10.4 8.8 7.2 12 3z" />
-      <path d="M9.5 13.5a2.6 2.6 0 0 0 2 2.6" />
-    </svg>
-  );
-}
-
 const GAMES: { id: GameId; bestKey: string; accent: string; icon: ReactNode }[] = [
   { id: "dbp", bestKey: DBP_BEST_KEY, accent: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300", icon: <BunnyIcon /> },
   { id: "sock", bestKey: SOCK_BEST_KEY, accent: "bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300", icon: <SockIcon /> },
-  { id: "stain", bestKey: STAIN_BEST_KEY, accent: "bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300", icon: <StainIcon /> },
 ];
 
 export function ArcadeShell() {
@@ -54,7 +42,6 @@ export function ArcadeShell() {
   const [bests, setBests] = useState<Record<GameId, number | null>>(() => ({
     dbp: readBest(DBP_BEST_KEY),
     sock: readBest(SOCK_BEST_KEY),
-    stain: readBest(STAIN_BEST_KEY),
   }));
 
   const handleBestDbp = useCallback(
@@ -63,10 +50,6 @@ export function ArcadeShell() {
   );
   const handleBestSock = useCallback(
     (value: number) => setBests((prev) => ({ ...prev, sock: value })),
-    [],
-  );
-  const handleBestStain = useCallback(
-    (value: number) => setBests((prev) => ({ ...prev, stain: value })),
     [],
   );
 
@@ -83,14 +66,13 @@ export function ArcadeShell() {
         <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 dark:border-slate-800 dark:bg-slate-900">
           {active === "dbp" && <DustBunnyPanic onBest={handleBestDbp} />}
           {active === "sock" && <SockMatchMadness onBest={handleBestSock} />}
-          {active === "stain" && <StainScrubShowdown onBest={handleBestStain} />}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-2">
       {GAMES.map((g) => {
         const best = bests[g.id];
         return (
