@@ -55,6 +55,7 @@ export function CallDemoPlayer() {
   }, [active]);
 
   useEffect(() => {
+    if (step === 0) return; // don't yank scroll position on page load
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [step]);
 
