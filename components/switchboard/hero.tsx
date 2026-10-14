@@ -49,7 +49,7 @@ export function Hero() {
           className="sb-reveal sb-hero-rise mx-auto mt-6 max-w-2xl font-sb text-lg text-sb-ink2 md:text-xl"
           style={{ transitionDelay: "0.2s" }}
         >
-          Switchboard answers every call <strong className="text-sb-ink">in your business&rsquo;s name</strong> — books
+          Wavva answers every call <strong className="text-sb-ink">in your business&rsquo;s name</strong> — books
           appointments, sends quotes, follows up until you&rsquo;re paid.{" "}
           <strong className="text-sb-ink">You run the business.</strong>
         </p>
