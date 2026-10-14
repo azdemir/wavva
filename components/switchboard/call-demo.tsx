@@ -5,7 +5,7 @@ import { Reveal } from "./reveal";
 
 type Turn = { who: "ai" | "caller"; text: string };
 
-/** Scripted sample call — what a real answered call sounds like. */
+/** Sample call — transcript matches the real audio file turn-for-turn. */
 const SCRIPT: Turn[] = [
   {
     who: "ai",
@@ -30,6 +30,10 @@ const OUTCOMES = [
   "Owner notified by text",
 ];
 
+const AUDIO_SRC = "/sample-call.mp3";
+/** Measured start time (seconds) of each turn in the audio file. */
+const TURN_STARTS = [0.0, 7.55, 13.01, 18.16, 20.84, 24.48, 30.95, 37.13, 39.16];
+/** Fallback pacing when the audio file isn't available. */
 const STEP_MS = 2600;
 
 /** The player card alone — used inside the hero. */
@@ -37,40 +41,91 @@ export function CallDemoPlayer() {
   const [step, setStep] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [seconds, setSeconds] = useState(0);
+  const [duration, setDuration] = useState(0);
+  /** Assume the audio file exists until an error proves otherwise. */
+  const [useAudio, setUseAudio] = useState(true);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
   const done = step >= SCRIPT.length;
   /** Derived: actually advancing. No effect-syncing of setState needed. */
   const active = playing && !done;
-  const bottomRef = useRef<HTMLDivElement>(null);
 
+  // ---- audio-driven mode ----
   useEffect(() => {
-    if (!active) return;
+    const a = audioRef.current;
+    if (!a || !useAudio) return;
+    const onTime = () => {
+      setSeconds(Math.floor(a.currentTime));
+      let s = 0;
+      for (const t of TURN_STARTS) if (a.currentTime >= t) s++;
+      setStep(Math.min(s, SCRIPT.length));
+    };
+    const onEnd = () => {
+      setStep(SCRIPT.length);
+      setPlaying(false);
+    };
+    const onMeta = () => setDuration(a.duration || 0);
+    const onErr = () => setUseAudio(false);
+    a.addEventListener("timeupdate", onTime);
+    a.addEventListener("ended", onEnd);
+    a.addEventListener("loadedmetadata", onMeta);
+    a.addEventListener("error", onErr);
+    return () => {
+      a.removeEventListener("timeupdate", onTime);
+      a.removeEventListener("ended", onEnd);
+      a.removeEventListener("loadedmetadata", onMeta);
+      a.removeEventListener("error", onErr);
+    };
+  }, [useAudio]);
+
+  // ---- timer fallback mode (audio file missing) ----
+  useEffect(() => {
+    if (useAudio || !active) return;
     const t = setTimeout(() => setStep((s) => s + 1), STEP_MS);
     return () => clearTimeout(t);
-  }, [active, step]);
+  }, [useAudio, active, step]);
 
   useEffect(() => {
-    if (!active) return;
+    if (useAudio || !active) return;
     const t = setInterval(() => setSeconds((s) => s + 1), 1000);
     return () => clearInterval(t);
-  }, [active]);
+  }, [useAudio, active]);
 
   useEffect(() => {
     if (step === 0) return; // don't yank scroll position on page load
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [step]);
 
-  const restart = () => {
-    setStep(0);
-    setSeconds(0);
+  const play = () => {
     setPlaying(true);
+    if (useAudio) {
+      audioRef.current?.play().catch(() => setUseAudio(false));
+    }
+  };
+  const pause = () => {
+    setPlaying(false);
+    audioRef.current?.pause();
+  };
+  const restart = () => {
+    setSeconds(0);
+    if (useAudio && audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(() => setUseAudio(false));
+      setPlaying(true);
+    } else {
+      setStep(0);
+      setPlaying(true);
+    }
   };
 
   const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
   const ss = String(seconds % 60).padStart(2, "0");
+  const progress = useAudio && duration > 0 ? Math.min(seconds / duration, 1) : step / SCRIPT.length;
 
   return (
     <Reveal className="mx-auto max-w-[680px]">
       <div id="chatdemo" className="scroll-mt-28 overflow-hidden rounded-[28px] border border-sb-ink/10 bg-white text-left shadow-[0_30px_70px_rgba(20,20,43,0.12)]">
+            <audio ref={audioRef} src={AUDIO_SRC} preload="auto" className="hidden" />
             {/* call header */}
             <div className="flex items-center justify-between bg-sb-ink px-6 py-4 text-white">
               <div className="flex items-center gap-3">
@@ -82,12 +137,19 @@ export function CallDemoPlayer() {
                   Sample call
                 </span>
                 <span className="rounded-full bg-white/10 px-3 py-1 font-sb text-xs font-semibold text-white/70">
-                  Scripted demo
+                  Real AI voice
                 </span>
               </div>
               <span className="font-sb text-sm font-bold tabular-nums text-white/80">
                 {mm}:{ss}
               </span>
+            </div>
+            {/* progress */}
+            <div className="h-1 w-full bg-sb-ink/10">
+              <div
+                className="h-full bg-sb-violet transition-[width] duration-300"
+                style={{ width: `${Math.round(progress * 100)}%` }}
+              />
             </div>
 
             {/* transcript */}
@@ -136,7 +198,7 @@ export function CallDemoPlayer() {
             <div className="flex items-center justify-center gap-3 border-t border-sb-ink/10 bg-white px-6 py-5">
               {!active && !done && (
                 <button
-                  onClick={() => setPlaying(true)}
+                  onClick={play}
                   className="rounded-full bg-sb-violet px-8 py-3 font-sb text-[15px] font-extrabold text-white transition-transform hover:scale-[1.03]"
                 >
                   ▶&nbsp; Play sample call
@@ -144,7 +206,7 @@ export function CallDemoPlayer() {
               )}
               {active && (
                 <button
-                  onClick={() => setPlaying(false)}
+                  onClick={pause}
                   className="rounded-full bg-sb-ink px-8 py-3 font-sb text-[15px] font-extrabold text-white transition-transform hover:scale-[1.03]"
                 >
                   ❚❚&nbsp; Pause
