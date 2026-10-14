@@ -1,10 +1,66 @@
-# TidyPro — Operations software for cleaning businesses
+<p align="center">
+  <img src="public/wavva-logo.svg" alt="Wavva — The AI front office for every business" width="280" />
+</p>
 
-Multi-tenant SaaS platform for residential and commercial cleaning businesses
-(scheduling, quotes & bookings, team management, invoicing, customer portal).
-"TidyPro" is a working title — rename it in `lib/site.ts`.
+# Wavva — The AI front office for every business
+
+Wavva answers every call in your business's name, books appointments, follows
+up quotes, and collects invoices — one flat monthly fee.
+
+> **Every call answered. Every job booked.**
+
+The logo is a waveform tracing a "W" — seven rounded bars in a violet gradient
+(#8B7CFF → #5B3DF0) next to the Wavva wordmark. Pure-vector outlined SVG
+(`components/ui/logo.tsx`: `WavvaMark` / `WavvaLogo`; favicon `app/icon.svg`),
+Plus Jakarta Sans shaped with HarfBuzz kerning and converted to path outlines,
+so there is no font dependency. It renders on light and dark.
 
 Built with Next.js 16 (App Router) + TypeScript + Tailwind CSS v4 + React 19.
+Vercel auto-deploys from `main`. (Repo is still named `TidyPro` on GitHub —
+the product brand is Wavva; internal identifiers such as DB tables and
+storage keys were intentionally left untouched by the rebrand.)
+
+## The product: AI call answering
+
+- **Real voice pipeline** — Twilio Voice webhooks (`/api/webhooks/voice`,
+  `/turn`, `/status`): TwiML Gather/Say turn loop with signature verification,
+  replacing the old stub.
+- **AI brain** (`lib/front-office/ai-brain.ts`) — per-company system prompt
+  with an OpenAI tool loop: `get_quote` (quotes only from the company price
+  list, never invented), `request_booking`, `escalate`, `end_call`.
+- **Minute metering** — Essential includes 250 AI-answered minutes/month,
+  Complete includes 600; **30¢/min overage**. Usage is tracked live in the
+  dashboard. Migration `0020_ai_answering.sql` (`ai_*` settings columns,
+  booking-request escalation kind, `ai_calls` log table).
+- **Dashboard** — `/dashboard/front-office/ai-answering`: usage vs. included
+  minutes, settings form, recent calls.
+- **Live demo on the front page** — the hero's sample-call player
+  (`#chatdemo`) plays a real 41-second two-voice AI call with a synced
+  transcript and progress bar. The MP3 ships as 12 base64 text chunks in
+  `public/call-audio/` (c01–c12), fetched and reassembled into a Blob URL in
+  the browser — binary assets can't travel through the GitHub file tools, so
+  the chunks are the portable format.
+- **Transparency rules** — callers are always told they're speaking with the
+  business's AI assistant. Anything unusual, or outside the price list, is
+  texted to the owner immediately; the AI never guesses on your behalf.
+
+**Pricing:** Essential **$299/mo** · Complete **$599/mo**. Month to month,
+7-day free trial, no card. (Founding 50 offer on the marketing site.)
+
+## What's underneath: multi-tenant operations platform
+
+The same codebase runs a full business-management dashboard — scheduling,
+customers, quotes → bookings with job generation, crew, checklists, invoices,
+Stripe payments, customer portal, team roles, audit logs:
+
+- PostgreSQL (Supabase) with **Row-Level Security on every table** — tenant
+  isolation is enforced in the database via `company_id`, not in
+  application code. Migrations: `supabase/migrations/0001`–`0020`.
+- Integrations: Stripe Connect (payments), Resend (email), Twilio
+  (SMS/Voice), OpenAI (AI brain); QuickBooks Online integration spec'd
+  (awaiting Intuit app credentials).
+- Dashboard and onboarding are multilingual (`en`/`es`/`uk`) via next-intl;
+  marketing pages stay static English.
 
 ## Quick start
 
@@ -15,123 +71,46 @@ npm run build    # production build check
 npm run lint     # eslint
 ```
 
-No environment variables are needed for the current stage. When later stages
-need secrets, copy `.env.example` to `.env.local` and fill in test-mode keys.
-
-## What's implemented (Stage 1 — foundation + marketing home page)
-
-- Next.js App Router project with TypeScript, Tailwind v4, ESLint
-- Design system: brand blue / accent green / white palette in `app/globals.css`
-  (`@theme` tokens), Geist font, reduced-motion support
-- UI primitives in `components/ui/`: `Button`, `Card`, `Field` (accessible
-  labeled input with hint/error states), `Badge` + `JobStatusPill`
-  (scheduled / in progress / completed / canceled), `EmptyState`, `Container`,
-  `SectionHeading`, and an SVG `icons` set
-- Marketing home page (`app/page.tsx`): navbar (with no-JS mobile menu),
-  hero with an illustrative product preview (labeled sample data), features,
-  how-it-works, pricing teaser (Starter $49 / Growth $99 / Pro $199 —
-  suggested pricing), FAQ, CTA band, footer
-- `/demo` — trial request page. **UI preview only**: the form is disabled and
-  labeled as not collecting submissions yet
-- `/signin`, `/signup` — real email/password auth backed by Supabase Auth
-  (requires Supabase env vars; see `.env.example`)
-- `/compare` — colorful comparison overviews for Jobber, Housecall Pro,
-  ZenMaid, and BookingKoala, with official sources and plan-limit caveats
-- `/onboarding` — 4-step company setup wizard (profile → services →
-  service area → team invites), shown to signed-in users without a company
-- `/dashboard` — authenticated workspace: dashboard home (today's jobs, open
-  quotes, outstanding, customers), customers, services & pricing, quotes,
-  bookings, team, settings
-
-## Stage 3 — auth, database, onboarding (done)
-
-- `supabase/migrations/0001_init.sql` — full PostgreSQL schema (companies,
-  memberships, invites, customers, addresses, services, add-ons, service
-  areas, quotes, bookings, jobs, invoices, payments, notifications, audit
-  logs) with **Row-Level Security on every table**: tenant isolation is
-  enforced in the database via `company_id`, not in application code
-- Supabase Auth (email/password) with `@supabase/ssr`; `proxy.ts` refreshes
-  the session; all server data access uses the user's JWT so RLS applies
-- Signed-in browser sessions sign out after 15 minutes of inactivity.
-  Pointer, keyboard, touch, and scroll activity reset the timer across tabs.
-  The timer also checks on focus and wake-up, and persists across reloads.
-  This is a browser-side timeout, not a server-enforced token expiry.
-- Team invites via shareable token links (`/invite/[token]`); acceptance
-  uses the service-role key server-side only (invitees aren't members yet,
-  so RLS can't authorize them)
-- Append-only `audit_logs` for key actions (company created, quotes,
-  bookings, invites, settings changes)
-
-## Stage 4 — customers, services, quotes, bookings (done)
-
-- Customers: CRUD + search, multiple service addresses per customer,
-  per-customer booking/quote history; delete is blocked while active
-  bookings exist
-- Services & pricing: service catalog (residential/commercial, per
-  visit/hour/sq ft) and add-ons with activate/deactivate; delete is blocked
-  when referenced by quotes or bookings; recurring-visit multipliers and
-  default tax rate in Settings
-- Quotes: builder with service/add-on/custom line items, discount, tax, live
-  totals, validity date; status flow draft → sent → approved/declined/expired
-  (enforced transitions); quote numbers per company (Q-0001…)
-- Bookings: one-time or recurring (weekly/biweekly/monthly) with automatic
-  job-visit generation (8/8/6 visits); create-from-quote prefill; reschedule
-  shifts future visits; cancel cancels future visits
-
-## What's explicitly placeholder / mockup (not real)
-
-- Testimonial cards are **clearly labeled placeholders** — no reviews invented
-- Hero dashboard preview is an illustration with fictional sample data
-- Pricing is suggested, flagged "final plans confirmed at launch"
-- `/demo` form is a non-functional UI placeholder
-- No payments, no email/SMS notifications exist yet — nothing here is
-  production-ready
-- The app requires Supabase credentials to run; without them, only the
-  marketing pages work
+1. Copy `.env.example` to `.env.local` and fill in the Supabase keys.
+   (For local dev, disable "Confirm email" in Supabase Auth settings.)
+2. Run migrations `0001`–`0020` on your Supabase project in order
+   (plus the two composite indexes from `0006`).
+3. For AI call answering: `TWILIO_*` keys + `OPENAI_API_KEY`, run migration
+   `0020`, and point your Twilio number's voice webhook at
+   `/api/webhooks/voice` (status callback at `/api/webhooks/voice/status`).
+4. `STRIPE_*` + `RESEND_API_KEY` unlock online payments and email; everything
+   key-gated degrades gracefully with explicit UI notes.
 
 ## Project structure
 
 ```
 app/
-  page.tsx            # marketing home
-  demo/page.tsx       # trial request (UI preview)
-  signin/page.tsx     # placeholder until Stage 3
-  layout.tsx          # root layout + metadata
-  globals.css         # Tailwind v4 theme + design tokens
+  page.tsx                      # Wavva marketing home (hero + sample-call player)
+  pricing/page.tsx              # Essential $299 / Complete $599
+  front-office/page.tsx         # AI answering product page
+  dashboard/front-office/ai-answering/  # usage + settings + recent calls
+  api/webhooks/voice/           # Twilio voice, /turn, /status webhooks
 components/
-  ui/                 # design-system primitives
-  marketing/          # home page sections
+  ui/logo.tsx                   # WavvaMark / WavvaLogo
+  switchboard/                  # marketing design system (pill nav, hero, pricing, FAQ)
 lib/
-  site.ts             # site config, plans, FAQs (rename brand here)
+  site.ts                       # brand name, tagline, FAQs
+  front-office/ai-brain.ts      # per-company prompt + tool loop
+  plans.ts                      # plan definitions (informational — real charges
+                                # come from STRIPE_PRICE_* env vars)
+supabase/migrations/            # 0001–0020 schema + RLS
+public/
+  wavva-logo.svg                # brand lockup (this README's header)
+  call-audio/c01–c12.txt        # sample call, base64 chunks → reassembled in browser
 ```
 
-## Build stages ahead
+## Current status
 
-- **Stage 2:** ✅ done — full marketing pages: `/features`, `/pricing` (plan comparison + billing FAQ), `/faq` (grouped Q&A), `/contact`
-- **Stage 3:** ✅ done — Supabase Auth, PostgreSQL schema with RLS tenant isolation, onboarding wizard, dashboard shell, team invites, settings
-- **Stage 4:** ✅ done — customers, services/pricing config, quotes → bookings with job generation
-- **Stage 5:** ✅ done — week schedule view, job detail with lifecycle (start/complete/cancel), interactive checklists, crew assignment, cleaner mobile "My jobs" view
-- **Stage 6:** ✅ done — invoices (builder, statuses, offline payments), Stripe Connect onboarding + webhook + Checkout, customer portal (`/p/[token]`: quotes approval, invoice payment)
-- **Stage 7:** ✅ done — email notification queue (Resend) + cron endpoint with booking reminders, platform admin (`/admin`), audit log viewer, `SECURITY.md` review
-- **Stage 8:** pilot prep kit ready in `pilot/` (checklist, outreach script, agreement template, feedback form, success metrics) — recruiting the 2–3 companies is a human task
-
-## Running the app (stages 3+)
-
-1. Create a Supabase project and run `supabase/migrations/0001_init.sql`,
-   `0002_job_lifecycle.sql`, `0003_billing_portal.sql` in order.
-2. Copy `.env.example` to `.env.local` and fill in the Supabase keys.
-   For local dev, disable "Confirm email" in Supabase Auth settings.
-3. `npm install && npm run dev` → sign up, complete onboarding, explore.
-4. Optional: `RESEND_API_KEY` + daily cron on `/api/cron/notifications`;
-   `STRIPE_SECRET_KEY` + webhook for online payments; `PLATFORM_ADMIN_EMAILS`
-   for `/admin`.
-
-## Honest limitations (pre-pilot)
-
-- **Roles are coarse:** every member currently has full access to company
-  data. Tighten RLS per `SECURITY.md` P0 before charging anyone.
-- **Stripe/Resend are key-gated:** without keys, payments and emails queue
-  but don't send — the UI says so explicitly.
-- **No platform subscription billing yet:** charging cleaning companies for
-  TidyPro itself is post-pilot work.
-- **Job photos** need object storage (schema-ready, UI notes it).
+- Marketing site, AI-answering pipeline, dashboard, and billing are built,
+  typechecked, linted, and production-build green (92 routes).
+- The texting half stays dark until Twilio 10DLC campaign approval lands
+  (registration packet ready; reviews run ~10–15 days).
+- Binary assets (PNG favicons, the source `sample-call.mp3`) can't travel
+  through the GitHub file tools — they need a real `git push` from a
+  credentialed machine; the SVG favicon and base64 audio chunks cover the
+  gap until then.
