@@ -1,6 +1,6 @@
 {
   "billingCard": {
-    "description": "Tu suscripción a TidyPro, los puestos de tu equipo y nuestras facturas.",
+    "description": "Tu suscripción a Switchboard, los puestos de tu equipo y nuestras facturas.",
     "manage": "Gestionar →",
     "title": "Facturación y plan"
   },
@@ -36,7 +36,7 @@
   },
   "form": {
     "followups": "Seguimientos automáticos de cotizaciones",
-    "followupsDescription": "Cuando envías una cotización, TidyPro le recuerda al cliente automáticamente si no responde — solo las herramientas grandes y caras hacen esto. Los envíos se detienen en cuanto el cliente aprueba, rechaza o la cotización vence.",
+    "followupsDescription": "Cuando envías una cotización, Switchboard le recuerda al cliente automáticamente si no responde — solo las herramientas grandes y caras hacen esto. Los envíos se detienen en cuanto el cliente aprueba, rechaza o la cotización vence.",
     "followupsEnable": "Enviar seguimientos automáticos",
     "multipliersDescription": "1 = precio completo, 0.95 = 5% de descuento. Se aplica al cotizar trabajos recurrentes.",
     "multipliersTitle": "Multiplicadores de precio para visitas recurrentes",
