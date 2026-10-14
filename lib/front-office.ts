@@ -31,6 +31,10 @@ export type FrontOfficePlan = {
   name: string;
   price: number;
   blurb: string;
+  /** AI-answered call minutes included per month. */
+  minutesIncluded: number;
+  /** Overage per AI-answered minute, in cents, after included minutes. */
+  overagePerMinuteCents: number;
   /** Bullets shown in the plan card / comparison table. */
   features: string[];
 };
@@ -41,7 +45,10 @@ export const FRONT_OFFICE_PLANS: Record<FrontOfficePlanId, FrontOfficePlan> = {
     name: "Essential",
     price: 299,
     blurb: "Every call, text and form answered — day or night.",
+    minutesIncluded: 250,
+    overagePerMinuteCents: 30,
     features: [
+      "250 AI-answered call minutes included every month",
       "Every call answered live by an AI assistant, day or night",
       "Texts, web forms and emails answered within minutes",
       "Quotes sent from your price list and followed up by text and email until the customer books or says no",
@@ -54,7 +61,10 @@ export const FRONT_OFFICE_PLANS: Record<FrontOfficePlanId, FrontOfficePlan> = {
     name: "Complete",
     price: 599,
     blurb: "Everything in Essential, plus invoicing and collections.",
+    minutesIncluded: 600,
+    overagePerMinuteCents: 30,
     features: [
+      "600 AI-answered call minutes included every month",
       "Everything in Front Desk",
       "Invoices sent after each visit; cards charged automatically; payment reminders by text and email until paid",
       "Reschedules, cancellations and review requests handled",
@@ -67,7 +77,7 @@ export const FRONT_OFFICE_PLAN_IDS: FrontOfficePlanId[] = [
   "full_office",
 ];
 
-/** Shared closing line for the offer: no per-call charges, free migration,
- *  nobody to hire. */
+/** Shared closing line for the offer: minutes spelled out, no per-call
+ *  surprises, free migration, nobody to hire. */
 export const FRONT_OFFICE_NO_HIRE_LINE =
-  "No per-call charges. We move your customers and schedule into our booking system for free. There is nobody to hire, train or manage.";
+  "No per-call surprises: 250 AI-answered minutes a month on Essential, 600 on Complete — extra minutes at 30¢ each, metered live in your dashboard. We move your customers and schedule into our booking system for free. There is nobody to hire, train or manage.";

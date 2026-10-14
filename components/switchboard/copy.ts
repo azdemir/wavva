@@ -15,6 +15,18 @@ export const VERTICALS = [
 
 export const FAQS: { q: string; a: string }[] = [
   {
+    q: "How many call minutes are included?",
+    a: "Essential includes 250 AI-answered minutes a month, Complete includes 600. Minutes reset monthly, and anything beyond is 30¢ a minute — tracked live in your dashboard.",
+  },
+  {
+    q: "What counts as a minute?",
+    a: "Only the time the AI is on the line with a caller. Texts, emails and web-form replies are always unlimited and never touch your minutes.",
+  },
+  {
+    q: "What happens if I go over my minutes?",
+    a: "Calls keep being answered — nothing ever goes to voicemail because of billing. Overage is 30¢ a minute, we warn you at 80%, and you can move up a plan any time.",
+  },
+  {
     q: "Will my callers know it's an AI?",
     a: "Yes — every caller is told they're speaking with your business's AI assistant. We never claim it's human.",
   },

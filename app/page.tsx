@@ -3,6 +3,7 @@ import { PillNav } from "@/components/switchboard/pill-nav";
 import { Hero } from "@/components/switchboard/hero";
 import { Marquee } from "@/components/switchboard/marquee";
 import { HowItWorks } from "@/components/switchboard/how-it-works";
+import { CallDemo } from "@/components/switchboard/call-demo";
 import { Benefits } from "@/components/switchboard/benefits";
 import { Pricing } from "@/components/switchboard/pricing";
 import { Faq } from "@/components/switchboard/faq";
@@ -29,6 +30,7 @@ export default function HomePage() {
         <Hero />
         <Marquee />
         <HowItWorks />
+        <CallDemo />
         <Benefits />
         <Pricing />
         <Faq limit={6} />

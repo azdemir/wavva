@@ -64,7 +64,7 @@ export function Pricing() {
           <Reveal><Eyebrow>Pricing</Eyebrow></Reveal>
           <Reveal delay={1}>
             <h2 className="font-sb text-4xl font-extrabold tracking-tight text-sb-ink sm:text-5xl">
-              One flat fee. <Grad>That&rsquo;s the invoice.</Grad>
+              Flat monthly price. <Grad>Minutes on the table.</Grad>
             </h2>
           </Reveal>
           <Reveal delay={2}>
@@ -113,6 +113,13 @@ export function Pricing() {
                   <small className={`text-[15px] font-semibold ${c.hot ? "text-[#d9d2fd]" : "text-sb-ink2"}`}>/mo</small>
                 </div>
                 <p className={`font-sb text-sm ${c.hot ? "text-[#e6e1ff]" : "text-sb-ink2"}`}>{c.plan.blurb}</p>
+                <p
+                  className={`mt-3 inline-flex w-fit items-center gap-2 rounded-full px-4 py-2 font-sb text-[13px] font-extrabold ${
+                    c.hot ? "bg-white/15 text-white" : "bg-sb-violet-soft text-sb-violet-dark"
+                  }`}
+                >
+                  ☎&nbsp;{c.plan.minutesIncluded} AI-answered minutes / month included
+                </p>
                 <ul className="my-6 flex-1 space-y-0">
                   {c.plan.features.map((f) => (
                     <li
@@ -155,6 +162,14 @@ export function Pricing() {
             </div>
           </Reveal>
         </div>
+
+        <Reveal className="mx-auto mt-10 max-w-3xl text-center">
+          <p className="font-sb text-sm leading-relaxed text-sb-ink2">
+            Minutes reset monthly. Only time the AI spends on the line with a caller counts — texts and
+            emails are always unlimited. Extra minutes are ${(FRONT_OFFICE_PLANS.front_desk.overagePerMinuteCents / 100).toFixed(2)} each,
+            metered live in your dashboard, and we warn you at 80%. No contracts, no setup fees, no per-call surprises.
+          </p>
+        </Reveal>
       </div>
     </section>
   );

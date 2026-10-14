@@ -66,6 +66,10 @@ export default async function FrontOfficePage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Button href="/dashboard/front-office/ai-answering" variant="outline" size="sm">
+            <PhoneIcon className="h-4 w-4" />
+            AI answering
+          </Button>
           <Button href="/dashboard/front-office/setup" variant="outline" size="sm">
             <PhoneIcon className="h-4 w-4" />
             {settings ? "Edit setup" : "Finish setup"}
