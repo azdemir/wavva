@@ -13,7 +13,7 @@ import { FRONT_OFFICE, FRONT_OFFICE_PLANS } from "@/lib/front-office";
 export const metadata: Metadata = {
   title: "The service — your AI front office, done for you",
   description:
-    "Switchboard's done-for-you service: an AI assistant answers every call, text and email in your company's name, books appointments, follows up quotes, and collects invoices. From $299/mo, month to month.",
+    "Wavva's done-for-you service: an AI assistant answers every call, text and email in your company's name, books appointments, follows up quotes, and collects invoices. From $299/mo, month to month.",
   alternates: { canonical: "/front-office" },
 };
 

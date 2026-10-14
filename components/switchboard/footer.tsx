@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SwitchboardLogo } from "./logo";
+import { WavvaLogo } from "./logo";
 
 const COLS: { title: string; links: { label: string; href: string }[] }[] = [
   {
@@ -44,7 +44,7 @@ export function Footer() {
       <div className="relative mx-auto max-w-[1200px] px-7">
         <div className="mb-12 grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
-            <SwitchboardLogo light />
+            <WavvaLogo light />
             <p className="mt-4 max-w-xs font-sb text-sm leading-relaxed">
               The AI front office for every business. Every call answered. Every business.
             </p>
@@ -67,7 +67,7 @@ export function Footer() {
           ))}
         </div>
         <div className="relative flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-6 font-sb text-[13px]">
-          <span>© 2026 Switchboard</span>
+          <span>© 2026 Wavva</span>
           <span>Every call answered. Every business.</span>
         </div>
       </div>

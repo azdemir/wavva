@@ -112,7 +112,7 @@ export function CallDemoPlayer() {
               ))}
               {step === 0 && !playing && (
                 <p className="pt-24 text-center font-sb text-sm text-sb-ink2">
-                  Press play to hear how Switchboard answers.
+                  Press play to hear how Wavva answers.
                 </p>
               )}
               <div ref={bottomRef} />

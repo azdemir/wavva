@@ -10,7 +10,7 @@ export function AuthSetupNotice() {
     >
       <p className="font-semibold">Sign-in isn&apos;t set up yet</p>
       <p className="mt-1">
-        This copy of Switchboard isn&apos;t connected to a database. Create a{" "}
+        This copy of Wavva isn&apos;t connected to a database. Create a{" "}
         <code className="rounded bg-amber-100 px-1">.env.local</code> file next
         to <code className="rounded bg-amber-100 px-1">.env.example</code> and
         fill in <code className="rounded bg-amber-100 px-1">NEXT_PUBLIC_SUPABASE_URL</code>,{" "}

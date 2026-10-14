@@ -12,7 +12,7 @@ import { isSupabaseConfigured } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Create account",
-  description: "Create your Switchboard account and set up your business.",
+  description: "Create your Wavva account and set up your business.",
   robots: { index: false, follow: false },
 };
 

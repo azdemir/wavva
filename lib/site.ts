@@ -3,11 +3,11 @@
  */
 
 export const site = {
-  name: "Switchboard",
+  name: "Wavva",
   tagline: "The AI front office for every business",
   description:
-    "Switchboard answers every call in your business's name, books appointments, follows up quotes, and collects invoices — one flat monthly fee.",
-  email: "hello@switchboard.example",
+    "Wavva answers every call in your business's name, books appointments, follows up quotes, and collects invoices — one flat monthly fee.",
+  email: "hello@wavva.example",
   cities: [
     "Albany",
     "Saratoga Springs",

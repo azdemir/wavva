@@ -3,28 +3,25 @@ type LogoMarkProps = {
 };
 
 /**
- * Switchboard brand mark — a switchboard plug sliding into its jack:
- * a ring (the jack) with the plug body and twin prongs.
+ * Wavva brand mark — waveform bars tracing a W: voice, visualized.
  * Pure vector: crisp from 16px favicon to billboard.
  */
 export function LogoMark({ className = "h-8 w-8" }: LogoMarkProps) {
   return (
-    <svg viewBox="0 0 40 40" className={className} aria-hidden="true">
-      <circle
-        cx="19"
-        cy="20"
-        r="15"
-        fill="none"
-        stroke="#6d5cff"
-        strokeWidth="3.4"
-      />
-      <rect x="13.5" y="16.5" width="11" height="7" rx="3.5" fill="#6d5cff" />
-      <path
-        d="M24.5 18.2h7M24.5 21.8h7"
-        stroke="#6d5cff"
-        strokeWidth="3.4"
-        strokeLinecap="round"
-      />
+    <svg viewBox="0 0 137 96" className={className} aria-hidden="true">
+      <defs>
+        <linearGradient id="wavva-mark-g" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#8b7cff" />
+          <stop offset="1" stopColor="#5b3df0" />
+        </linearGradient>
+      </defs>
+      <rect x="6" y="14" width="11" height="68" rx="5.5" fill="url(#wavva-mark-g)" />
+      <rect x="25" y="25" width="11" height="46" rx="5.5" fill="url(#wavva-mark-g)" />
+      <rect x="44" y="33" width="11" height="30" rx="5.5" fill="url(#wavva-mark-g)" />
+      <rect x="63" y="21" width="11" height="54" rx="5.5" fill="url(#wavva-mark-g)" />
+      <rect x="82" y="33" width="11" height="30" rx="5.5" fill="url(#wavva-mark-g)" />
+      <rect x="101" y="25" width="11" height="46" rx="5.5" fill="url(#wavva-mark-g)" />
+      <rect x="120" y="14" width="11" height="68" rx="5.5" fill="url(#wavva-mark-g)" />
     </svg>
   );
 }
@@ -32,13 +29,13 @@ export function LogoMark({ className = "h-8 w-8" }: LogoMarkProps) {
 type LogoProps = {
   className?: string;
   markClassName?: string;
-  /** Override the wordmark. Defaults to Switchboard. */
+  /** Override the wordmark. Defaults to Wavva. */
   wordmark?: string;
 };
 
 /** Full lockup: mark + wordmark. */
 export function Logo({ className = "", markClassName = "h-8 w-8", wordmark }: LogoProps) {
-  const name = wordmark?.trim() || "Switchboard";
+  const name = wordmark?.trim() || "Wavva";
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
       <LogoMark className={markClassName} />

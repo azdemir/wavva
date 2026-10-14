@@ -12,13 +12,13 @@ import { Footer } from "@/components/switchboard/footer";
 export const metadata: Metadata = {
   title: "Every call answered. Every business.",
   description:
-    "Switchboard is the AI front office for every business: every call answered in your business's name, appointments booked, quotes followed up, invoices collected. Flat $299/mo. Free 7-day trial.",
+    "Wavva is the AI front office for every business: every call answered in your business's name, appointments booked, quotes followed up, invoices collected. Flat $299/mo. Free 7-day trial.",
   alternates: { canonical: "/" },
 };
 
 /**
- * Switchboard homepage — option-Q design.
- * Marketing surface is Switchboard's; the backend (auth, dashboard,
+ * Wavva homepage — option-Q design.
+ * Marketing surface is Wavva's; the backend (auth, dashboard,
  * APIs, data) is TidyPro's.
  */
 export default function HomePage() {

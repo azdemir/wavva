@@ -92,7 +92,7 @@ export default async function StudioPage() {
       <CrmSetupNotice />
       <Heading
         title="Studio overview"
-        description="The health of the Switchboard business itself — revenue, companies, and your sales pipeline."
+        description="The health of the Wavva business itself — revenue, companies, and your sales pipeline."
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
