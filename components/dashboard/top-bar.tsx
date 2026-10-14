@@ -80,13 +80,13 @@ export function DashboardUserBar({
   };
 
   const linkCls = (active: boolean) =>
-    `flex items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+    `flex items-center gap-2 whitespace-nowrap rounded-full px-3.5 py-2 font-sb text-sm font-semibold transition-all ${
       active
-        ? "bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300"
-        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+        ? "bg-sb-violet-soft text-sb-violet-dark dark:bg-sb-violet dark:text-white"
+        : "text-slate-600 hover:bg-sb-violet-soft/60 hover:text-sb-violet-dark dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
     }`;
 
-  const initials = user.companyName.trim().slice(0, 2).toUpperCase() || "TP";
+  const initials = user.companyName.trim().slice(0, 2).toUpperCase() || "SB";
 
   const renderItem = (item: UserBarNavItem) => {
     const content = (
@@ -158,7 +158,7 @@ export function DashboardUserBar({
             >
               <span
                 aria-hidden="true"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-600 text-sm font-bold text-white"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-sb-violet font-sb text-sm font-bold text-white"
               >
                 {initials}
               </span>

@@ -5,8 +5,10 @@ import { useId, useState } from "react";
 import { ChevronDownIcon } from "@/components/ui/icons";
 import { FEATURE_LINKS } from "./feature-links";
 
-const linkClass =
-  "block rounded-xl px-3.5 py-3 text-sm font-medium text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600";
+const itemBase =
+  "block rounded-xl px-3.5 text-sm font-medium text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600";
+const linkClass = `${itemBase} py-3`;
+const subLinkClass = `${itemBase} flex items-center gap-2.5 py-2`;
 
 const otherLinks = [
   { label: "Front Office", href: "/front-office" },
@@ -33,7 +35,7 @@ export function MobileNav({ children }: { children: React.ReactNode }) {
         aria-expanded={menuOpen}
         aria-label={menuOpen ? "Close menu" : "Open menu"}
         onClick={() => setMenuOpen((v) => !v)}
-        className="flex h-10 cursor-pointer list-none items-center gap-2 rounded-full border border-line-strong bg-surface px-4 text-sm font-semibold text-ink transition-colors hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+        className="flex h-10 cursor-pointer items-center gap-2 rounded-full border border-line-strong bg-surface px-4 text-sm font-semibold text-ink transition-colors hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
       >
         {menuOpen ? "Close" : "Menu"}
         <ChevronDownIcon
@@ -68,7 +70,7 @@ export function MobileNav({ children }: { children: React.ReactNode }) {
                     key={f.slug}
                     href={f.href}
                     onClick={() => setMenuOpen(false)}
-                    className={`${linkClass} flex items-center gap-2.5 !py-2`}
+                    className={subLinkClass}
                   >
                     <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-brand-50 text-brand-600 dark:bg-brand-950 dark:text-brand-400">
                       <f.icon className="h-4 w-4" />

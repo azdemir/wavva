@@ -36,13 +36,25 @@ export interface SmsProvider {
 /**
  * Opt-out keywords (case-insensitive, per CTIA guidance). Any inbound SMS
  * whose body starts with one of these is a STOP and must be honored
- * immediately — see compliance.handleStop().
+ * immediately — see compliance.handleInboundSms().
  */
 const STOP_KEYWORDS = ["stop", "stopall", "unsubscribe", "cancel", "end", "quit"];
 
 export function isStopMessage(body: string): boolean {
   const first = body.trim().toLowerCase().split(/\s+/)[0] ?? "";
   return STOP_KEYWORDS.includes(first);
+}
+
+/** "start" re-subscribes after a STOP — honored immediately like STOP. */
+export function isStartMessage(body: string): boolean {
+  const first = body.trim().toLowerCase().split(/\s+/)[0] ?? "";
+  return first === "start";
+}
+
+/** "help" requests the standard help reply (see compliance.HELP_MESSAGE). */
+export function isHelpMessage(body: string): boolean {
+  const first = body.trim().toLowerCase().split(/\s+/)[0] ?? "";
+  return first === "help";
 }
 
 /** Stub used until Twilio SMS is configured. */

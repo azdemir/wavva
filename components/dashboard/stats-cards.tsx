@@ -3,7 +3,6 @@ import { requireCompany } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { dayBoundsUtc } from "@/lib/dates";
 import { formatCents } from "@/lib/format";
-import { Card, CardContent } from "@/components/ui/card";
 import { CalendarIcon, QuoteIcon, UsersIcon, CardIcon } from "@/components/ui/icons";
 
 /**
@@ -33,10 +32,10 @@ export async function StatsCards() {
   )?.[0];
 
   const cards = [
-    { key: "jobsToday", label: t("stats.jobsToday"), value: String(stat?.jobs_today ?? 0), icon: CalendarIcon },
-    { key: "openQuotes", label: t("stats.openQuotes"), value: String(stat?.open_quotes ?? 0), icon: QuoteIcon },
-    { key: "outstanding", label: t("stats.outstanding"), value: formatCents(stat?.outstanding_cents ?? 0), icon: CardIcon },
-    { key: "customers", label: t("stats.customers"), value: String(stat?.customer_count ?? 0), icon: UsersIcon },
+    { key: "jobsToday", label: t("stats.jobsToday"), value: String(stat?.jobs_today ?? 0), icon: CalendarIcon, bg: "linear-gradient(160deg,#f1edff,#ffffff)" },
+    { key: "openQuotes", label: t("stats.openQuotes"), value: String(stat?.open_quotes ?? 0), icon: QuoteIcon, bg: "linear-gradient(160deg,#ffeef3,#ffffff)" },
+    { key: "outstanding", label: t("stats.outstanding"), value: formatCents(stat?.outstanding_cents ?? 0), icon: CardIcon, bg: "linear-gradient(160deg,#e7f8ec,#ffffff)" },
+    { key: "customers", label: t("stats.customers"), value: String(stat?.customer_count ?? 0), icon: UsersIcon, bg: "linear-gradient(160deg,#e9f2ff,#ffffff)" },
   ];
 
   return (
@@ -44,17 +43,17 @@ export async function StatsCards() {
       {cards.map((s) => {
         const Icon = s.icon;
         return (
-          <Card key={s.key}>
-            <CardContent className="flex items-center gap-4 pt-6">
-              <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400">
-                <Icon className="h-6 w-6" />
-              </span>
-              <div>
-                <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{s.value}</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">{s.label}</p>
-              </div>
-            </CardContent>
-          </Card>
+          <div
+            key={s.key}
+            className="rounded-[20px] border border-white p-5 shadow-sm transition-transform duration-300 hover:-translate-y-1 dark:border-slate-800 dark:bg-slate-900"
+            style={{ background: s.bg }}
+          >
+            <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-sb-violet-dark shadow-sm dark:bg-slate-800">
+              <Icon className="h-6 w-6" />
+            </span>
+            <p className="mt-3 font-sb text-[26px] font-extrabold tracking-tight text-slate-900 dark:text-slate-100">{s.value}</p>
+            <p className="font-sb text-[13px] font-medium text-slate-500 dark:text-slate-400">{s.label}</p>
+          </div>
         );
       })}
     </div>

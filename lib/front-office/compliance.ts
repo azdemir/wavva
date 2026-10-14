@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { isStopMessage } from "./providers/sms";
+import { isHelpMessage, isStartMessage, isStopMessage } from "./providers/sms";
 
 /**
  * Front Office compliance rules, enforced in code.
@@ -101,18 +101,83 @@ export async function revokeConsent(
 }
 
 /**
- * Inbound SMS triage: detect STOP keywords and revoke consent on the spot.
- * Returns true when the message was an opt-out (caller should not reply
- * with anything except the standard confirmation).
+ * Standard STOP confirmation, sent once immediately after an opt-out.
+ * CTIA requires this reply even though no further texts may follow — it
+ * must go out right away and must NOT be held for quiet hours.
+ */
+export function STOP_CONFIRMATION_MESSAGE(companyName: string): string {
+  return `You're unsubscribed from ${companyName} texts and won't receive more. Reply START to re-subscribe.`;
+}
+
+/** Confirmation for a START re-subscribe (consent re-stamped, opt-in flow). */
+export function START_CONFIRMATION_MESSAGE(companyName: string): string {
+  return `You're re-subscribed to ${companyName} texts. Reply STOP to unsubscribe.`;
+}
+
+/**
+ * Standard HELP reply, sent once in response to HELP.
+ * businessLine is the company's real line (front_office_settings.business_line).
+ */
+export function HELP_MESSAGE(companyName: string, businessLine?: string): string {
+  const callBit = businessLine
+    ? ` or call ${businessLine}`
+    : "";
+  return `${companyName}: text questions to this number${callBit}. Reply STOP to unsubscribe.`;
+}
+
+export type InboundSmsHandling =
+  | { handled: false; kind: null; reply: null }
+  | { handled: true; kind: "stop" | "start" | "help"; reply: string };
+
+export type InboundSmsCompany = {
+  /** companies.name — used in the reply copy. */
+  name: string;
+  /** front_office_settings.business_line — used in the HELP reply. */
+  businessLine?: string;
+};
+
+/**
+ * Inbound SMS triage: detect STOP / START / HELP and act on the spot.
+ *
+ * - STOP: revoke consent immediately, return the one standard confirmation
+ *   (caller must send it right away — NOT queued for quiet hours — and send
+ *   nothing else afterwards).
+ * - START: re-record consent (timestamp + source stamped) and confirm.
+ * - HELP: return the standard help reply; consent state is unchanged.
+ * - Anything else: unhandled — route to the assistant/escalation path.
+ *
+ * Returns the exact reply the caller must send; null when nothing is owed.
  */
 export async function handleInboundSms(
   supabase: SupabaseClient,
   customerId: string,
   body: string,
-): Promise<{ stopped: boolean }> {
-  if (!isStopMessage(body)) return { stopped: false };
-  await revokeConsent(supabase, customerId, "sms", "inbound_stop");
-  return { stopped: true };
+  company: InboundSmsCompany,
+): Promise<InboundSmsHandling> {
+  if (isStopMessage(body)) {
+    await revokeConsent(supabase, customerId, "sms", "inbound_stop");
+    return {
+      handled: true,
+      kind: "stop",
+      reply: STOP_CONFIRMATION_MESSAGE(company.name),
+    };
+  }
+  if (isStartMessage(body)) {
+    await recordConsent(supabase, customerId, "sms", "inbound_start");
+    return {
+      handled: true,
+      kind: "start",
+      reply: START_CONFIRMATION_MESSAGE(company.name),
+    };
+  }
+  if (isHelpMessage(body)) {
+    return {
+      handled: true,
+      kind: "help",
+      reply: HELP_MESSAGE(company.name, company.businessLine),
+    };
+  }
+  return { handled: false, kind: null, reply: null };
 }
 
 /** Hour (0–23) in a timezone, for quiet-hours math. */

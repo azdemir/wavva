@@ -1,14 +1,13 @@
 /**
  * Central site configuration and marketing copy.
- * "TidyPro" is a working title — rename here and it updates across the marketing site.
  */
 
 export const site = {
-  name: "TidyPro",
-  tagline: "Operations software for cleaning businesses",
+  name: "Switchboard",
+  tagline: "The AI front office for every business",
   description:
-    "TidyPro helps residential and commercial cleaning businesses manage quotes, scheduling, teams, invoices, and customers in one simple place.",
-  email: "hello@tidypro.example",
+    "Switchboard answers every call in your business's name, books appointments, follows up quotes, and collects invoices — one flat monthly fee.",
+  email: "hello@switchboard.example",
   cities: [
     "Albany",
     "Saratoga Springs",
