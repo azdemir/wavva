@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { updateTag } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/server";
 import {
   isVoiceConfigured,
@@ -66,6 +67,9 @@ export async function POST(request: Request) {
     direction: "in",
     body: summary,
   });
+
+  // Refresh the dashboard's cached AI-answering view (minutes, recent calls).
+  updateTag(`ai-answering:${call.company_id}`);
 
   return NextResponse.json({ ok: true });
 }

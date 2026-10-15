@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { getAiAnsweringView } from "@/lib/actions/ai-answering";
+import { getAiAnsweringView } from "@/lib/data/ai-answering-view";
 import { AiAnsweringForm } from "@/components/dashboard/front-office/ai-answering-form";
 
 export const metadata: Metadata = {
