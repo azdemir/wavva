@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import type { CSSProperties } from "react";
 import { requireCompany } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { dayBoundsUtc } from "@/lib/dates";
@@ -32,10 +33,10 @@ export async function StatsCards() {
   )?.[0];
 
   const cards = [
-    { key: "jobsToday", label: t("stats.jobsToday"), value: String(stat?.jobs_today ?? 0), icon: CalendarIcon, bg: "linear-gradient(160deg,#f1edff,#ffffff)" },
-    { key: "openQuotes", label: t("stats.openQuotes"), value: String(stat?.open_quotes ?? 0), icon: QuoteIcon, bg: "linear-gradient(160deg,#ffeef3,#ffffff)" },
-    { key: "outstanding", label: t("stats.outstanding"), value: formatCents(stat?.outstanding_cents ?? 0), icon: CardIcon, bg: "linear-gradient(160deg,#e7f8ec,#ffffff)" },
-    { key: "customers", label: t("stats.customers"), value: String(stat?.customer_count ?? 0), icon: UsersIcon, bg: "linear-gradient(160deg,#e9f2ff,#ffffff)" },
+    { key: "jobsToday", label: t("stats.jobsToday"), value: String(stat?.jobs_today ?? 0), icon: CalendarIcon, bg: "linear-gradient(160deg,#f1edff,#ffffff)", darkBg: "linear-gradient(160deg,#232046,#0f172a)" },
+    { key: "openQuotes", label: t("stats.openQuotes"), value: String(stat?.open_quotes ?? 0), icon: QuoteIcon, bg: "linear-gradient(160deg,#ffeef3,#ffffff)", darkBg: "linear-gradient(160deg,#2e1c2b,#0f172a)" },
+    { key: "outstanding", label: t("stats.outstanding"), value: formatCents(stat?.outstanding_cents ?? 0), icon: CardIcon, bg: "linear-gradient(160deg,#e7f8ec,#ffffff)", darkBg: "linear-gradient(160deg,#16281d,#0f172a)" },
+    { key: "customers", label: t("stats.customers"), value: String(stat?.customer_count ?? 0), icon: UsersIcon, bg: "linear-gradient(160deg,#e9f2ff,#ffffff)", darkBg: "linear-gradient(160deg,#17273a,#0f172a)" },
   ];
 
   return (
@@ -45,8 +46,8 @@ export async function StatsCards() {
         return (
           <div
             key={s.key}
-            className="rounded-[20px] border border-white p-5 shadow-sm transition-transform duration-300 hover:-translate-y-1 dark:border-slate-800 dark:bg-slate-900"
-            style={{ background: s.bg }}
+            className="rounded-[20px] border border-white/60 bg-[var(--card-bg)] p-5 shadow-sm transition-transform duration-300 hover:-translate-y-1 dark:border-slate-800 dark:bg-[var(--card-bg-dark)]"
+            style={{ "--card-bg": s.bg, "--card-bg-dark": s.darkBg } as CSSProperties}
           >
             <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-sb-violet-dark shadow-sm dark:bg-slate-800">
               <Icon className="h-6 w-6" />
