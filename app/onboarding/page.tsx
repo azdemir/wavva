@@ -11,8 +11,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Logo } from "@/components/ui/logo";
 import { OnboardingProgress } from "@/components/onboarding/progress";
 import { CompanyStep } from "@/components/onboarding/company-step";
-import { ServicesStep } from "@/components/onboarding/services-step";
-import { AreasStep } from "@/components/onboarding/areas-step";
 import { TeamStep } from "@/components/onboarding/team-step";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -36,7 +34,7 @@ export default async function OnboardingPage({
   const stepMeta = t.raw("steps") as { title: string; description: string }[];
 
   const rawStep = parseInt((await searchParams).step ?? "1", 10);
-  const step = Number.isFinite(rawStep) ? Math.min(Math.max(rawStep, 1), 4) : 1;
+  const step = Number.isFinite(rawStep) ? Math.min(Math.max(rawStep, 1), 2) : 1;
 
   // Can't skip ahead before the company exists.
   if (!active && step > 1) redirect("/onboarding?step=1");
@@ -63,9 +61,7 @@ export default async function OnboardingPage({
             </CardHeader>
             <CardContent>
               {step === 1 && <CompanyStep company={active?.company ?? null} logoPreviewUrl={logoPreviewUrl} />}
-              {step === 2 && <ServicesStep />}
-              {step === 3 && <AreasStep />}
-              {step === 4 && <TeamStep baseUrl={baseUrl} />}
+              {step === 2 && <TeamStep baseUrl={baseUrl} />}
             </CardContent>
           </Card>
         </div>

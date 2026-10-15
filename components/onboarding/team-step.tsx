@@ -11,11 +11,11 @@ import {
   type CreatedInvite,
 } from "@/lib/actions/onboarding";
 
-type Row = { email: string; role: "owner" | "manager" | "cleaner" };
+type Row = { email: string; role: "owner" | "manager" };
 
 export function TeamStep({ baseUrl }: { baseUrl: string }) {
   const t = useTranslations("onboarding");
-  const [rows, setRows] = useState<Row[]>([{ email: "", role: "cleaner" }]);
+  const [rows, setRows] = useState<Row[]>([{ email: "", role: "manager" }]);
   const [invites, setInvites] = useState<CreatedInvite[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -38,7 +38,7 @@ export function TeamStep({ baseUrl }: { baseUrl: string }) {
       setError(result.error);
     } else {
       setInvites(result.invites ?? []);
-      setRows([{ email: "", role: "cleaner" }]);
+      setRows([{ email: "", role: "manager" }]);
     }
   }
 
@@ -98,7 +98,6 @@ export function TeamStep({ baseUrl }: { baseUrl: string }) {
               onChange={(e) => set(i, { role: e.target.value as Row["role"] })}
               className="mt-1.5 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
             >
-              <option value="cleaner">{t("team.roles.cleaner")}</option>
               <option value="manager">{t("team.roles.manager")}</option>
               <option value="owner">{t("team.roles.owner")}</option>
             </select>
@@ -118,7 +117,7 @@ export function TeamStep({ baseUrl }: { baseUrl: string }) {
         <Button
           type="button"
           variant="outline"
-          onClick={() => setRows((rs) => [...rs, { email: "", role: "cleaner" }])}
+          onClick={() => setRows((rs) => [...rs, { email: "", role: "manager" }])}
         >
           {t("team.addInvite")}
         </Button>

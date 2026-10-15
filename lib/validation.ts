@@ -13,6 +13,7 @@ export const uuid = z.string().uuid();
 export const companySchema = z.object({
   name: z.string().min(2, "Company name is required").max(120),
   phone: phone,
+  owner_phone: phone,
   email: email.optional().or(z.literal("")),
   website: z.string().max(255).optional().or(z.literal("")),
   timezone: z.string().min(1),

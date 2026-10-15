@@ -3,10 +3,19 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import { Field } from "@/components/ui/input";
+import { Field, SelectField } from "@/components/ui/input";
 import { LogoField } from "@/components/company/logo-field";
 import { saveCompanyProfile } from "@/lib/actions/onboarding";
 import type { Company } from "@/lib/auth";
+
+const TIMEZONES = [
+  "America/New_York",
+  "America/Chicago",
+  "America/Denver",
+  "America/Los_Angeles",
+  "America/Anchorage",
+  "Pacific/Honolulu",
+];
 
 export function CompanyStep({
   company,
@@ -53,6 +62,18 @@ export function CompanyStep({
           defaultValue={company?.phone ?? ""}
         />
         <Field
+          id="ob-owner-phone"
+          name="owner_phone"
+          label={t("company.ownerPhone")}
+          type="tel"
+          placeholder={t("company.ownerPhonePlaceholder")}
+          hint={t("company.ownerPhoneHint")}
+          defaultValue=""
+          required
+        />
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field
           id="ob-email"
           name="email"
           label={t("company.email")}
@@ -60,6 +81,18 @@ export function CompanyStep({
           placeholder={t("company.emailPlaceholder")}
           defaultValue={company?.email ?? ""}
         />
+        <SelectField
+          id="ob-timezone"
+          name="timezone"
+          label={t("company.timezone")}
+          defaultValue={company?.timezone ?? "America/New_York"}
+        >
+          {TIMEZONES.map((tz) => (
+            <option key={tz} value={tz}>
+              {tz.replace("_", " ")}
+            </option>
+          ))}
+        </SelectField>
       </div>
       <Field
         id="ob-website"

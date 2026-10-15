@@ -10,8 +10,6 @@ import { logAudit } from "@/lib/audit";
 import { uploadCompanyLogo, hasLogoFile, type LogoUploadError } from "@/lib/company-logo";
 import {
   companySchema,
-  serviceSchema,
-  serviceAreaSchema,
   inviteSchema,
 } from "@/lib/validation";
 
@@ -37,10 +35,9 @@ export async function saveCompanyProfile(
   const parsed = companySchema.safeParse({
     name: formData.get("name"),
     phone: formData.get("phone") || "",
+    owner_phone: formData.get("owner_phone") || "",
     email: formData.get("email") || "",
     website: formData.get("website") || "",
-    // Time zone is no longer asked during onboarding; default it here.
-    // Users can change it later in Settings.
     timezone: formData.get("timezone") || "America/New_York",
   });
   if (!parsed.success) return err(parsed.error.issues[0]?.message ?? t("errors.invalidInput"));
@@ -134,81 +131,30 @@ export async function saveCompanyProfile(
     if (logoErr) return err(logoErr.message);
   }
 
+  // Owner mobile: the AI texts this number when it needs a human.
+  // Stored on front_office_settings (upsert; the row may not exist yet).
+  if (parsed.data.owner_phone) {
+    const settingsDb = active ? supabase : db;
+    const { error: foErr } = await settingsDb
+      .from("front_office_settings")
+      .upsert(
+        {
+          company_id: companyId,
+          plan: "front_desk",
+          owner_phone: parsed.data.owner_phone,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "company_id" },
+      );
+    if (foErr) return err(foErr.message);
+  }
+
   redirect("/onboarding?step=2");
-}
-
-/** Step 2: replace the company's service catalog. */
-export async function saveServices(
-  items: unknown,
-): Promise<ActionResult> {
-  const ctx = await requireUser().then(async (user) => {
-    const active = await getActiveMembership();
-    if (!active) redirect("/onboarding");
-    return { user, ...active };
-  });
-
-  const t = await getTranslations("onboarding");
-  const parsed = serviceSchema.array().min(1, "Add at least one service").safeParse(items);
-  if (!parsed.success) return err(parsed.error.issues[0]?.message ?? t("errors.invalidServices"));
-
-  const supabase = await createClient();
-  const { error: delErr } = await supabase
-    .from("services")
-    .delete()
-    .eq("company_id", ctx.company.id);
-  if (delErr) return err(delErr.message);
-
-  const { error } = await supabase.from("services").insert(
-    parsed.data.map((s) => ({
-      company_id: ctx.company.id,
-      name: s.name,
-      category: s.category,
-      description: s.description || null,
-      base_price_cents: s.base_price_cents,
-      unit: s.unit,
-    })),
-  );
-  if (error) return err(error.message);
-
-  redirect("/onboarding?step=3");
-}
-
-/** Step 3: replace the company's service areas. */
-export async function saveServiceAreas(items: unknown): Promise<ActionResult> {
-  const user = await requireUser();
-  void user;
-  const active = await getActiveMembership();
-  if (!active) redirect("/onboarding");
-
-  const t = await getTranslations("onboarding");
-  const parsed = serviceAreaSchema
-    .array()
-    .min(1, "Add at least one service area")
-    .safeParse(items);
-  if (!parsed.success) return err(parsed.error.issues[0]?.message ?? t("errors.invalidAreas"));
-
-  const supabase = await createClient();
-  const { error: delErr } = await supabase
-    .from("service_areas")
-    .delete()
-    .eq("company_id", active.company.id);
-  if (delErr) return err(delErr.message);
-
-  const { error } = await supabase.from("service_areas").insert(
-    parsed.data.map((a) => ({
-      company_id: active.company.id,
-      area_type: a.area_type,
-      value: a.value,
-    })),
-  );
-  if (error) return err(error.message);
-
-  redirect("/onboarding?step=4");
 }
 
 export type CreatedInvite = { email: string; role: string; link: string };
 
-/** Step 4: create team invites. Returns shareable links (no email service yet). */
+/** Step 2: create team invites. Returns shareable links (no email service yet). */
 export async function createInvites(
   items: unknown,
   baseUrl: string,
