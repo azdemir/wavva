@@ -254,31 +254,29 @@ export function SampleCallBar() {
   const turn = step > 0 && !done ? SCRIPT[Math.min(step, SCRIPT.length - 1)] : null;
 
   return (
-    <Reveal className="relative z-[2] mb-12 w-full">
-      <div id="chatdemo" className="scroll-mt-28 border-y border-sb-ink/10">
+    <Reveal className="relative z-[2] mb-10 w-full">
+      <div id="chatdemo" className="scroll-mt-28">
         {audioUrl && <audio ref={audioRef} src={audioUrl} preload="auto" className="hidden" />}
 
-        <div className="flex flex-col gap-6 py-8 md:flex-row md:items-center md:gap-10 md:py-10">
+        <div className="flex flex-col gap-5 py-7 md:flex-row md:items-center md:gap-8">
           {/* status block */}
-          <div className="flex shrink-0 items-center gap-4 md:w-64 md:flex-col md:items-start md:gap-3">
-            <div className="flex items-center gap-4">
-              <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-sb-violet/10">
-                {active && (
-                  <span className="absolute inset-0 rounded-full bg-sb-violet/25 motion-safe:animate-ping" aria-hidden="true" />
-                )}
-                <PhoneIcon className="relative h-5 w-5 text-sb-violet" />
-              </div>
-              <div>
-                <p className="flex items-center gap-1.5 font-sb text-[11px] font-extrabold uppercase tracking-[0.18em] text-sb-ink">
-                  <span className="h-1.5 w-1.5 rounded-full bg-red-500 motion-safe:animate-sb-pulse-dot" aria-hidden="true" />
-                  Sample call
-                </p>
-                <p className="mt-0.5 font-sb text-xs font-semibold text-sb-ink2">Real AI voice</p>
-              </div>
+          <div className="flex shrink-0 items-center gap-3.5">
+            <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-sb-violet/10">
+              {active && (
+                <span className="absolute inset-0 rounded-full bg-sb-violet/25 motion-safe:animate-ping" aria-hidden="true" />
+              )}
+              <PhoneIcon className="relative h-5 w-5 text-sb-violet" />
             </div>
-            <p className="ml-auto font-sb text-[26px] font-extrabold tabular-nums leading-none text-sb-ink md:ml-0">
-              {mm}:{ss} <span className="text-sm font-semibold text-sb-ink2/70">/ {tmm}:{tss}</span>
-            </p>
+            <div>
+              <p className="flex items-center gap-1.5 font-sb text-[11px] font-extrabold uppercase tracking-[0.18em] text-sb-ink">
+                <span className="h-1.5 w-1.5 rounded-full bg-red-500 motion-safe:animate-sb-pulse-dot" aria-hidden="true" />
+                Sample call
+              </p>
+              <p className="mt-1 font-sb text-xs font-semibold tabular-nums text-sb-ink2">
+                Real AI voice · <span className="text-sb-ink">{mm}:{ss}</span>
+                <span className="text-sb-ink2/70"> / {tmm}:{tss}</span>
+              </p>
+            </div>
           </div>
 
           {/* waveform + transcript ticker */}
@@ -289,12 +287,12 @@ export function SampleCallBar() {
                   key={i}
                   style={{ height: `${h}px`, animationDelay: `${-(i * 0.045)}s` }}
                   className={`w-[3px] origin-center rounded-full transition-colors duration-300 ${
-                    active ? "bg-sb-violet/70 motion-safe:animate-sb-wave" : "bg-sb-ink/15"
+                    active ? "bg-sb-violet/80 motion-safe:animate-sb-wave" : "bg-sb-violet/35"
                   }`}
                 />
               ))}
             </div>
-            <div className="mt-3 min-w-0 overflow-hidden">
+            <div className="mt-2.5 min-w-0 overflow-hidden">
               {done ? (
                 <p
                   key="done"
@@ -337,7 +335,7 @@ export function SampleCallBar() {
                 type="button"
                 onClick={play}
                 aria-label="Play sample call"
-                className="flex h-16 w-16 items-center justify-center rounded-full bg-sb-violet text-white shadow-[0_14px_34px_rgba(109,92,255,0.45)] transition-transform duration-200 hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sb-violet active:scale-95"
+                className="flex h-14 w-14 items-center justify-center rounded-full bg-sb-violet text-white shadow-[0_14px_34px_rgba(109,92,255,0.45)] transition-transform duration-200 hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sb-violet active:scale-95"
               >
                 <PlayIcon className="ml-1 h-6 w-6" />
               </button>
@@ -347,7 +345,7 @@ export function SampleCallBar() {
                 type="button"
                 onClick={pause}
                 aria-label="Pause"
-                className="flex h-16 w-16 items-center justify-center rounded-full bg-sb-ink text-white shadow-[0_14px_34px_rgba(20,20,43,0.35)] transition-transform duration-200 hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sb-ink active:scale-95"
+                className="flex h-14 w-14 items-center justify-center rounded-full bg-sb-ink text-white shadow-[0_14px_34px_rgba(20,20,43,0.35)] transition-transform duration-200 hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sb-ink active:scale-95"
               >
                 <PauseIcon className="h-6 w-6" />
               </button>
@@ -357,7 +355,7 @@ export function SampleCallBar() {
                 type="button"
                 onClick={restart}
                 aria-label="Replay sample call"
-                className="flex h-16 w-16 items-center justify-center rounded-full border-[1.5px] border-sb-ink/15 text-sb-ink transition-all duration-200 hover:scale-105 hover:border-sb-violet hover:text-sb-violet-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sb-violet active:scale-95"
+                className="flex h-14 w-14 items-center justify-center rounded-full border-[1.5px] border-sb-ink/15 text-sb-ink transition-all duration-200 hover:scale-105 hover:border-sb-violet hover:text-sb-violet-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sb-violet active:scale-95"
               >
                 <ReplayIcon className="h-6 w-6" />
               </button>
