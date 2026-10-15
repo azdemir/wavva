@@ -6,6 +6,11 @@ import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ServiceManager, AddonManager } from "@/components/services/catalog";
 
+// @next-codemod-ignore Cache Components adoption: this segment temporarily allows blocking.
+// Remove this opt-out after verifying the segment passes validation without it.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false
+
 export default async function ServicesPage() {
   const { company } = await requirePermission("services.manage");
   const t = await getTranslations("services");

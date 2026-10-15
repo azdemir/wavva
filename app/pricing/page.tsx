@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { PillNav } from "@/components/switchboard/pill-nav";
-import { getSessionUser } from "@/lib/auth";
+import { SessionNav } from "@/components/switchboard/session-nav";
 import { Footer } from "@/components/switchboard/footer";
 import { Pricing } from "@/components/switchboard/pricing";
 import { Faq } from "@/components/switchboard/faq";
@@ -13,10 +12,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "/pricing" },
 };
 
-export default async function PricingPage() {
+export default function PricingPage() {
   return (
     <div className="bg-white font-sb text-sb-ink antialiased">
-      <PillNav signedIn={!!(await getSessionUser())} />
+      <SessionNav />
       <main className="pt-24">
         <Pricing />
         <Faq limit={4} />

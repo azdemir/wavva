@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { PillNav } from "@/components/switchboard/pill-nav";
-import { getSessionUser } from "@/lib/auth";
+import { SessionNav } from "@/components/switchboard/session-nav";
 import { Footer } from "@/components/switchboard/footer";
 import { Reveal } from "@/components/switchboard/reveal";
 import { Eyebrow, Grad } from "@/components/switchboard/section-head";
@@ -14,10 +13,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "/about" },
 };
 
-export default async function AboutPage() {
+export default function AboutPage() {
   return (
     <div className="bg-white font-sb text-sb-ink antialiased">
-      <PillNav signedIn={!!(await getSessionUser())} />
+      <SessionNav />
       <main>
         <section className="relative overflow-hidden pt-40 pb-20 text-center">
           <div aria-hidden className="animate-sb-drift pointer-events-none absolute -left-32 -top-24 h-[420px] w-[420px] rounded-full bg-[#d9cfff] opacity-60 blur-[70px]" />

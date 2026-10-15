@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { PillNav } from "@/components/switchboard/pill-nav";
-import { getSessionUser } from "@/lib/auth";
+import { SessionNav } from "@/components/switchboard/session-nav";
 import { Footer } from "@/components/switchboard/footer";
 import { Reveal } from "@/components/switchboard/reveal";
 import { Eyebrow } from "@/components/switchboard/section-head";
@@ -34,10 +33,10 @@ const SECTIONS = [
   },
 ];
 
-export default async function TermsPage() {
+export default function TermsPage() {
   return (
     <div className="bg-white font-sb text-sb-ink antialiased">
-      <PillNav signedIn={!!(await getSessionUser())} />
+      <SessionNav />
       <main className="pt-40 pb-24">
         <div className="mx-auto max-w-3xl px-7">
           <Reveal><Eyebrow>Legal</Eyebrow></Reveal>

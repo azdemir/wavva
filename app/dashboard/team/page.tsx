@@ -13,6 +13,11 @@ import { FilterPills } from "@/components/ui/filters";
 const roleTones = { owner: "brand", manager: "accent", cleaner: "slate" } as const;
 const roles = ["all", "owner", "manager", "cleaner"] as const;
 
+// @next-codemod-ignore Cache Components adoption: this segment temporarily allows blocking.
+// Remove this opt-out after verifying the segment passes validation without it.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false
+
 export default async function TeamPage({
   searchParams,
 }: {
