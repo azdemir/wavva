@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { PillNav } from "@/components/switchboard/pill-nav";
-import { getSessionUser } from "@/lib/auth";
+import { SessionNav } from "@/components/switchboard/session-nav";
 import { Hero } from "@/components/switchboard/hero";
 import { Marquee } from "@/components/switchboard/marquee";
 import { HowItWorks } from "@/components/switchboard/how-it-works";
@@ -9,8 +8,6 @@ import { Pricing } from "@/components/switchboard/pricing";
 import { Faq } from "@/components/switchboard/faq";
 import { Contact, TrialBand } from "@/components/switchboard/contact";
 import { Footer } from "@/components/switchboard/footer";
-
-export const instant = false;
 
 export const metadata: Metadata = {
   title: "Every call answered. Every business.",
@@ -24,10 +21,10 @@ export const metadata: Metadata = {
  * Marketing surface is Wavva's; the backend (auth, dashboard,
  * APIs, data) is TidyPro's.
  */
-export default async function HomePage() {
+export default function HomePage() {
   return (
     <div className="bg-white font-sb text-sb-ink antialiased">
-      <PillNav signedIn={!!(await getSessionUser())} />
+      <SessionNav />
       <main>
         <Hero />
         <Marquee />
