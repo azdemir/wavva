@@ -123,6 +123,12 @@ export function PillNav() {
               </div>
             </div>
           </div>
+          <Link
+            href="/signin"
+            className="font-sb text-sm font-semibold text-sb-ink2 transition-colors hover:text-sb-violet-dark"
+          >
+            Sign in
+          </Link>
         </nav>
         <SbButton href="/#trial" size="sm" magnetic={false}>
           Start free trial
