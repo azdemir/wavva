@@ -38,6 +38,12 @@ const SCRIPT: Turn[] = [
   { who: "ai", text: "You're welcome. Thanks for calling Brightline!", short: "You're welcome — thanks for calling Brightline!" },
 ];
 
+const OUTCOMES = [
+  "Quoted $89 — straight from the price list",
+  "Booking request sent to the owner",
+  "Owner notified by text",
+];
+
 /** Measured start time (seconds) of each turn in the audio file. */
 const TURN_STARTS = [0.0, 7.55, 13.01, 18.16, 20.84, 24.48, 30.95, 37.13, 39.16];
 /** Fallback pacing when the audio file isn't available. */
@@ -63,10 +69,10 @@ async function fetchChunks(base: (i: number) => string): Promise<string[]> {
 }
 
 /**
- * Sample-call player card — the "console" that owns the zone between the nav
- * and the hero headline: dark live header, big waveform, scrolling transcript
- * ticker, transport controls. Same audio engine (base64-chunk MP3,
- * audio-driven turns, timer fallback).
+ * Sample-call player — a full console that sits in its own section just
+ * before "How it works": dark live header, transcript that builds turn by
+ * turn, outcome chips, and a control bar with waveform + transport. Same
+ * audio engine (base64-chunk MP3, audio-driven turns, timer fallback).
  */
 export function SampleCallBar() {
   const [step, setStep] = useState(0);
@@ -79,6 +85,7 @@ export function SampleCallBar() {
   const [useAudio, setUseAudio] = useState(true);
   const audioRef = useRef<HTMLAudioElement>(null);
   const pendingPlay = useRef(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
   const done = step >= SCRIPT.length;
   /** Derived: actually advancing. No effect-syncing of setState needed. */
   const active = playing && !done;
@@ -86,9 +93,9 @@ export function SampleCallBar() {
   // Deterministic pseudo-random waveform heights — stable across renders.
   const bars = useMemo(
     () =>
-      Array.from({ length: 56 }, (_, i) => {
+      Array.from({ length: 48 }, (_, i) => {
         const x = Math.sin(i * 12.9898) * 43758.5453;
-        return Math.round(14 + (x - Math.floor(x)) * 50);
+        return Math.round(6 + (x - Math.floor(x)) * 24);
       }),
     []
   );
@@ -178,6 +185,12 @@ export function SampleCallBar() {
     return () => clearInterval(t);
   }, [useAudio, active]);
 
+  // Keep the latest turn in view (inner transcript only — never yanks the page).
+  useEffect(() => {
+    if (step === 0) return;
+    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [step]);
+
   const play = () => {
     setPlaying(true);
     if (!useAudio) return; // timer fallback drives itself
@@ -217,10 +230,8 @@ export function SampleCallBar() {
   const tss = String(totalSecs % 60).padStart(2, "0");
   const progress = useAudio && duration > 0 ? Math.min(seconds / duration, 1) : step / SCRIPT.length;
 
-  const turn = step > 0 && !done ? SCRIPT[Math.min(step, SCRIPT.length - 1)] : null;
-
   return (
-    <Reveal className="relative z-[2] mx-auto w-full max-w-[880px]">
+    <Reveal className="relative mx-auto w-full max-w-[920px] px-5 py-14 sm:px-7 md:py-20">
       <div
         id="chatdemo"
         className="scroll-mt-28 overflow-hidden rounded-[24px] bg-white text-left shadow-[0_36px_90px_rgba(20,20,43,0.16)] ring-1 ring-sb-ink/10"
@@ -252,63 +263,56 @@ export function SampleCallBar() {
           />
         </div>
 
-        {/* waveform + transcript ticker */}
-        <div className="px-6 pb-2 pt-6 sm:px-8">
-          <div className="flex h-16 items-center gap-[3px]" aria-hidden="true">
-            {bars.map((h, i) => (
-              <span
-                key={i}
-                style={{ height: `${h}px`, animationDelay: `${-(i * 0.05)}s` }}
-                className={`w-[3px] origin-center rounded-full transition-colors duration-300 ${
-                  active ? "bg-sb-violet/80 motion-safe:animate-sb-wave" : "bg-sb-violet/35"
-                }`}
-              />
-            ))}
-          </div>
-          <div className="mt-4 min-w-0 overflow-hidden">
-            {done ? (
-              <p
-                key="done"
-                className="truncate font-sb text-[15px] font-bold leading-snug text-sb-ink motion-safe:animate-sb-fade-swap"
-              >
-                ✓ Quoted $89 <span className="font-semibold text-sb-ink2">·</span> ✓ Booking request sent{" "}
-                <span className="font-semibold text-sb-ink2">·</span> ✓ Owner notified by text
-              </p>
-            ) : turn ? (
-              <p
-                key={step}
-                aria-live="polite"
-                style={{ animationDuration: "14s" }}
-                className={`flex w-max items-center whitespace-nowrap font-sb text-[15px] leading-snug ${
-                  active ? "motion-safe:animate-sb-mq" : ""
+        {/* transcript */}
+        <div className="h-[340px] space-y-4 overflow-y-auto bg-sb-bg2 px-6 py-6" aria-live="polite">
+          {SCRIPT.slice(0, step).map((t, i) => (
+            <div key={i} className={`flex ${t.who === "caller" ? "justify-end" : "justify-start"}`}>
+              <div
+                className={`max-w-[85%] rounded-[20px] px-5 py-3.5 font-sb text-[15px] leading-relaxed motion-safe:animate-sb-fade-swap ${
+                  t.who === "caller"
+                    ? "rounded-br-md bg-sb-violet text-white"
+                    : "rounded-bl-md border border-sb-ink/10 bg-white text-sb-ink"
                 }`}
               >
-                {[0, 1].map((copy) => (
-                  <span key={copy} aria-hidden={copy === 1} className="flex items-center">
-                    <span className={`font-extrabold ${turn.who === "ai" ? "text-sb-violet-dark" : "text-sb-ink"}`}>
-                      {turn.who === "ai" ? "Wavva AI" : "Caller"}
-                    </span>
-                    <span className="text-sb-ink2"> — {turn.short}</span>
-                    <span aria-hidden="true" className="mx-8 inline-block h-1.5 w-1.5 rounded-full bg-sb-violet/50" />
-                  </span>
-                ))}
-              </p>
-            ) : (
-              <p className="truncate font-sb text-[15px] leading-snug text-sb-ink2">
-                Press play to hear how Wavva answers.
-              </p>
-            )}
-          </div>
+                {t.who === "ai" && (
+                  <p className="mb-1 text-[11px] font-extrabold uppercase tracking-[0.12em] text-sb-violet-dark">
+                    AI assistant
+                  </p>
+                )}
+                {t.text}
+              </div>
+            </div>
+          ))}
+          {step === 0 && !playing && (
+            <p className="pt-24 text-center font-sb text-sm text-sb-ink2">
+              Press play to hear how Wavva answers.
+            </p>
+          )}
+          <div ref={bottomRef} />
         </div>
 
-        {/* transport */}
-        <div className="flex items-center justify-center gap-3 px-6 py-5">
+        {/* outcomes */}
+        {done && (
+          <div className="flex flex-wrap gap-2 border-t border-sb-ink/10 bg-white px-6 py-4">
+            {OUTCOMES.map((o) => (
+              <span
+                key={o}
+                className="rounded-full bg-sb-violet-soft px-4 py-1.5 font-sb text-[13px] font-bold text-sb-violet-dark"
+              >
+                ✓ {o}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* control bar */}
+        <div className="flex items-center gap-4 border-t border-sb-ink/10 bg-white px-6 py-4">
           {!active && !done && (
             <button
               type="button"
               onClick={play}
               aria-label="Play sample call"
-              className="rounded-full bg-sb-violet px-8 py-3 font-sb text-[15px] font-extrabold text-white shadow-[0_12px_28px_rgba(109,92,255,0.45)] transition-transform duration-200 hover:scale-[1.04] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sb-violet active:scale-95"
+              className="shrink-0 rounded-full bg-sb-violet px-7 py-3 font-sb text-[15px] font-extrabold text-white shadow-[0_12px_28px_rgba(109,92,255,0.45)] transition-transform duration-200 hover:scale-[1.04] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sb-violet active:scale-95"
             >
               ▶&nbsp; Play sample call
             </button>
@@ -318,17 +322,28 @@ export function SampleCallBar() {
               type="button"
               onClick={pause}
               aria-label="Pause"
-              className="rounded-full bg-sb-ink px-8 py-3 font-sb text-[15px] font-extrabold text-white shadow-[0_12px_28px_rgba(20,20,43,0.35)] transition-transform duration-200 hover:scale-[1.04] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sb-ink active:scale-95"
+              className="shrink-0 rounded-full bg-sb-ink px-7 py-3 font-sb text-[15px] font-extrabold text-white shadow-[0_12px_28px_rgba(20,20,43,0.35)] transition-transform duration-200 hover:scale-[1.04] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sb-ink active:scale-95"
             >
               ❚❚&nbsp; Pause
             </button>
           )}
+          <div className="flex h-8 min-w-0 flex-1 items-center gap-[2px]" aria-hidden="true">
+            {bars.map((h, i) => (
+              <span
+                key={i}
+                style={{ height: `${h}px`, animationDelay: `${-(i * 0.06)}s` }}
+                className={`w-[2.5px] origin-center rounded-full transition-colors duration-300 ${
+                  active ? "bg-sb-violet/80 motion-safe:animate-sb-wave" : "bg-sb-violet/30"
+                }`}
+              />
+            ))}
+          </div>
           {(step > 0 || done) && (
             <button
               type="button"
               onClick={restart}
               aria-label="Replay sample call"
-              className="rounded-full border-[1.5px] border-sb-ink/15 px-8 py-3 font-sb text-[15px] font-extrabold text-sb-ink transition-all duration-200 hover:scale-[1.04] hover:border-sb-violet hover:text-sb-violet-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sb-violet active:scale-95"
+              className="shrink-0 rounded-full border-[1.5px] border-sb-ink/15 px-6 py-3 font-sb text-[15px] font-extrabold text-sb-ink transition-all duration-200 hover:scale-[1.04] hover:border-sb-violet hover:text-sb-violet-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sb-violet active:scale-95"
             >
               ↺&nbsp; Replay
             </button>

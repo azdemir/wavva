@@ -3,9 +3,8 @@
 import { useEffect } from "react";
 import { SbButton } from "./buttons";
 import { Grad } from "./section-head";
-import { SampleCallBar } from "./sample-call-bar";
 
-/** Option-Q hero: giant headline, then a split — copy block left, sample-call player right. */
+/** Option-Q hero: giant headline, dual CTA. The sample-call player lives in its own section below. */
 export function Hero() {
   useEffect(() => {
     const t = requestAnimationFrame(() =>
@@ -45,30 +44,30 @@ export function Hero() {
           <br />
           for every business.
         </h1>
-        <div className="mx-auto mt-12 grid max-w-[1080px] items-center gap-10 md:grid-cols-2 md:gap-12 md:text-left">
-          <div className="sb-reveal sb-hero-rise" style={{ transitionDelay: "0.2s" }}>
-            <p className="font-sb text-lg text-sb-ink2 md:text-xl">
-              Wavva answers every call <strong className="text-sb-ink">in your business&rsquo;s name</strong> — books
-              appointments, sends quotes, follows up until you&rsquo;re paid.{" "}
-              <strong className="text-sb-ink">You run the business.</strong>
-            </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-3.5 md:justify-start">
-              <SbButton href="#trial" size="lg">Start free 7-day trial</SbButton>
-              <SbButton href="#chatdemo" size="lg" variant="light">Hear a sample call</SbButton>
-            </div>
-            <div
-              className="mt-7 flex items-center justify-center gap-3 font-sb text-sm font-semibold text-sb-ink2 md:justify-start"
-            >
-              <span className="tracking-[2px] text-[#f5a623]">★★★★★</span>
-              <span>
-                <strong className="text-sb-ink">67%</strong> of prospects hire whoever responds first · No card
-                required
-              </span>
-            </div>
-          </div>
-          <div className="sb-reveal sb-hero-rise" style={{ transitionDelay: "0.3s" }}>
-            <SampleCallBar />
-          </div>
+        <p
+          className="sb-reveal sb-hero-rise mx-auto mt-6 max-w-2xl font-sb text-lg text-sb-ink2 md:text-xl"
+          style={{ transitionDelay: "0.2s" }}
+        >
+          Wavva answers every call <strong className="text-sb-ink">in your business&rsquo;s name</strong> — books
+          appointments, sends quotes, follows up until you&rsquo;re paid.{" "}
+          <strong className="text-sb-ink">You run the business.</strong>
+        </p>
+        <div
+          className="sb-reveal sb-hero-rise mt-9 flex flex-wrap justify-center gap-3.5"
+          style={{ transitionDelay: "0.3s" }}
+        >
+          <SbButton href="#trial" size="lg">Start free 7-day trial</SbButton>
+          <SbButton href="#chatdemo" size="lg" variant="light">Hear a sample call</SbButton>
+        </div>
+        <div
+          className="sb-reveal sb-hero-rise mt-7 flex items-center justify-center gap-3 font-sb text-sm font-semibold text-sb-ink2"
+          style={{ transitionDelay: "0.4s" }}
+        >
+          <span className="tracking-[2px] text-[#f5a623]">★★★★★</span>
+          <span>
+            <strong className="text-sb-ink">67%</strong> of prospects hire whoever responds first · No card
+            required
+          </span>
         </div>
       </div>
     </header>
