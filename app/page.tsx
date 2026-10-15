@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { SessionNav } from "@/components/switchboard/session-nav";
-import { SampleCallBar } from "@/components/switchboard/sample-call-bar";
 import { Hero } from "@/components/switchboard/hero";
 import { Marquee } from "@/components/switchboard/marquee";
 import { HowItWorks } from "@/components/switchboard/how-it-works";
@@ -27,7 +26,6 @@ export default function HomePage() {
     <div className="bg-white font-sb text-sb-ink antialiased">
       <SessionNav />
       <main>
-        <SampleCallBar />
         <Hero />
         <Marquee />
         <HowItWorks />

@@ -108,7 +108,7 @@ export function SampleCallBar() {
     () =>
       Array.from({ length: 44 }, (_, i) => {
         const x = Math.sin(i * 12.9898) * 43758.5453;
-        return Math.round(10 + (x - Math.floor(x)) * 30);
+        return Math.round(8 + (x - Math.floor(x)) * 16);
       }),
     []
   );
@@ -241,16 +241,13 @@ export function SampleCallBar() {
   const captionKey = done ? "done" : step;
 
   return (
-    <Reveal className="relative z-[3] mx-auto w-full max-w-[1120px] px-5 pt-24 sm:px-7">
-      <div
-        id="chatdemo"
-        className="scroll-mt-28 overflow-hidden rounded-[26px] border border-white/90 bg-white/85 shadow-[0_24px_60px_rgba(20,20,43,0.12)] backdrop-blur-xl"
-      >
+    <Reveal className="relative z-[2] mx-auto mb-10 w-full max-w-[980px]">
+      <div id="chatdemo" className="scroll-mt-28 overflow-hidden">
         {audioUrl && <audio ref={audioRef} src={audioUrl} preload="auto" className="hidden" />}
 
-        <div className="flex items-center gap-3 px-4 py-3.5 sm:gap-5 sm:px-6 sm:py-4">
+        <div className="flex items-center gap-3 py-2.5 sm:gap-4">
           {/* live handset */}
-          <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-sb-violet/10">
+          <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sb-violet/10">
             {active && (
               <span className="absolute inset-0 rounded-full bg-sb-violet/25 motion-safe:animate-ping" aria-hidden="true" />
             )}
@@ -268,7 +265,7 @@ export function SampleCallBar() {
 
           {/* waveform + live caption */}
           <div className="min-w-0 flex-1">
-            <div className="hidden h-10 items-center gap-[3px] min-[560px]:flex" aria-hidden="true">
+            <div className="hidden h-6 items-center gap-[3px] min-[560px]:flex" aria-hidden="true">
               {bars.map((h, i) => (
                 <span
                   key={i}
@@ -282,7 +279,7 @@ export function SampleCallBar() {
             <p
               key={captionKey}
               aria-live="polite"
-              className="truncate font-sb text-[13px] leading-snug text-sb-ink2 motion-safe:animate-sb-fade-swap min-[560px]:mt-1"
+              className="truncate font-sb text-[13px] leading-snug text-sb-ink2 motion-safe:animate-sb-fade-swap min-[560px]:mt-0.5"
             >
               {done ? (
                 <span className="font-bold text-sb-ink">
@@ -314,9 +311,9 @@ export function SampleCallBar() {
                 type="button"
                 onClick={play}
                 aria-label="Play sample call"
-                className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-sb-violet text-white shadow-[0_10px_26px_rgba(109,92,255,0.45)] transition-transform duration-200 hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sb-violet active:scale-95"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-sb-violet text-white shadow-[0_10px_26px_rgba(109,92,255,0.45)] transition-transform duration-200 hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sb-violet active:scale-95"
               >
-                <PlayIcon className="ml-0.5 h-5 w-5" />
+                <PlayIcon className="ml-0.5 h-4 w-4" />
               </button>
             )}
             {active && (
@@ -324,9 +321,9 @@ export function SampleCallBar() {
                 type="button"
                 onClick={pause}
                 aria-label="Pause"
-                className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-sb-ink text-white shadow-[0_10px_26px_rgba(20,20,43,0.35)] transition-transform duration-200 hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sb-ink active:scale-95"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-sb-ink text-white shadow-[0_10px_26px_rgba(20,20,43,0.35)] transition-transform duration-200 hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sb-ink active:scale-95"
               >
-                <PauseIcon className="h-5 w-5" />
+                <PauseIcon className="h-4 w-4" />
               </button>
             )}
             {(step > 0 || done) && (
@@ -334,9 +331,9 @@ export function SampleCallBar() {
                 type="button"
                 onClick={restart}
                 aria-label="Replay sample call"
-                className="flex h-[52px] w-[52px] items-center justify-center rounded-full border-[1.5px] border-sb-ink/15 text-sb-ink transition-all duration-200 hover:scale-105 hover:border-sb-violet hover:text-sb-violet-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sb-violet active:scale-95"
+                className="flex h-10 w-10 items-center justify-center rounded-full border-[1.5px] border-sb-ink/15 text-sb-ink transition-all duration-200 hover:scale-105 hover:border-sb-violet hover:text-sb-violet-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sb-violet active:scale-95"
               >
-                <ReplayIcon className="h-5 w-5" />
+                <ReplayIcon className="h-4 w-4" />
               </button>
             )}
           </div>
