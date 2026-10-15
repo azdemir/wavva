@@ -9,10 +9,8 @@ import { isPlanId, type PlanId } from "@/lib/plans";
 import { logAudit } from "@/lib/audit";
 
 const PRICE_ENV: Record<PlanId, string> = {
-  basic: "STRIPE_PRICE_BASIC",
-  starter: "STRIPE_PRICE_STARTER",
-  growth: "STRIPE_PRICE_GROWTH",
-  pro: "STRIPE_PRICE_PRO",
+  essential: "STRIPE_PRICE_ESSENTIAL",
+  complete: "STRIPE_PRICE_COMPLETE",
 };
 
 function siteUrl(): string {
@@ -139,7 +137,7 @@ export async function getBillingState() {
   return {
     // Effective plan (founder all-access grant / Studio tier override), so the
     // billing page agrees with the feature gates instead of the raw DB value.
-    plan: (isPlanId(ctx.company.plan) ? ctx.company.plan : "starter") as PlanId,
+    plan: (isPlanId(ctx.company.plan) ? ctx.company.plan : "essential") as PlanId,
     subscriptionStatus: (company?.subscription_status ?? "none") as string,
     hasSubscription: !!company?.stripe_subscription_id,
     memberCount: memberCount ?? 0,

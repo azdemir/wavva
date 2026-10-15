@@ -1,12 +1,14 @@
 /**
- * TidyPro platform plans — what the cleaning company itself pays us.
- * Separate from Stripe Connect, which the company uses to charge
+ * Wavva platform plans — what the business itself pays us.
+ * Separate from Stripe Connect, which the business uses to charge
  * ITS customers. Prices are informational; Stripe Price IDs live in
- * STRIPE_PRICE_BASIC / STRIPE_PRICE_STARTER / STRIPE_PRICE_GROWTH /
- * STRIPE_PRICE_PRO.
+ * STRIPE_PRICE_ESSENTIAL / STRIPE_PRICE_COMPLETE.
+ *
+ * Plans are minutes-based (AI-answered call minutes), not seat-based,
+ * so both tiers allow unlimited team seats.
  */
 
-export type PlanId = "basic" | "starter" | "growth" | "pro";
+export type PlanId = "essential" | "complete";
 
 export type Plan = {
   id: PlanId;
@@ -16,78 +18,63 @@ export type Plan = {
   seats: number | null;
   blurb: string;
   features: string[];
+  /** AI-answered call minutes included per month. */
+  minutesIncluded: number;
+  /** Overage per AI-answered minute, in cents, after included minutes. */
+  overagePerMinuteCents: number;
 };
 
 export const PLANS: Record<PlanId, Plan> = {
-  basic: {
-    id: "basic",
-    name: "Basic",
-    priceCents: 1000,
-    seats: 1,
-    blurb: "For solo operators getting started.",
-    features: [
-      "1 user",
-      "Up to 50 active customers",
-      "Scheduling",
-      "Quotes & bookings",
-      "Invoicing with online payments",
-      "Customer portal",
-      "Email support",
-    ],
-  },
-  starter: {
-    id: "starter",
-    name: "Starter",
-    priceCents: 1500,
-    seats: 3,
-    blurb: "Perfect for small teams getting organized.",
-    features: [
-      "3 users",
-      "Up to 100 active customers",
-      "Scheduling",
-      "Quotes & bookings",
-      "Invoicing with online payments",
-      "Customer portal",
-      "Email support",
-    ],
-  },
-  growth: {
-    id: "growth",
-    name: "Growth",
-    priceCents: 3500,
-    seats: 5,
-    blurb: "Ideal for established businesses ready to scale.",
-    features: [
-      "Up to 5 users",
-      "Unlimited customers",
-      "Everything in Starter",
-      "Automated quote follow-up",
-      "Recurring bookings",
-      "Crew scheduling & mobile checklists",
-      "Reusable checklist templates",
-      "Automated reminders",
-    ],
-  },
-  pro: {
-    id: "pro",
-    name: "Pro",
-    priceCents: 4500,
+  essential: {
+    id: "essential",
+    name: "Essential",
+    priceCents: 29900,
     seats: null,
-    blurb: "Our most comprehensive plan with full features and priority support.",
+    blurb: "Every call, text and form answered — day or night.",
     features: [
-      "Unlimited users",
-      "Everything in Starter & Growth",
-      "Business reports",
-      "Before/after photo uploads",
-      "Automated SMS & email templates",
-      "Mailchimp & Zapier integrations",
-      "QuickBooks accounting sync",
-      "Priority support",
+      "250 AI-answered call minutes included every month",
+      "Every call answered live by an AI assistant, day or night",
+      "Texts, web forms and emails answered within minutes",
+      "Quotes sent from your price list and followed up until the customer books or says no",
+      "New appointments booked into your schedule, with confirmations and day-before reminders",
+      "Monday report: enquiries, bookings, open quotes, money collected and overdue",
     ],
+    minutesIncluded: 250,
+    overagePerMinuteCents: 30,
+  },
+  complete: {
+    id: "complete",
+    name: "Complete",
+    priceCents: 59900,
+    seats: null,
+    blurb: "Everything in Essential, plus invoicing and collections.",
+    features: [
+      "600 AI-answered call minutes included every month",
+      "Everything in Essential",
+      "Invoices sent after each visit; cards charged automatically",
+      "Payment reminders by text and email until paid",
+      "Reschedules, cancellations and review requests handled",
+    ],
+    minutesIncluded: 600,
+    overagePerMinuteCents: 30,
   },
 };
 
 export const PLAN_IDS = Object.keys(PLANS) as PlanId[];
+
+/** Legacy TidyPro plan ids → Wavva plan ids (for the 0021 migration). */
+const LEGACY_PLAN_MAP: Record<string, PlanId> = {
+  basic: "essential",
+  starter: "essential",
+  growth: "complete",
+  pro: "complete",
+};
+
+/** Map a legacy TidyPro plan id to its Wavva equivalent, if any. */
+export function legacyPlanToNew(v: unknown): PlanId | null {
+  if (typeof v !== "string") return null;
+  return LEGACY_PLAN_MAP[v] ?? null;
+}
 
 export function isPlanId(v: unknown): v is PlanId {
   return typeof v === "string" && v in PLANS;
@@ -107,6 +94,7 @@ export function subscriptionInGoodStanding(status: string | null | undefined): b
 /**
  * Seat check: members count includes the owner. Pending invites are not
  * counted here (they are blocked at invite time instead).
+ * Both Wavva tiers allow unlimited seats.
  */
 export function seatsAvailable(plan: PlanId, memberCount: number): boolean {
   const limit = PLANS[plan].seats;
@@ -119,8 +107,8 @@ export function seatLimitLabel(plan: PlanId): string {
 }
 
 /**
- * Feature gating by plan. Tiers are cumulative: Growth includes everything
- * in Starter, Pro includes everything in Growth.
+ * Feature gating by plan. Tiers are cumulative: Complete includes everything
+ * in Essential.
  */
 export type PlanFeature =
   | "schedule"
@@ -132,16 +120,16 @@ export type PlanFeature =
   | "quickbooks";
 
 const FEATURE_MIN_PLAN: Record<PlanFeature, PlanId> = {
-  schedule: "growth", // Week schedule view
-  checklists: "growth", // Job checklists & crew assignment
-  reports: "pro", // Company reporting dashboard
-  photos: "pro", // Before/after job photo uploads
-  communications: "pro", // Automated SMS & email templates
-  integrations: "pro", // Mailchimp & Zapier integrations
-  quickbooks: "pro", // QuickBooks Online accounting sync
+  schedule: "essential",
+  checklists: "essential",
+  communications: "essential", // Automated SMS & email templates (core to Wavva)
+  reports: "complete",
+  photos: "complete", // Before/after job photo uploads
+  integrations: "complete", // Mailchimp & Zapier integrations
+  quickbooks: "complete", // QuickBooks Online accounting sync
 };
 
-const PLAN_RANK: Record<PlanId, number> = { basic: 0, starter: 1, growth: 2, pro: 3 };
+const PLAN_RANK: Record<PlanId, number> = { essential: 0, complete: 1 };
 
 /**
  * Accounts with access to every tier's features, regardless of the

@@ -419,7 +419,7 @@ export async function studioUpdateUserEmail(
 
 const studioTierSchema = z.object({
   companyId: z.string().uuid("Invalid company."),
-  tier: z.enum(["basic", "starter", "growth", "pro"]),
+  tier: z.enum(["essential", "complete"]),
 });
 
 export type TierChangeResult = ActionResult & {

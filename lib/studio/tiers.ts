@@ -40,7 +40,7 @@ async function guardedService() {
 
 /**
  * Effective plan for a company, mirroring requireCompany() in lib/auth.ts:
- * the founder / platform-admin all-access grant reports Pro unless the
+ * the founder / platform-admin all-access grant reports Complete unless the
  * company's tier was explicitly changed in Studio, in which case the
  * explicit choice wins (so the owner can move their own account up or down).
  */
@@ -49,9 +49,9 @@ export function studioEffectivePlan(
   hasAllAccessMember: boolean,
   tierManaged: boolean,
 ): { effective: PlanId; grantApplies: boolean } {
-  if (hasAllAccessMember && !tierManaged) return { effective: "pro", grantApplies: true };
+  if (hasAllAccessMember && !tierManaged) return { effective: "complete", grantApplies: true };
   return {
-    effective: isPlanId(storedPlan) ? storedPlan : "starter",
+    effective: isPlanId(storedPlan) ? storedPlan : "essential",
     grantApplies: false,
   };
 }

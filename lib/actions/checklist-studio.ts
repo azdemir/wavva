@@ -32,7 +32,7 @@ export async function generateChecklistAction(
   input: unknown,
 ): Promise<GenerateResult> {
   const { company } = await requireOwner();
-  const plan = isPlanId(company.plan) ? company.plan : "starter";
+  const plan = isPlanId(company.plan) ? company.plan : "essential";
   if (!hasFeature(plan, "checklists")) return { ok: false, error: "NOT_PERMITTED" };
 
   const rl = await rateLimit(`checklist-gen:${company.id}`, 20, 24 * 60 * 60 * 1000);

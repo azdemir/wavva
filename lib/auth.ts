@@ -137,7 +137,7 @@ export async function isCompanyTierManaged(companyId: string): Promise<boolean> 
  * - Company without completed onboarding -> /onboarding
  *
  * Founder / platform-admin accounts get every tier's features: their
- * company reports as Pro regardless of the stored plan — UNLESS the tier
+ * company reports as Complete regardless of the stored plan — UNLESS the tier
  * was changed explicitly in Studio (/studio/tiers). An explicit change
  * always wins, so the owner can move their own company to any tier,
  * up or down, and the new tier's features and limits apply consistently.
@@ -148,7 +148,7 @@ export async function requireCompany() {
   if (!active) redirect("/onboarding");
   if (!active.company.onboarding_completed) redirect("/onboarding");
   if (hasAllAccess(user.email)) {
-    let plan = "pro";
+    let plan = "complete";
     if (
       (await isCompanyTierManaged(active.company.id).catch(() => false)) &&
       isPlanId(active.company.plan)

@@ -16,10 +16,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
-const tierTones = { basic: "slate", starter: "amber", growth: "accent", pro: "brand" } as const;
+const tierTones = { essential: "amber", complete: "brand" } as const;
 
-/** Active customers included per plan (from the plan feature lists). */
-const CUSTOMER_CAPS: Partial<Record<PlanId, number>> = { basic: 50, starter: 100 };
+/** Active customers included per plan — both Wavva tiers are unlimited. */
+const CUSTOMER_CAPS: Partial<Record<PlanId, number>> = {};
 
 const FEATURE_LABELS: { key: PlanFeature; label: string }[] = [
   { key: "schedule", label: "Week schedule view" },
@@ -159,9 +159,9 @@ export function TierManager({
     if (lost.length > 0) {
       out.push(`They will lose: ${lost.map((f) => f.label).join(", ")}.`);
     }
-    if (selected.grantApplies && pendingTier !== "pro") {
+    if (selected.grantApplies && pendingTier !== "complete") {
       out.push(
-        "This company currently gets Pro through the founder all-access grant. Saving makes the new tier explicit — the grant will no longer apply to them.",
+        "This company currently gets Complete through the founder all-access grant. Saving makes the new tier explicit — the grant will no longer apply to them.",
       );
     }
     return out;

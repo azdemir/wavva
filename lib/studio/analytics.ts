@@ -71,7 +71,7 @@ export function parseAnalyticsFilter(sp: {
     ? (Number(sp.weeks) as 4 | 12 | 26)
     : 12;
   const plan =
-    sp.plan === "starter" || sp.plan === "growth" || sp.plan === "pro"
+    sp.plan === "essential" || sp.plan === "complete"
       ? sp.plan
       : "all";
   return { weeks, plan, q: (sp.q ?? "").trim().slice(0, 80) };
@@ -132,10 +132,8 @@ export async function getAnalytics(
   let paying = 0;
   let trialing = 0;
   const planCounts: Record<PlanId, { count: number; mrrCents: number }> = {
-    basic: { count: 0, mrrCents: 0 },
-    starter: { count: 0, mrrCents: 0 },
-    growth: { count: 0, mrrCents: 0 },
-    pro: { count: 0, mrrCents: 0 },
+    essential: { count: 0, mrrCents: 0 },
+    complete: { count: 0, mrrCents: 0 },
   };
   for (const c of companyRows) {
     if (isPlanId(c.plan)) planCounts[c.plan].count += 1;

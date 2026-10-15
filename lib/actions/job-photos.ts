@@ -36,7 +36,7 @@ async function photoContext(jobId: string): Promise<
 > {
   const ctx = await requireCompany();
   const t = await getTranslations("jobs");
-  const plan = isPlanId(ctx.company.plan) ? ctx.company.plan : "starter";
+  const plan = isPlanId(ctx.company.plan) ? ctx.company.plan : "essential";
   if (!hasFeature(plan, "photos")) {
     return { error: t("actions.needPro") };
   }
@@ -135,7 +135,7 @@ export async function confirmPhotoUpload(
 export async function deleteJobPhoto(photoId: string): Promise<ActionResult> {
   const ctx = await requireCompany();
   const t = await getTranslations("jobs");
-  const plan = isPlanId(ctx.company.plan) ? ctx.company.plan : "starter";
+  const plan = isPlanId(ctx.company.plan) ? ctx.company.plan : "essential";
   if (!hasFeature(plan, "photos")) return { error: NOT_PERMITTED };
   const supabase = await createClient();
   const { data: photo } = await supabase

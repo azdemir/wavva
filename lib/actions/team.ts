@@ -40,7 +40,7 @@ export async function createInvite(
       .select("id", { count: "exact", head: true })
       .eq("company_id", ctx.company.id),
   ]);
-  const planId = isPlanId(companyRow?.plan) ? companyRow.plan : "starter";
+  const planId = isPlanId(companyRow?.plan) ? companyRow.plan : "essential";
   if (!seatsAvailable(planId, memberCount ?? 0)) {
     return {
       error: t("errors.seatLimit", {
