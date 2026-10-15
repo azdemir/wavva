@@ -7,7 +7,25 @@ export const cents = z.coerce
   .min(0, "Enter an amount of 0 or more.");
 
 export const email = z.string().email("Enter a valid email address").max(255);
-export const phone = z.string().max(32).optional().or(z.literal(""));
+/**
+ * Optional phone number with format validation: when provided it must look
+ * like a phone number (digits with optional +, spaces, dashes, dots,
+ * parentheses) and contain at least 7 digits. Prevents junk like "abc"
+ * from being saved silently (regression B-03, 2026-10-15).
+ */
+export const phone = z
+  .string()
+  .max(32)
+  .optional()
+  .or(z.literal(""))
+  .refine(
+    (v) => {
+      if (!v) return true;
+      if (!/^[+\d\s().-]*$/.test(v)) return false;
+      return (v.match(/\d/g) ?? []).length >= 7;
+    },
+    "Enter a valid phone number.",
+  );
 export const uuid = z.string().uuid();
 
 export const companySchema = z.object({

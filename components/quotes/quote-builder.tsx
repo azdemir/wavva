@@ -77,22 +77,31 @@ export function QuoteBuilder({
   async function submit() {
     setPending(true);
     setError(null);
-    const result = await createQuote({
-      customer_id: customerId,
-      valid_until: validUntil || "",
-      notes,
-      discount_cents: Math.round(Number(discount || 0) * 100),
-      tax_rate: Number(taxRate || 0),
-      items: items.map((it) => ({
-        kind: it.kind,
-        ref_id: it.ref_id || "",
-        label: it.label.trim(),
-        qty: Number(it.qty) || 1,
-        unit_price_cents: Math.round(Number(it.unit_price_cents || 0) * 100),
-      })),
-    });
-    setPending(false);
-    if (result?.error) setError(result.error);
+    try {
+      const result = await createQuote({
+        customer_id: customerId,
+        valid_until: validUntil || "",
+        notes,
+        discount_cents: Math.round(Number(discount || 0) * 100),
+        tax_rate: Number(taxRate || 0),
+        items: items.map((it) => ({
+          kind: it.kind,
+          ref_id: it.ref_id || "",
+          label: it.label.trim(),
+          qty: Number(it.qty) || 1,
+          unit_price_cents: Math.round(Number(it.unit_price_cents || 0) * 100),
+        })),
+      });
+      // Validation failures (e.g. "Add at least one line item") come back as
+      // result.error and are shown inline. An unexpected throw must never
+      // leave the button stuck on "Creating…" with no message (regression
+      // B-04, 2026-10-15: silent no-op on zero-item submit).
+      if (result?.error) setError(result.error);
+    } catch {
+      setError(t("actions.createFailed"));
+    } finally {
+      setPending(false);
+    }
     // Success redirects to the quote detail page.
   }
 
