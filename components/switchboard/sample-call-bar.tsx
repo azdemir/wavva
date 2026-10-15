@@ -3,25 +3,39 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Reveal } from "./reveal";
 
-type Turn = { who: "ai" | "caller"; text: string };
+type Turn = { who: "ai" | "caller"; text: string; short: string };
 
 /** Sample call — transcript matches the real audio file turn-for-turn. */
 const SCRIPT: Turn[] = [
   {
     who: "ai",
     text: "Hi, thanks for calling Brightline Plumbing — you're speaking with Brightline's AI assistant. This call may be recorded. How can I help?",
+    short: "Thanks for calling Brightline Plumbing — you're speaking with our AI assistant. How can I help?",
   },
-  { who: "caller", text: "Hi, my kitchen sink is draining really slow. What would it cost for someone to come look?" },
-  { who: "ai", text: "I can help with that. A drain inspection visit is $89. Want me to set one up?" },
-  { who: "caller", text: "Yeah — Tuesday morning if you've got anything." },
-  { who: "ai", text: "Tuesday morning works. What's your name and the best number to reach you?" },
-  { who: "caller", text: "Marcus Reed, 555-014-2288." },
+  {
+    who: "caller",
+    text: "Hi, my kitchen sink is draining really slow. What would it cost for someone to come look?",
+    short: "My kitchen sink is draining really slow — what would it cost for someone to come look?",
+  },
+  {
+    who: "ai",
+    text: "I can help with that. A drain inspection visit is $89. Want me to set one up?",
+    short: "A drain inspection visit is $89 — want me to set one up?",
+  },
+  { who: "caller", text: "Yeah — Tuesday morning if you've got anything.", short: "Yeah — Tuesday morning if you've got anything." },
+  {
+    who: "ai",
+    text: "Tuesday morning works. What's your name and the best number to reach you?",
+    short: "Tuesday morning works — what's your name and the best number to reach you?",
+  },
+  { who: "caller", text: "Marcus Reed, 555-014-2288.", short: "Marcus Reed, 555-014-2288." },
   {
     who: "ai",
     text: "Got it, Marcus. I've sent your Tuesday morning request to the owner — they'll confirm your slot by text shortly.",
+    short: "Got it, Marcus — I've sent your Tuesday morning request to the owner.",
   },
-  { who: "caller", text: "Perfect, thanks." },
-  { who: "ai", text: "You're welcome. Thanks for calling Brightline!" },
+  { who: "caller", text: "Perfect, thanks.", short: "Perfect, thanks." },
+  { who: "ai", text: "You're welcome. Thanks for calling Brightline!", short: "You're welcome — thanks for calling Brightline!" },
 ];
 
 /** Measured start time (seconds) of each turn in the audio file. */
@@ -238,7 +252,6 @@ export function SampleCallBar() {
   const progress = useAudio && duration > 0 ? Math.min(seconds / duration, 1) : step / SCRIPT.length;
 
   const turn = step > 0 && !done ? SCRIPT[Math.min(step, SCRIPT.length - 1)] : null;
-  const captionKey = done ? "done" : step;
 
   return (
     <Reveal className="relative z-[2] mx-auto mb-10 w-full max-w-[980px]">
@@ -276,27 +289,40 @@ export function SampleCallBar() {
                 />
               ))}
             </div>
-            <p
-              key={captionKey}
-              aria-live="polite"
-              className="truncate font-sb text-[13px] leading-snug text-sb-ink2 motion-safe:animate-sb-fade-swap min-[560px]:mt-0.5"
-            >
+            <div className="min-w-0 overflow-hidden min-[560px]:mt-0.5">
               {done ? (
-                <span className="font-bold text-sb-ink">
+                <p
+                  key="done"
+                  className="truncate font-sb text-[13px] font-bold leading-snug text-sb-ink motion-safe:animate-sb-fade-swap"
+                >
                   ✓ Quoted $89 <span className="font-semibold text-sb-ink2">·</span> ✓ Booking request sent{" "}
                   <span className="font-semibold text-sb-ink2">·</span> ✓ Owner notified by text
-                </span>
+                </p>
               ) : turn ? (
-                <>
-                  <span className={`font-extrabold ${turn.who === "ai" ? "text-sb-violet-dark" : "text-sb-ink"}`}>
-                    {turn.who === "ai" ? "Wavva AI" : "Caller"}
-                  </span>
-                  <span className="text-sb-ink2"> — {turn.text}</span>
-                </>
+                <p
+                  key={step}
+                  aria-live="polite"
+                  style={{ animationDuration: "14s" }}
+                  className={`flex w-max items-center whitespace-nowrap font-sb text-[13px] leading-snug ${
+                    active ? "motion-safe:animate-sb-mq" : ""
+                  }`}
+                >
+                  {[0, 1].map((copy) => (
+                    <span key={copy} aria-hidden={copy === 1} className="flex items-center">
+                      <span className={`font-extrabold ${turn.who === "ai" ? "text-sb-violet-dark" : "text-sb-ink"}`}>
+                        {turn.who === "ai" ? "Wavva AI" : "Caller"}
+                      </span>
+                      <span className="text-sb-ink2"> — {turn.short}</span>
+                      <span aria-hidden="true" className="mx-8 inline-block h-1.5 w-1.5 rounded-full bg-sb-violet/50" />
+                    </span>
+                  ))}
+                </p>
               ) : (
-                "Press play to hear how Wavva answers."
+                <p className="truncate font-sb text-[13px] leading-snug text-sb-ink2">
+                  Press play to hear how Wavva answers.
+                </p>
               )}
-            </p>
+            </div>
           </div>
 
           {/* timer */}
