@@ -60,7 +60,7 @@ export function AiAnsweringForm({ initial }: { initial: AiAnsweringSettings }) {
         rows={3}
         value={greeting}
         onChange={(e) => setGreeting(e.target.value)}
-        placeholder="Hi, thanks for calling Acme — you're speaking with Acme's AI assistant…"
+        placeholder="Hi, thanks for calling — you're speaking with our AI assistant…"
       />
 
       <SelectField

@@ -31,5 +31,7 @@
   },
   "availability": "Disponibilidad",
   "integrations": "Integraciones",
-  "arcade": "Arcade"
+  "arcade": "Arcade",
+  "calls": "Llamadas",
+  "aiAssistant": "Asistente IA"
 }

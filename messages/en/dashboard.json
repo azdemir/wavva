@@ -1,1 +1,54 @@
-{"actions":{"newBooking":"New booking","newQuote":"New quote","viewAll":"View all"},"description":"Here's what's happening in your business today.","greeting":{"afternoon":"Good afternoon","evening":"Good evening","morning":"Good morning","title":"{part}, {company}"},"quotes":{"empty":{"description":"Build a quote in under a minute and send it to a customer.","title":"No open quotes"},"title":"Open quotes","unknownCustomer":"Customer","validUntil":"Valid until {date}"},"schedule":{"empty":{"description":"Create a booking and its jobs will appear here.","title":"Nothing scheduled today"},"title":"Today's schedule"},"stats":{"customers":"Customers","jobsToday":"Jobs today","openQuotes":"Open quotes","outstanding":"Outstanding"}}
+{
+  "actions": {
+    "newBooking": "New booking",
+    "newQuote": "New quote",
+    "viewAll": "View all"
+  },
+  "description": "Here's what's happening in your business today.",
+  "greeting": {
+    "afternoon": "Good afternoon",
+    "evening": "Good evening",
+    "morning": "Good morning",
+    "title": "{part}, {company}"
+  },
+  "quotes": {
+    "empty": {
+      "description": "Build a quote in under a minute and send it to a customer.",
+      "title": "No open quotes"
+    },
+    "title": "Open quotes",
+    "unknownCustomer": "Customer",
+    "validUntil": "Valid until {date}"
+  },
+  "schedule": {
+    "empty": {
+      "description": "Create a booking and its jobs will appear here.",
+      "title": "Nothing scheduled today"
+    },
+    "title": "Today's schedule"
+  },
+  "stats": {
+    "customers": "Customers",
+    "jobsToday": "Jobs today",
+    "openQuotes": "Open quotes",
+    "outstanding": "Outstanding"
+  },
+  "overview": {
+    "viewCalls": "View calls",
+    "aiSettings": "AI settings",
+    "callsAnswered": "Calls answered",
+    "callsAnsweredHint": "AI-handled this month",
+    "minutesUsed": "Minutes used",
+    "minutesUsedHint": "{included} included / mo",
+    "needsOk": "Needs your OK",
+    "needsOkHint": "Awaiting your decision",
+    "enquiries": "New enquiries",
+    "enquiriesHint": "Last 7 days",
+    "needsOkTitle": "Needs your OK",
+    "noEscalations": "Nothing needs your decision right now.",
+    "recentCallsTitle": "Recent calls",
+    "noCalls": "No calls answered yet. Once your line is live, they'll show up here.",
+    "unknownCaller": "Unknown caller",
+    "min": "min"
+  }
+}

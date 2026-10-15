@@ -9,19 +9,10 @@ import { DashboardUserBar, type UserBarNavItem } from "@/components/dashboard/to
 import {
   HomeIcon,
   UsersIcon,
-  TagIcon,
-  QuoteIcon,
-  CalendarIcon,
-  CheckIcon,
-  ClockIcon,
   CardIcon,
   GearIcon,
-  BellIcon,
-  ChartIcon,
-  DownloadIcon,
-  PlugIcon,
-  GamepadIcon,
   PhoneIcon,
+  SparkleIcon,
 } from "@/components/ui/icons";
 import { LogoMark } from "@/components/ui/logo";
 import { SidebarNav, type SidebarNavItem } from "@/components/dashboard/sidebar-nav";
@@ -52,25 +43,11 @@ const STAFF: Role[] = ["owner", "manager"];
 
 const nav: NavItem[] = [
   { href: "/dashboard", labelKey: "dashboard", icon: HomeIcon, roles: STAFF },
-  { href: "/dashboard/customers", labelKey: "customers", icon: UsersIcon, roles: STAFF },
-  { href: "/dashboard/services", labelKey: "services", icon: TagIcon, roles: STAFF },
-  { href: "/dashboard/quotes", labelKey: "quotes", icon: QuoteIcon, roles: STAFF },
-  { href: "/dashboard/bookings", labelKey: "bookings", icon: CalendarIcon, roles: STAFF },
-  { href: "/dashboard/jobs", labelKey: "jobs", icon: ClockIcon, roles: STAFF },
-  { href: "/dashboard/schedule", labelKey: "schedule", icon: CalendarIcon, feature: "schedule", roles: STAFF },
-  { href: "/dashboard/front-office", labelKey: "frontOffice", icon: PhoneIcon, roles: STAFF },
-  { href: "/dashboard/checklists", labelKey: "checklists", icon: CheckIcon, feature: "checklists", roles: ["owner"] },
-  { href: "/dashboard/availability", labelKey: "availability", icon: ClockIcon },
-  { href: "/dashboard/my-jobs", labelKey: "myJobs", icon: ClockIcon },
-  { href: "/dashboard/invoices", labelKey: "invoices", icon: CardIcon, roles: STAFF },
-  { href: "/dashboard/reports", labelKey: "reports", icon: ChartIcon, feature: "reports", roles: ["owner"] },
+  { href: "/dashboard/front-office", labelKey: "calls", icon: PhoneIcon, roles: STAFF },
+  { href: "/dashboard/front-office/ai-answering", labelKey: "aiAssistant", icon: SparkleIcon, roles: STAFF },
   { href: "/dashboard/billing", labelKey: "billing", icon: CardIcon, roles: ["owner"] },
   { href: "/dashboard/team", labelKey: "team", icon: UsersIcon, roles: ["owner"] },
   { href: "/dashboard/settings", labelKey: "settings", icon: GearIcon, roles: ["owner"] },
-  { href: "/dashboard/import", labelKey: "import", icon: DownloadIcon, roles: STAFF },
-  { href: "/dashboard/integrations", labelKey: "integrations", icon: PlugIcon, feature: "integrations", roles: ["owner"] },
-  { href: "/dashboard/audit", labelKey: "audit", icon: BellIcon, roles: ["owner"] },
-  { href: "/dashboard/arcade", labelKey: "arcade", icon: GamepadIcon },
 ];
 
 async function NavLinks({ plan, role }: { plan: PlanId; role: Role }) {
@@ -99,7 +76,7 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const { user, membership, company } = await requireCompany();
-  const plan = isPlanId(company.plan) ? company.plan : "starter";
+  const plan = isPlanId(company.plan) ? company.plan : "essential";
   const t = await getTranslations("nav");
 
   // Nav items for the mobile hamburger menu (desktop uses the sidebar).

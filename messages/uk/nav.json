@@ -31,5 +31,7 @@
   },
   "availability": "Доступність",
   "integrations": "Інтеграції",
-  "arcade": "Аркада"
+  "arcade": "Аркада",
+  "calls": "Дзвінки",
+  "aiAssistant": "АІ-асистент"
 }

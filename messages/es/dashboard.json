@@ -1,1 +1,54 @@
-{"actions":{"newBooking":"Nueva reserva","newQuote":"Nueva cotización","viewAll":"Ver todas"},"description":"Esto es lo que está sucediendo en su negocio hoy.","greeting":{"afternoon":"Buenas tardes","evening":"Buenas noches","morning":"Buenos días","title":"{part}, {company}"},"quotes":{"empty":{"description":"Cree una cotización en menos de un minuto y envíesela a un cliente.","title":"No hay cotizaciones abiertas"},"title":"Cotizaciones abiertas","unknownCustomer":"Cliente","validUntil":"Válida hasta el {date}"},"schedule":{"empty":{"description":"Cree una reserva y sus trabajos aparecerán aquí.","title":"Nada programado para hoy"},"title":"Agenda de hoy"},"stats":{"customers":"Clientes","jobsToday":"Trabajos de hoy","openQuotes":"Cotizaciones abiertas","outstanding":"Saldo pendiente"}}
+{
+  "actions": {
+    "newBooking": "Nueva reserva",
+    "newQuote": "Nueva cotización",
+    "viewAll": "Ver todas"
+  },
+  "description": "Esto es lo que está sucediendo en su negocio hoy.",
+  "greeting": {
+    "afternoon": "Buenas tardes",
+    "evening": "Buenas noches",
+    "morning": "Buenos días",
+    "title": "{part}, {company}"
+  },
+  "quotes": {
+    "empty": {
+      "description": "Cree una cotización en menos de un minuto y envíesela a un cliente.",
+      "title": "No hay cotizaciones abiertas"
+    },
+    "title": "Cotizaciones abiertas",
+    "unknownCustomer": "Cliente",
+    "validUntil": "Válida hasta el {date}"
+  },
+  "schedule": {
+    "empty": {
+      "description": "Cree una reserva y sus trabajos aparecerán aquí.",
+      "title": "Nada programado para hoy"
+    },
+    "title": "Agenda de hoy"
+  },
+  "stats": {
+    "customers": "Clientes",
+    "jobsToday": "Trabajos de hoy",
+    "openQuotes": "Cotizaciones abiertas",
+    "outstanding": "Saldo pendiente"
+  },
+  "overview": {
+    "viewCalls": "Ver llamadas",
+    "aiSettings": "Ajustes de IA",
+    "callsAnswered": "Llamadas atendidas",
+    "callsAnsweredHint": "Por la IA este mes",
+    "minutesUsed": "Minutos usados",
+    "minutesUsedHint": "{included} incluidos / mes",
+    "needsOk": "Necesita tu OK",
+    "needsOkHint": "Esperando tu decisión",
+    "enquiries": "Nuevas consultas",
+    "enquiriesHint": "Últimos 7 días",
+    "needsOkTitle": "Necesita tu OK",
+    "noEscalations": "Nada necesita tu decisión ahora mismo.",
+    "recentCallsTitle": "Llamadas recientes",
+    "noCalls": "Aún no hay llamadas atendidas. Cuando tu línea esté activa, aparecerán aquí.",
+    "unknownCaller": "Llamante desconocido",
+    "min": "min"
+  }
+}
