@@ -4,6 +4,7 @@ import { useState } from "react";
 import { HOW_STEPS } from "./copy";
 import { Reveal } from "./reveal";
 import { Eyebrow, Grad } from "./section-head";
+import { WavvaMark } from "./logo";
 
 /** How-it-works: numbered accordion + orbiting integration visual. */
 export function HowItWorks() {
@@ -77,11 +78,7 @@ export function HowItWorks() {
                 </span>
               </div>
               <div className="absolute left-1/2 top-1/2 grid h-24 w-24 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-[32px] bg-sb-ink shadow-[0_20px_44px_rgba(20,20,43,0.35)]">
-                <svg width="44" height="44" viewBox="0 0 40 40" fill="none">
-                  <circle cx="19" cy="20" r="15" stroke="#fff" strokeWidth="3" />
-                  <rect x="13.5" y="16.5" width="11" height="7" rx="3.5" fill="#fff" />
-                  <path d="M24.5 18.2h7M24.5 21.8h7" stroke="#fff" strokeWidth="3" strokeLinecap="round" />
-                </svg>
+                <WavvaMark className="h-11 w-auto" />
               </div>
             </div>
             <div className="animate-sb-float absolute inset-x-8 bottom-8 flex items-center gap-3.5 rounded-[20px] border border-white/60 bg-white/90 p-4.5 shadow-[0_20px_44px_rgba(20,20,43,0.16)] backdrop-blur">
