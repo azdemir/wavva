@@ -97,10 +97,10 @@ function ReplayIcon({ className }: { className?: string }) {
 }
 
 /**
- * Sample-call strip — the "live line" bar that sits between the nav and the
- * hero. Same audio engine as the old card (base64-chunk MP3, audio-driven
- * turns, timer fallback), rebuilt as a compact now-playing strip: live
- * waveform, rotating transcript caption, hairline progress.
+ * Sample-call "live band" — a full-width broadcast-style strip that owns the
+ * zone between the nav and the hero headline: status block, big waveform
+ * with a scrolling transcript ticker, and transport controls. Same audio
+ * engine (base64-chunk MP3, audio-driven turns, timer fallback).
  */
 export function SampleCallBar() {
   const [step, setStep] = useState(0);
@@ -120,9 +120,9 @@ export function SampleCallBar() {
   // Deterministic pseudo-random waveform heights — stable across renders.
   const bars = useMemo(
     () =>
-      Array.from({ length: 44 }, (_, i) => {
+      Array.from({ length: 64 }, (_, i) => {
         const x = Math.sin(i * 12.9898) * 43758.5453;
-        return Math.round(8 + (x - Math.floor(x)) * 16);
+        return Math.round(12 + (x - Math.floor(x)) * 44);
       }),
     []
   );
@@ -254,46 +254,51 @@ export function SampleCallBar() {
   const turn = step > 0 && !done ? SCRIPT[Math.min(step, SCRIPT.length - 1)] : null;
 
   return (
-    <Reveal className="relative z-[2] mx-auto mb-10 w-full max-w-[980px]">
-      <div id="chatdemo" className="scroll-mt-28 overflow-hidden">
+    <Reveal className="relative z-[2] mb-12 w-full">
+      <div id="chatdemo" className="scroll-mt-28 border-y border-sb-ink/10">
         {audioUrl && <audio ref={audioRef} src={audioUrl} preload="auto" className="hidden" />}
 
-        <div className="flex items-center gap-3 py-2.5 sm:gap-4">
-          {/* live handset */}
-          <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sb-violet/10">
-            {active && (
-              <span className="absolute inset-0 rounded-full bg-sb-violet/25 motion-safe:animate-ping" aria-hidden="true" />
-            )}
-            <PhoneIcon className="relative h-5 w-5 text-sb-violet" />
-          </div>
-
-          {/* labels */}
-          <div className="hidden min-w-0 shrink-0 min-[420px]:block">
-            <p className="flex items-center gap-1.5 font-sb text-[11px] font-extrabold uppercase tracking-[0.18em] text-sb-ink">
-              <span className="h-1.5 w-1.5 rounded-full bg-red-500 motion-safe:animate-sb-pulse-dot" aria-hidden="true" />
-              Sample call
+        <div className="flex flex-col gap-6 py-8 md:flex-row md:items-center md:gap-10 md:py-10">
+          {/* status block */}
+          <div className="flex shrink-0 items-center gap-4 md:w-64 md:flex-col md:items-start md:gap-3">
+            <div className="flex items-center gap-4">
+              <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-sb-violet/10">
+                {active && (
+                  <span className="absolute inset-0 rounded-full bg-sb-violet/25 motion-safe:animate-ping" aria-hidden="true" />
+                )}
+                <PhoneIcon className="relative h-5 w-5 text-sb-violet" />
+              </div>
+              <div>
+                <p className="flex items-center gap-1.5 font-sb text-[11px] font-extrabold uppercase tracking-[0.18em] text-sb-ink">
+                  <span className="h-1.5 w-1.5 rounded-full bg-red-500 motion-safe:animate-sb-pulse-dot" aria-hidden="true" />
+                  Sample call
+                </p>
+                <p className="mt-0.5 font-sb text-xs font-semibold text-sb-ink2">Real AI voice</p>
+              </div>
+            </div>
+            <p className="ml-auto font-sb text-[26px] font-extrabold tabular-nums leading-none text-sb-ink md:ml-0">
+              {mm}:{ss} <span className="text-sm font-semibold text-sb-ink2/70">/ {tmm}:{tss}</span>
             </p>
-            <p className="mt-0.5 font-sb text-xs font-semibold text-sb-ink2">Real AI voice</p>
           </div>
 
-          {/* waveform + live caption */}
+          {/* waveform + transcript ticker */}
           <div className="min-w-0 flex-1">
-            <div className="hidden h-6 items-center gap-[3px] min-[560px]:flex" aria-hidden="true">
+            <div className="flex h-14 items-center gap-[3px]" aria-hidden="true">
               {bars.map((h, i) => (
                 <span
                   key={i}
-                  style={{ height: `${h}px`, animationDelay: `${-(i * 0.055)}s` }}
+                  style={{ height: `${h}px`, animationDelay: `${-(i * 0.045)}s` }}
                   className={`w-[3px] origin-center rounded-full transition-colors duration-300 ${
                     active ? "bg-sb-violet/70 motion-safe:animate-sb-wave" : "bg-sb-ink/15"
                   }`}
                 />
               ))}
             </div>
-            <div className="min-w-0 overflow-hidden min-[560px]:mt-0.5">
+            <div className="mt-3 min-w-0 overflow-hidden">
               {done ? (
                 <p
                   key="done"
-                  className="truncate font-sb text-[13px] font-bold leading-snug text-sb-ink motion-safe:animate-sb-fade-swap"
+                  className="truncate font-sb text-sm font-bold leading-snug text-sb-ink motion-safe:animate-sb-fade-swap"
                 >
                   ✓ Quoted $89 <span className="font-semibold text-sb-ink2">·</span> ✓ Booking request sent{" "}
                   <span className="font-semibold text-sb-ink2">·</span> ✓ Owner notified by text
@@ -303,7 +308,7 @@ export function SampleCallBar() {
                   key={step}
                   aria-live="polite"
                   style={{ animationDuration: "14s" }}
-                  className={`flex w-max items-center whitespace-nowrap font-sb text-[13px] leading-snug ${
+                  className={`flex w-max items-center whitespace-nowrap font-sb text-sm leading-snug ${
                     active ? "motion-safe:animate-sb-mq" : ""
                   }`}
                 >
@@ -318,28 +323,23 @@ export function SampleCallBar() {
                   ))}
                 </p>
               ) : (
-                <p className="truncate font-sb text-[13px] leading-snug text-sb-ink2">
+                <p className="truncate font-sb text-sm leading-snug text-sb-ink2">
                   Press play to hear how Wavva answers.
                 </p>
               )}
             </div>
           </div>
 
-          {/* timer */}
-          <span className="hidden shrink-0 font-sb text-[13px] font-bold tabular-nums text-sb-ink min-[420px]:block">
-            {mm}:{ss} <span className="font-semibold text-sb-ink2/70">/ {tmm}:{tss}</span>
-          </span>
-
           {/* transport */}
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="flex shrink-0 items-center gap-3">
             {!active && !done && (
               <button
                 type="button"
                 onClick={play}
                 aria-label="Play sample call"
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-sb-violet text-white shadow-[0_10px_26px_rgba(109,92,255,0.45)] transition-transform duration-200 hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sb-violet active:scale-95"
+                className="flex h-16 w-16 items-center justify-center rounded-full bg-sb-violet text-white shadow-[0_14px_34px_rgba(109,92,255,0.45)] transition-transform duration-200 hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sb-violet active:scale-95"
               >
-                <PlayIcon className="ml-0.5 h-4 w-4" />
+                <PlayIcon className="ml-1 h-6 w-6" />
               </button>
             )}
             {active && (
@@ -347,9 +347,9 @@ export function SampleCallBar() {
                 type="button"
                 onClick={pause}
                 aria-label="Pause"
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-sb-ink text-white shadow-[0_10px_26px_rgba(20,20,43,0.35)] transition-transform duration-200 hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sb-ink active:scale-95"
+                className="flex h-16 w-16 items-center justify-center rounded-full bg-sb-ink text-white shadow-[0_14px_34px_rgba(20,20,43,0.35)] transition-transform duration-200 hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sb-ink active:scale-95"
               >
-                <PauseIcon className="h-4 w-4" />
+                <PauseIcon className="h-6 w-6" />
               </button>
             )}
             {(step > 0 || done) && (
@@ -357,9 +357,9 @@ export function SampleCallBar() {
                 type="button"
                 onClick={restart}
                 aria-label="Replay sample call"
-                className="flex h-10 w-10 items-center justify-center rounded-full border-[1.5px] border-sb-ink/15 text-sb-ink transition-all duration-200 hover:scale-105 hover:border-sb-violet hover:text-sb-violet-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sb-violet active:scale-95"
+                className="flex h-16 w-16 items-center justify-center rounded-full border-[1.5px] border-sb-ink/15 text-sb-ink transition-all duration-200 hover:scale-105 hover:border-sb-violet hover:text-sb-violet-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sb-violet active:scale-95"
               >
-                <ReplayIcon className="h-4 w-4" />
+                <ReplayIcon className="h-6 w-6" />
               </button>
             )}
           </div>
