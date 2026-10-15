@@ -5,10 +5,54 @@ import { sendContactMessage } from "@/lib/actions/contact";
 import { Reveal } from "./reveal";
 import { Eyebrow, Grad } from "./section-head";
 import { SbButton } from "./buttons";
+
+function TileIcon({ children }: { children: React.ReactNode }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className="h-[22px] w-[22px]"
+    >
+      {children}
+    </svg>
+  );
+}
+
+function MailIcon() {
+  return (
+    <TileIcon>
+      <rect x="3" y="5" width="18" height="14" rx="2.5" />
+      <path d="M3.5 7.5l8.5 5.5 8.5-5.5" />
+    </TileIcon>
+  );
+}
+
+function PhoneIcon() {
+  return (
+    <TileIcon>
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+    </TileIcon>
+  );
+}
+
+function PinIcon() {
+  return (
+    <TileIcon>
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+      <circle cx="12" cy="10" r="3" />
+    </TileIcon>
+  );
+}
+
 const INFO = [
-  { icon: "✉️", t: "Email", s: "hello@wavva.example" },
-  { icon: "📞", t: "Phone", s: "(315) 555-0147 · sample line" },
-  { icon: "📍", t: "Office", s: "Syracuse, New York" },
+  { icon: <MailIcon />, t: "Email", s: "hello@wavva.example" },
+  { icon: <PhoneIcon />, t: "Phone", s: "(315) 555-0147 · sample line" },
+  { icon: <PinIcon />, t: "Office", s: "Syracuse, New York" },
 ];
 
 /** Contact section: info cards + form wired to the TidyPro contact backend. */
@@ -42,7 +86,7 @@ export function Contact() {
             <div className="mt-8 grid gap-3.5">
               {INFO.map((c) => (
                 <div key={c.t} className="flex items-center gap-4 rounded-[18px] bg-white/75 p-4.5">
-                  <span className="grid h-[46px] w-[46px] shrink-0 place-items-center rounded-[15px] bg-sb-violet text-[19px] text-white">
+                  <span className="grid h-[46px] w-[46px] shrink-0 place-items-center rounded-[15px] bg-sb-violet text-white">
                     {c.icon}
                   </span>
                   <span>
