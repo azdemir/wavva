@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PillNav } from "@/components/switchboard/pill-nav";
+import { getSessionUser } from "@/lib/auth";
 import { Footer } from "@/components/switchboard/footer";
 import { Faq } from "@/components/switchboard/faq";
 import { TrialBand } from "@/components/switchboard/contact";
@@ -11,10 +12,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "/faq" },
 };
 
-export default function FaqPage() {
+export default async function FaqPage() {
   return (
     <div className="bg-white font-sb text-sb-ink antialiased">
-      <PillNav />
+      <PillNav signedIn={!!(await getSessionUser())} />
       <main className="pt-24">
         <Faq />
         <TrialBand />

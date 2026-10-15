@@ -30,7 +30,7 @@ function ChevronDown({ className }: { className?: string }) {
 }
 
 /** Floating pill nav — hides on scroll down, returns on scroll up. */
-export function PillNav() {
+export function PillNav({ signedIn = false }: { signedIn?: boolean }) {
   const [hidden, setHidden] = useState(false);
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -115,10 +115,10 @@ export function PillNav() {
             </div>
           </div>
           <Link
-            href="/signin"
+            href={signedIn ? "/dashboard" : "/signin"}
             className="font-sb text-sm font-semibold text-sb-ink2 transition-colors hover:text-sb-violet-dark"
           >
-            Sign in
+            {signedIn ? "Dashboard" : "Sign in"}
           </Link>
         </nav>
         <SbButton href="/#trial" size="sm" magnetic={false}>
