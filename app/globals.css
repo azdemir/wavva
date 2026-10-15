@@ -238,6 +238,8 @@ body {
   --animate-sb-spin-slower: sb-spin 26s linear infinite;
   --animate-sb-spin-rev: sb-spin-rev 18s linear infinite;
   --animate-sb-pulse-dot: sb-pulse-dot 1.8s ease-in-out infinite;
+  --animate-sb-wave: sb-wave 1.15s ease-in-out infinite;
+  --animate-sb-fade-swap: sb-fade-swap 0.45s ease both;
   --animate-sb-typing: sb-typing 1.2s ease-in-out infinite;
   --animate-sb-mq: sb-mq 32s linear infinite;
 
@@ -246,6 +248,13 @@ body {
   @keyframes sb-spin { to { transform: rotate(360deg); } }
   @keyframes sb-spin-rev { to { transform: rotate(-360deg); } }
   @keyframes sb-pulse-dot { 50% { opacity: 0.3; } }
+  @keyframes sb-wave {
+    0%, 100% { transform: scaleY(0.32); }
+    50% { transform: scaleY(1); }
+  }
+  @keyframes sb-fade-swap {
+    from { opacity: 0; transform: translateY(7px); }
+  }
   @keyframes sb-typing {
     0%, 100% { transform: none; opacity: 0.4; }
     50% { transform: translateY(-5px); opacity: 1; }

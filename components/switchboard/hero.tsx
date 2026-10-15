@@ -3,9 +3,8 @@
 import { useEffect } from "react";
 import { SbButton } from "./buttons";
 import { Grad } from "./section-head";
-import { CallDemoPlayer } from "./call-demo";
 
-/** Option-Q hero: giant headline, dual CTA, sample-call player. */
+/** Option-Q hero: giant headline, dual CTA. The sample-call strip lives above it. */
 export function Hero() {
   useEffect(() => {
     const t = requestAnimationFrame(() =>
@@ -17,7 +16,7 @@ export function Hero() {
   }, []);
 
   return (
-    <header className="relative overflow-hidden pt-40 text-center">
+    <header className="relative overflow-hidden pt-14 text-center">
       {/* pastel blobs */}
       <div aria-hidden className="animate-sb-drift pointer-events-none absolute -left-32 -top-36 h-[520px] w-[520px] rounded-full bg-[#d9cfff] opacity-60 blur-[70px]" />
       <div aria-hidden className="animate-sb-drift pointer-events-none absolute -right-32 top-10 h-[460px] w-[460px] rounded-full bg-[#ffd9e4] opacity-60 blur-[70px] [animation-delay:-6s]" />
@@ -69,11 +68,6 @@ export function Hero() {
             <strong className="text-sb-ink">67%</strong> of prospects hire whoever responds first · No card
             required
           </span>
-        </div>
-
-        {/* sample call player */}
-        <div className="sb-reveal sb-hero-rise mx-auto mt-16 max-w-[680px]" style={{ transitionDelay: "0.15s" }}>
-          <CallDemoPlayer />
         </div>
       </div>
     </header>
