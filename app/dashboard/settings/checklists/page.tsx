@@ -8,7 +8,7 @@ import { ChecklistTemplateManager } from "@/components/settings/checklist-templa
 
 export default async function ChecklistTemplatesPage() {
   const { company } = await requireOwner();
-  const plan = isPlanId(company.plan) ? company.plan : "starter";
+  const plan = isPlanId(company.plan) ? company.plan : "essential";
   const t = await getTranslations("checklists");
 
   if (!hasFeature(plan, "checklists")) {

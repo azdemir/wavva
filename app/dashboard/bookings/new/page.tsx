@@ -32,7 +32,7 @@ export default async function NewBookingPage({
       .eq("is_active", true)
       .order("name"),
   ]);
-  const plan = isPlanId(company.plan) ? company.plan : "starter";
+  const plan = isPlanId(company.plan) ? company.plan : "essential";
   const checklistTemplates = hasFeature(plan, "checklists") ? await listChecklistTemplates() : [];
 
   let prefill: BookingPrefill | undefined;

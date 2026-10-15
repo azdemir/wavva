@@ -5,7 +5,6 @@ import Link from "next/link";
 import { WavvaLogo } from "./logo";
 import { SbButton } from "./buttons";
 
-const FEATURES_ITEM = { href: "#features", label: "Features" };
 const DROPDOWN_LINKS = [
   { href: "#how", label: "How it works" },
   { href: "/pricing", label: "Pricing" },
@@ -102,14 +101,6 @@ export function PillNav() {
               }`}
             >
               <div className="rounded-2xl border border-white/90 bg-white/95 p-2 shadow-[0_18px_46px_rgba(20,20,43,0.16)] backdrop-blur-xl">
-                <Link
-                  href={FEATURES_ITEM.href}
-                  onClick={() => setOpen(false)}
-                  className="font-sb block rounded-xl px-4 py-2.5 text-sm font-semibold text-sb-ink2 transition-colors hover:bg-sb-violet/10 hover:text-sb-violet-dark"
-                >
-                  {FEATURES_ITEM.label}
-                </Link>
-                <div className="mx-3 my-1 border-t border-sb-ink2/10" aria-hidden="true" />
                 {DROPDOWN_LINKS.map((l) => (
                   <Link
                     key={l.href}

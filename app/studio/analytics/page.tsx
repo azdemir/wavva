@@ -113,9 +113,8 @@ export default async function StudioAnalyticsPage({
               param="plan"
               options={[
                 { value: "all", label: "All" },
-                { value: "starter", label: "Starter" },
-                { value: "growth", label: "Growth" },
-                { value: "pro", label: "Pro" },
+                { value: "essential", label: "Essential" },
+                { value: "complete", label: "Complete" },
               ]}
               current={filter.plan}
               preserve={{

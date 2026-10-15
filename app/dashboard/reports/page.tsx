@@ -42,7 +42,7 @@ export default async function ReportsPage({
   const t = await getTranslations("reports");
   const tTeam = await getTranslations("team");
   const locale = await getLocale();
-  const plan = isPlanId(company.plan) ? company.plan : "starter";
+  const plan = isPlanId(company.plan) ? company.plan : "essential";
 
   if (!hasFeature(plan, "reports")) {
     return (

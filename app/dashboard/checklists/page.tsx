@@ -8,7 +8,7 @@ import { ChecklistStudio } from "@/components/checklists/checklist-studio";
 
 export default async function ChecklistsPage() {
   const { company } = await requireOwner();
-  const plan = isPlanId(company.plan) ? company.plan : "starter";
+  const plan = isPlanId(company.plan) ? company.plan : "essential";
   const t = await getTranslations("checklists");
 
   if (!hasFeature(plan, "checklists")) {

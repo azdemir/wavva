@@ -62,7 +62,7 @@ export default async function JobDetailPage({
   const { id } = await params;
   const { company, membership } = await requireCompany();
   const t = await getTranslations("jobs");
-  const plan = isPlanId(company.plan) ? company.plan : "starter";
+  const plan = isPlanId(company.plan) ? company.plan : "essential";
   const canUseChecklists = hasFeature(plan, "checklists");
   const canUsePhotos = hasFeature(plan, "photos");
   const storageReady = isStorageConfigured();

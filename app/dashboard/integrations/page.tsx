@@ -14,7 +14,7 @@ export const instant = false;
 export default async function IntegrationsPage() {
   const { company } = await requirePermission("settings.manage");
   const t = await getTranslations("integrations");
-  const plan = isPlanId(company.plan) ? company.plan : "starter";
+  const plan = isPlanId(company.plan) ? company.plan : "essential";
 
   return (
     <div className="space-y-6">

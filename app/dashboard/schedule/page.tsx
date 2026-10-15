@@ -31,7 +31,7 @@ export default async function SchedulePage({
   const { company, membership } = await requirePermission("schedule.view");
   const t = await getTranslations("schedule");
   const locale = await getLocale();
-  const plan = isPlanId(company.plan) ? company.plan : "starter";
+  const plan = isPlanId(company.plan) ? company.plan : "essential";
   if (!hasFeature(plan, "schedule")) {
     return (
       <div className="space-y-6">
