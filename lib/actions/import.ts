@@ -288,12 +288,18 @@ export async function commitImport(input: unknown): Promise<CommitResult> {
   // can't smuggle them past the duplicates step.
   const withinFileDupes = findWithinFileDuplicateEmails(rows);
 
-  // Booking numbers: query the count once, then increment per insert.
-  const { count: bookingCount } = await supabase
+  // Booking numbers: take MAX(existing) once, then increment per insert —
+  // never reuse deleted numbers, so the unique constraint can't collide.
+  const { data: existingBookings } = await supabase
     .from("bookings")
-    .select("id", { count: "exact", head: true })
-    .eq("company_id", companyId);
-  let bookingSeq = bookingCount ?? 0;
+    .select("booking_number")
+    .eq("company_id", companyId)
+    .like("booking_number", "B-%");
+  let bookingSeq = 0;
+  for (const b of existingBookings ?? []) {
+    const m = b.booking_number?.match(/-(\d+)$/);
+    if (m) bookingSeq = Math.max(bookingSeq, parseInt(m[1], 10));
+  }
 
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];

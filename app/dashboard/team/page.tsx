@@ -2,21 +2,16 @@ import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import { requirePermission } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
-import { createInvite, deleteInvite } from "@/lib/actions/team";
+import { deleteInvite } from "@/lib/actions/team";
+import { InviteForm } from "@/components/team/invite-form";
 import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Field, SelectField } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { FilterPills } from "@/components/ui/filters";
 
 const roleTones = { owner: "brand", manager: "accent", cleaner: "slate" } as const;
 const roles = ["all", "owner", "manager", "cleaner"] as const;
-
-// @next-codemod-ignore Cache Components adoption: this segment temporarily allows blocking.
-// Remove this opt-out after verifying the segment passes validation without it.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false
 
 export default async function TeamPage({
   searchParams,
@@ -105,33 +100,7 @@ export default async function TeamPage({
           <CardTitle>{t("invite.title")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <form
-              action={async (formData) => {
-                "use server";
-                const result = await createInvite(formData);
-                if (result?.error) throw new Error(result.error);
-              }}
-              className="flex flex-wrap items-end gap-3"
-            >
-              <div className="min-w-52 flex-1">
-                <Field
-                  id="team-email"
-                  name="email"
-                  label={t("invite.emailLabel")}
-                  type="email"
-                  required
-                  placeholder={t("invite.emailPlaceholder")}
-                />
-              </div>
-              <div className="w-36">
-                <SelectField id="team-role" name="role" label={t("invite.roleLabel")}>
-                  <option value="cleaner">{t("roles.cleaner")}</option>
-                  <option value="manager">{t("roles.manager")}</option>
-                  <option value="owner">{t("roles.owner")}</option>
-                </SelectField>
-              </div>
-              <Button type="submit">{t("invite.submit")}</Button>
-            </form>
+            <InviteForm />
             <p className="mt-3 text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">
               {t("invite.note")}
             </p>

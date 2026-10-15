@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireCompany } from "@/lib/auth";
 import { isStaff, NOT_PERMITTED } from "@/lib/permissions";
 import { logAudit } from "@/lib/audit";
-import { computeTotals, nextNumber } from "@/lib/pricing";
+import { computeTotals, nextNumberAfter } from "@/lib/pricing";
 import { one } from "@/lib/relations";
 import { baseUrl } from "@/lib/base-url";
 import { formatDate } from "@/lib/format";
@@ -46,9 +46,11 @@ export async function createInvoice(input: unknown): Promise<ActionResult> {
     return { error: parsed.error.issues[0]?.message ?? t("errors.invalidInvoice") };
   }
 
-  // Customer check and the numbering count are independent — run together.
+  // Customer check and the numbering lookup are independent — run together.
+  // Numbers come from MAX(existing), not COUNT: deleted numbers are never
+  // reused, so the unique constraint can't collide after deletions.
   const supabase = await createClient();
-  const [{ data: customer }, { count }] = await Promise.all([
+  const [{ data: customer }, { data: existingNumbers }] = await Promise.all([
     supabase
       .from("customers")
       .select("id")
@@ -57,8 +59,9 @@ export async function createInvoice(input: unknown): Promise<ActionResult> {
       .maybeSingle(),
     supabase
       .from("invoices")
-      .select("id", { count: "exact", head: true })
-      .eq("company_id", ctx.company.id),
+      .select("invoice_number")
+      .eq("company_id", ctx.company.id)
+      .like("invoice_number", "I-%"),
   ]);
   if (!customer) return { error: t("errors.customerNotFound") };
 
@@ -70,7 +73,10 @@ export async function createInvoice(input: unknown): Promise<ActionResult> {
       company_id: ctx.company.id,
       customer_id: customer.id,
       booking_id: parsed.data.booking_id || null,
-      invoice_number: nextNumber("I", count ?? 0),
+      invoice_number: nextNumberAfter(
+        "I",
+        (existingNumbers ?? []).map((r) => r.invoice_number),
+      ),
       status: "draft",
       subtotal_cents: totals.subtotal,
       tax_rate: parsed.data.tax_rate,

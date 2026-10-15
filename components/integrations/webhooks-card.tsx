@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { ConfirmActionButton } from "@/components/ui/confirm-action-button";
 import { Field } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -98,7 +99,6 @@ export function WebhooksCard({
   }
 
   async function handleDelete(hook: IntegrationWebhook) {
-    if (!window.confirm(t("webhooks.deleteConfirm"))) return;
     setBusyId(hook.id);
     setError(null);
     const result = await deleteZapierWebhook(hook.id);
@@ -192,14 +192,13 @@ export function WebhooksCard({
                   >
                     {hook.active ? t("webhooks.paused") : t("webhooks.active")}
                   </Button>
-                  <Button
-                    size="sm"
+                  <ConfirmActionButton
+                    label={t("webhooks.delete")}
+                    confirmMessage={t("webhooks.deleteConfirm")}
+                    pendingLabel={t("webhooks.deleting")}
                     variant="danger"
-                    onClick={() => handleDelete(hook)}
-                    disabled={busyId === hook.id}
-                  >
-                    {busyId === hook.id ? t("webhooks.deleting") : t("webhooks.delete")}
-                  </Button>
+                    action={() => handleDelete(hook)}
+                  />
                 </div>
               </li>
             ))}

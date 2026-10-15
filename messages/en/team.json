@@ -1,1 +1,36 @@
-{"errors":{"invalidInvite":"Enter a valid email and role.","inviteInvalid":"This invite link is invalid or has already been used.","inviteWrongEmail":"This invite was sent to {email}. Sign in with that address to accept it.","seatLimit":"Your {plan} plan includes {seats, plural, one {# seat} other {# seats}}. Upgrade in Settings → Billing to invite more people."},"heading":{"description":"Everyone who can access your company's workspace.","title":"Team"},"invite":{"emailLabel":"Email","emailPlaceholder":"teammate@example.com","note":"Email delivery arrives in a later stage — for now, share the invite link below directly.","roleLabel":"Role","submit":"Send invite","title":"Invite a teammate"},"members":{"joinedOn":"Joined {date}","title":"Members ({count})"},"pending":{"revoke":"Revoke","title":"Pending invites"},"roles":{"all":"All","cleaner":"Cleaner","manager":"Manager","owner":"Owner"}}
+{
+  "errors": {
+    "invalidInvite": "Enter a valid email and role.",
+    "inviteInvalid": "This invite link is invalid or has already been used.",
+    "inviteWrongEmail": "This invite was sent to {email}. Sign in with that address to accept it.",
+    "seatLimit": "Your {plan} plan includes {seats, plural, one {# seat} other {# seats}}. Upgrade in Settings → Billing to invite more people."
+  },
+  "heading": {
+    "description": "Everyone who can access your company's workspace.",
+    "title": "Team"
+  },
+  "invite": {
+    "emailLabel": "Email",
+    "emailPlaceholder": "teammate@example.com",
+    "note": "Email delivery arrives in a later stage — for now, share the invite link below directly.",
+    "roleLabel": "Role",
+    "submit": "Send invite",
+    "title": "Invite a teammate",
+    "sending": "Sending…",
+    "sent": "Invite sent — share the link below."
+  },
+  "members": {
+    "joinedOn": "Joined {date}",
+    "title": "Members ({count})"
+  },
+  "pending": {
+    "revoke": "Revoke",
+    "title": "Pending invites"
+  },
+  "roles": {
+    "all": "All",
+    "cleaner": "Cleaner",
+    "manager": "Manager",
+    "owner": "Owner"
+  }
+}

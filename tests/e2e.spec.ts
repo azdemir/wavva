@@ -77,18 +77,13 @@ test.describe("Marketing site end-to-end", () => {
   test("navbar mobile menu opens and links work", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");
-    // Mobile nav is a button disclosure (aria-expanded), not <details>.
-    const menuButton = page.getByRole("button", { name: /open menu/i });
-    await expect(menuButton).toBeVisible();
-    await menuButton.click();
-    // It renders its own <nav aria-label="Mobile"> inside the primary nav.
-    const nav = page.getByRole("navigation", { name: /^mobile$/i });
-    const pricingLink = nav.getByRole("link", { name: /^pricing$/i });
+    // Mobile nav uses a <details>/<summary> disclosure.
+    await page.locator("summary").first().click();
+    const nav = page.getByRole("navigation", { name: /primary/i });
+    const pricingLink = nav.getByRole("link", { name: /pricing/i });
     await expect(pricingLink).toBeVisible();
     await pricingLink.click();
     await expect(page).toHaveURL(/\/pricing/);
-    // Navigating closes the menu.
-    await expect(nav).toHaveCount(0);
   });
 });
 
@@ -103,20 +98,12 @@ test.describe("Theme toggle end-to-end", () => {
     await expect(toggle).toBeVisible({ timeout: 15000 });
     await toggle.click();
     await expect(page.locator("html.dark")).toHaveCount(1);
-    await expect(page.locator("main section").first()).toHaveCSS(
-      "background-color",
-      "rgb(10, 17, 40)",
-    );
     expect(
       await page.evaluate(() => localStorage.getItem("tidypro-theme")),
     ).toBe("dark");
 
     await page.reload();
     await expect(page.locator("html.dark")).toHaveCount(1);
-    await expect(page.locator("main section").first()).toHaveCSS(
-      "background-color",
-      "rgb(10, 17, 40)",
-    );
 
     // Toggle back to light (label is correct after the hydration fix).
     const lightToggle = page
@@ -125,10 +112,6 @@ test.describe("Theme toggle end-to-end", () => {
     await expect(lightToggle).toBeVisible({ timeout: 15000 });
     await lightToggle.click();
     await expect(page.locator("html.dark")).toHaveCount(0);
-    await expect(page.locator("main section").first()).toHaveCSS(
-      "background-color",
-      "rgb(233, 238, 251)",
-    );
     expectCleanConsole(errors, "theme toggle");
   });
 
@@ -280,14 +263,11 @@ test.describe("Studio (founder HQ) end-to-end", () => {
   test("marketing pages render CMS-driven sections", async ({ page }) => {
     const errors = await watchErrors(page);
     await page.goto("/");
-    // Hero (CMS: home.hero.*), service-area marquee (CMS: site.cities),
-    // features, stories, FAQ.
+    // Hero (CMS: home.hero.*), proof strip, features, stories, FAQ, CTA.
     await expect(
       page.getByRole("heading", { name: /run your cleaning business/i }),
     ).toBeVisible();
-    // The stats/why-us cards were removed from this band on 2026-10-10; the
-    // marquee is what remains. Cities come from CMS, so assert the band.
-    await expect(page.getByText(/now serving/i)).toBeVisible();
+    await expect(page.getByText(/flat pricing, no per-user fees/i)).toBeVisible();
     await expect(
       page.getByRole("heading", { name: /everything a cleaning business needs/i }),
     ).toBeVisible();

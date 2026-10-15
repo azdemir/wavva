@@ -2,13 +2,6 @@
 
 All notable changes to TidyPro. Dates are in America/New_York.
 
-## 2026-10-14
-
-### Switchboard goes live on production (tidy-pro.vercel.app)
-
-- Merged develop to main (PR #5); Vercel auto-deploys main to production.
-- Full Switchboard marketing site + dashboard/Studio reskin now live.
-
 ## 2026-10-13
 
 ### Switchboard: full marketing site in option-Q design on TidyPro backend — PUSHED to `develop`

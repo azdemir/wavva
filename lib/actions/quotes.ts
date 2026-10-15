@@ -8,7 +8,7 @@ import { requireCompany } from "@/lib/auth";
 import { isStaff, NOT_PERMITTED } from "@/lib/permissions";
 import { logAudit } from "@/lib/audit";
 import { quoteSchema } from "@/lib/validation";
-import { computeTotals, nextNumber } from "@/lib/pricing";
+import { computeTotals, nextNumberAfter } from "@/lib/pricing";
 import { one } from "@/lib/relations";
 import { baseUrl } from "@/lib/base-url";
 import { formatDate } from "@/lib/format";
@@ -37,8 +37,10 @@ export async function createQuote(input: unknown): Promise<ActionResult> {
 
   const supabase = await createClient();
 
-  // Customer check and the numbering count are independent — run together.
-  const [{ data: customer }, { count }] = await Promise.all([
+  // Customer check and the numbering lookup are independent — run together.
+  // Numbers come from MAX(existing), not COUNT: deleted numbers are never
+  // reused, so the unique constraint can't collide after deletions.
+  const [{ data: customer }, { data: existingNumbers }] = await Promise.all([
     supabase
       .from("customers")
       .select("id")
@@ -47,8 +49,9 @@ export async function createQuote(input: unknown): Promise<ActionResult> {
       .maybeSingle(),
     supabase
       .from("quotes")
-      .select("id", { count: "exact", head: true })
-      .eq("company_id", ctx.company.id),
+      .select("quote_number")
+      .eq("company_id", ctx.company.id)
+      .like("quote_number", "Q-%"),
   ]);
   if (!customer) return { error: t("actions.customerNotFound") };
 
@@ -63,7 +66,10 @@ export async function createQuote(input: unknown): Promise<ActionResult> {
     .insert({
       company_id: ctx.company.id,
       customer_id: parsed.data.customer_id,
-      quote_number: nextNumber("Q", count ?? 0),
+      quote_number: nextNumberAfter(
+        "Q",
+        (existingNumbers ?? []).map((r) => r.quote_number),
+      ),
       status: "draft",
       subtotal_cents: totals.subtotal,
       discount_cents: totals.discount,

@@ -9,6 +9,8 @@ import { isStaff } from "@/lib/permissions";
 import { logAudit } from "@/lib/audit";
 import { customerSchema, addressSchema } from "@/lib/validation";
 import { missingColumnName } from "@/lib/supabase/schema-fallback";
+import { isQuickBooksConfigured } from "@/lib/quickbooks/config";
+import { pushCustomer } from "@/lib/quickbooks/sync";
 
 export type ActionResult = { error?: string; ok?: boolean };
 
@@ -23,51 +25,12 @@ function formToCustomer(formData: FormData) {
   });
 }
 
-/**
- * Reject an email already used by another customer in this company.
- *
- * `customers` has no unique constraint on (company_id, email) — the
- * `unique (company_id, email)` in 0001_init.sql belongs to `invites` — so
- * without this the manual form silently creates duplicate customer records.
- * The CSV importer has its own dedupe pass; this covers the UI path.
- *
- * `excludeId` lets an edit keep its own email without tripping the check.
- * Comparison is case-insensitive, matching how the importer normalizes.
- */
-async function checkDuplicateEmail(
-  companyId: string,
-  email: string | null,
-  excludeId?: string,
-): Promise<{ error: string } | null> {
-  const normalized = (email ?? "").trim().toLowerCase();
-  if (!normalized) return null; // Emails are optional.
-
-  const supabase = await createClient();
-  // Escape LIKE metacharacters — "_" and "%" are common in real addresses
-  // (john_doe@…, 100%clean@…) and would otherwise match other customers.
-  const pattern = normalized.replace(/([\\%_])/g, "\\$1");
-  const { data: existing } = await supabase
-    .from("customers")
-    .select("id, name, email")
-    .eq("company_id", companyId)
-    .ilike("email", pattern);
-
-  const clash = (existing ?? []).find((c) => c.id !== excludeId);
-  if (!clash) return null;
-  return {
-    error: `That email is already used by ${clash.name}. Open that customer instead of creating a duplicate.`,
-  };
-}
-
 export async function createCustomer(formData: FormData): Promise<ActionResult> {
   const ctx = await requireCompany();
   const t = await getTranslations("customers");
   if (!isStaff(ctx.membership.role)) return { error: t("errors.notPermitted") };
   const parsed = formToCustomer(formData);
   if (!parsed.success) return { error: t("errors.checkCustomer") };
-
-  const duplicate = await checkDuplicateEmail(ctx.company.id, parsed.data.email || null);
-  if (duplicate) return duplicate;
 
   const supabase = await createClient();
   const row = {
@@ -100,6 +63,12 @@ export async function createCustomer(formData: FormData): Promise<ActionResult> 
     entity_id: data.id,
   });
 
+  // QuickBooks push (Pro): no-op until QBO is configured; never blocks the save.
+  if (isQuickBooksConfigured()) {
+    const customerId = data.id;
+    pushCustomer(customerId).catch(() => {});
+  }
+
   redirect(`/dashboard/customers/${data.id}`);
 }
 
@@ -109,14 +78,6 @@ export async function updateCustomer(id: string, formData: FormData): Promise<Ac
   if (!isStaff(ctx.membership.role)) return { error: t("errors.notPermitted") };
   const parsed = formToCustomer(formData);
   if (!parsed.success) return { error: t("errors.checkCustomer") };
-
-  // Exclude this customer so saving without changing the email still works.
-  const duplicate = await checkDuplicateEmail(
-    ctx.company.id,
-    parsed.data.email || null,
-    id,
-  );
-  if (duplicate) return duplicate;
 
   const supabase = await createClient();
   const patch = {
@@ -140,6 +101,11 @@ export async function updateCustomer(id: string, formData: FormData): Promise<Ac
       .eq("company_id", ctx.company.id));
   }
   if (error) return { error: error.message };
+
+  // QuickBooks push (Pro): no-op until QBO is configured; never blocks the save.
+  if (isQuickBooksConfigured()) {
+    pushCustomer(id).catch(() => {});
+  }
 
   revalidatePath(`/dashboard/customers/${id}`);
   return { ok: true };

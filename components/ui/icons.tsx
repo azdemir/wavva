@@ -280,6 +280,49 @@ export function PlugIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/**
+ * Message template — a speech bubble with text lines. Used for the
+ * pre-written email/SMS templates (a bell says "notification", not
+ * "template").
+ */
+export function TemplateIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Base {...props}>
+      <path d="M7 5h6a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H8.5L5 19.5V17H7a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3z" />
+      <path d="M8 9.5h5M8 12.5h3.2" />
+    </Base>
+  );
+}
+
+/**
+ * Automation trigger — a solid lightning bolt. Reads instantly as
+ * "fires automatically", where a clock only says "time".
+ */
+export function BoltIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Base {...props}>
+      <path
+        d="M13 2.5L5.5 13.5H11l-1 8 7.5-11H12l1-8z"
+        fill="currentColor"
+        stroke="none"
+      />
+    </Base>
+  );
+}
+
+/**
+ * Delivery channels — a paper plane. Email and SMS are how messages
+ * travel; a checkmark says "done", not "channel".
+ */
+export function SendIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Base {...props}>
+      <path d="M21.5 2.5L11 13" />
+      <path d="M21.5 2.5L14.5 21.5l-3.5-8.5-8.5-3.5L21.5 2.5z" />
+    </Base>
+  );
+}
+
 export function GamepadIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <Base {...props}>

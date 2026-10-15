@@ -13,9 +13,6 @@ import { parsePageParam, PAGE_SIZE } from "@/lib/pagination";
 import { PlusIcon, UsersIcon } from "@/components/ui/icons";
 import { missingColumnName } from "@/lib/supabase/schema-fallback";
 
-// Authenticated customer data is loaded per request, not during prefetching.
-export const instant = false;
-
 const types = ["all", "residential", "commercial"] as const;
 const typeTones = { residential: "slate", commercial: "brand" } as const;
 

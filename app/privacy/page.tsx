@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
-import { SessionNav } from "@/components/switchboard/session-nav";
+import { PillNav } from "@/components/switchboard/pill-nav";
+import { getSessionUser } from "@/lib/auth";
 import { Footer } from "@/components/switchboard/footer";
 import { Reveal } from "@/components/switchboard/reveal";
 import { Eyebrow } from "@/components/switchboard/section-head";
+
+export const instant = false;
 
 export const metadata: Metadata = {
   title: "Privacy",
@@ -33,10 +36,10 @@ const SECTIONS = [
   },
 ];
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
   return (
     <div className="bg-white font-sb text-sb-ink antialiased">
-      <SessionNav />
+      <PillNav signedIn={!!(await getSessionUser())} />
       <main className="pt-40 pb-24">
         <div className="mx-auto max-w-3xl px-7">
           <Reveal><Eyebrow>Legal</Eyebrow></Reveal>

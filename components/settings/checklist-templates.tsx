@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { ConfirmActionButton } from "@/components/ui/confirm-action-button";
 import { Field } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
@@ -70,7 +71,6 @@ export function ChecklistTemplateManager({
   }
 
   async function remove(id: string) {
-    if (!window.confirm(t("deleteConfirm"))) return;
     const result = await deleteChecklistTemplate(id);
     if (result?.error) {
       setError(result.error);
@@ -116,14 +116,12 @@ export function ChecklistTemplateManager({
                   <Button variant="outline" size="sm" onClick={() => openEdit(tpl)}>
                     {t("editTemplate")}
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
+                  <ConfirmActionButton
+                    label={t("delete")}
+                    confirmMessage={t("deleteConfirm")}
                     className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950"
-                    onClick={() => remove(tpl.id)}
-                  >
-                    {t("delete")}
-                  </Button>
+                    action={() => remove(tpl.id)}
+                  />
                 </div>
               </CardContent>
             </Card>

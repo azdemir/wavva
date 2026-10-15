@@ -26,3 +26,17 @@ export function computeTotals(
 export function nextNumber(prefix: string, count: number): string {
   return `${prefix}-${String(count + 1).padStart(4, "0")}`;
 }
+
+/**
+ * Next document number based on the highest existing number, e.g. Q-0012.
+ * Uses MAX, not COUNT, so deleted numbers are never reused and the unique
+ * constraint can't collide after deletions.
+ */
+export function nextNumberAfter(prefix: string, existing: string[]): string {
+  let max = 0;
+  for (const n of existing) {
+    const m = n.match(/-(\d+)$/);
+    if (m) max = Math.max(max, parseInt(m[1], 10));
+  }
+  return `${prefix}-${String(max + 1).padStart(4, "0")}`;
+}

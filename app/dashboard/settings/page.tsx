@@ -7,11 +7,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { SettingsForm } from "@/components/settings/settings-form";
 import { QuickBooksCard } from "@/components/settings/quickbooks-card";
 
-// @next-codemod-ignore Cache Components adoption: this segment temporarily allows blocking.
-// Remove this opt-out after verifying the segment passes validation without it.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false
-
 export default async function SettingsPage() {
   const { company } = await requireOwner();
   const t = await getTranslations("settings");

@@ -9,7 +9,7 @@ import { isStaff, NOT_PERMITTED } from "@/lib/permissions";
 import { logAudit } from "@/lib/audit";
 import { bookingSchema } from "@/lib/validation";
 import { localInputToUtc } from "@/lib/dates";
-import { nextNumber } from "@/lib/pricing";
+import { nextNumberAfter } from "@/lib/pricing";
 import { one } from "@/lib/relations";
 import { missingColumnName } from "@/lib/supabase/schema-fallback";
 import { baseUrl } from "@/lib/base-url";
@@ -69,18 +69,21 @@ export async function createBooking(input: unknown): Promise<ActionResult> {
     return { error: t("actions.addressMismatch") };
   }
   // Independent lookups run in parallel: service/quote/template verification
-  // and the numbering count don't depend on each other.
-  const [{ data: svc }, { data: q }, { count }, { data: tpl }] = await Promise.all([
+  // and the numbering lookup don't depend on each other.
+  const [{ data: svc }, { data: q }, { data: existingNumbers }, { data: tpl }] = await Promise.all([
     parsed.data.service_id
       ? supabase.from("services").select("id").eq("id", parsed.data.service_id).eq("company_id", ctx.company.id).maybeSingle()
       : Promise.resolve({ data: { id: "__skip" } }),
     parsed.data.quote_id
       ? supabase.from("quotes").select("id").eq("id", parsed.data.quote_id).eq("company_id", ctx.company.id).maybeSingle()
       : Promise.resolve({ data: { id: "__skip" } }),
+    // Numbers come from MAX(existing), not COUNT: deleted numbers are never
+    // reused, so the unique constraint can't collide after deletions.
     supabase
       .from("bookings")
-      .select("id", { count: "exact", head: true })
-      .eq("company_id", ctx.company.id),
+      .select("booking_number")
+      .eq("company_id", ctx.company.id)
+      .like("booking_number", "B-%"),
     parsed.data.checklist_template_id
       ? supabase
           .from("checklist_templates")
@@ -105,7 +108,10 @@ export async function createBooking(input: unknown): Promise<ActionResult> {
     service_address_id: address.id,
     service_id: parsed.data.service_id || null,
     quote_id: parsed.data.quote_id || null,
-    booking_number: nextNumber("B", count ?? 0),
+    booking_number: nextNumberAfter(
+      "B",
+      (existingNumbers ?? []).map((r) => r.booking_number),
+    ),
     recurrence: parsed.data.recurrence,
     scheduled_start: start.toISOString(),
     scheduled_end: end.toISOString(),

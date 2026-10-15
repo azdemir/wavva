@@ -22,19 +22,14 @@ function applyTheme(theme: Theme) {
   document.documentElement.classList.toggle("dark", theme === "dark");
 }
 
-/**
- * Reads the initial theme (same logic as the inline script in layout).
- *
- * Light is the default and the brand's primary presentation — we deliberately
- * do NOT follow the OS `prefers-color-scheme`, so a visitor on a dark-mode
- * machine still lands on the intended light design. Dark is opt-in via the
- * toggle, and the choice is remembered.
- */
+/** Reads the initial theme (same logic as the inline script in layout). */
 function initialTheme(): Theme {
   if (typeof window === "undefined") return "light";
   const stored = window.localStorage.getItem(STORAGE_KEY);
   if (stored === "light" || stored === "dark") return stored;
-  return "light";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
@@ -76,4 +71,4 @@ export function useTheme() {
  * paint so there's no light-flash on load. Must stay in sync with
  * initialTheme() above.
  */
-export const themeInitScript = `(function(){try{if(localStorage.getItem('${STORAGE_KEY}')==='dark'){document.documentElement.classList.add('dark');}}catch(e){}})();`;
+export const themeInitScript = `(function(){try{var t=localStorage.getItem('${STORAGE_KEY}');if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}if(t==='dark'){document.documentElement.classList.add('dark');}}catch(e){}})();`;

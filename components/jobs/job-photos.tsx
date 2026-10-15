@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { CameraIcon } from "@/components/ui/icons";
+import { ConfirmActionButton } from "@/components/ui/confirm-action-button";
 import {
   requestPhotoUpload,
   confirmPhotoUpload,
@@ -135,14 +136,16 @@ function PhotoSection({
               loading="lazy"
             />
             {!readOnly && (
-              <button
-                type="button"
-                onClick={() => onDelete(p)}
-                aria-label={t("photos.deleteLabel")}
-                className="absolute right-1 top-1 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-lg font-bold leading-none text-white"
+              <ConfirmActionButton
+                label={t("photos.deleteLabel")}
+                confirmMessage={t("photos.deleteConfirm")}
+                className="absolute right-1 top-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-black/60 text-lg font-bold leading-none text-white"
+                action={async () => {
+                  await onDelete(p);
+                }}
               >
-                ×
-              </button>
+                <span aria-hidden="true">×</span>
+              </ConfirmActionButton>
             )}
           </div>
         ))}
@@ -249,7 +252,6 @@ export function JobPhotos({
   }
 
   async function onDelete(photo: JobPhoto) {
-    if (!window.confirm(t("photos.deleteConfirm"))) return;
     setDeletingId(photo.id);
     const result = await deleteJobPhoto(photo.id);
     setDeletingId(null);
@@ -258,6 +260,7 @@ export function JobPhotos({
     } else {
       setPhotos((p) => p.filter((x) => x.id !== photo.id));
     }
+    return result;
   }
 
   const before = photos.filter((p) => p.kind === "before");

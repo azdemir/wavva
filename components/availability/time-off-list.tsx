@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { ConfirmActionButton } from "@/components/ui/confirm-action-button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -52,7 +53,6 @@ export function TimeOffList({
   }
 
   async function remove(id: string) {
-    if (!window.confirm(t("deleteConfirm"))) return;
     setError(null);
     const result = await deleteTimeOff(id);
     if (result?.error) {
@@ -106,13 +106,13 @@ export function TimeOffList({
                   </>
                 ) : null}
                 {canDelete(r) ? (
-                  <button
-                    type="button"
-                    onClick={() => remove(r.id)}
-                    className="text-xs font-medium text-slate-500 hover:text-red-600 dark:text-slate-400"
-                  >
-                    {t("delete")}
-                  </button>
+                  <ConfirmActionButton
+                    label={t("delete")}
+                    confirmMessage={t("deleteConfirm")}
+                    variant="outline"
+                    className="h-auto border-0 p-0 text-xs font-medium text-slate-500 hover:bg-transparent hover:text-red-600 dark:text-slate-400"
+                    action={() => remove(r.id)}
+                  />
                 ) : null}
               </div>
             </div>

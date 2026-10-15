@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { SessionNav } from "@/components/switchboard/session-nav";
+import { PillNav } from "@/components/switchboard/pill-nav";
+import { getSessionUser } from "@/lib/auth";
 import { Footer } from "@/components/switchboard/footer";
 import { Reveal } from "@/components/switchboard/reveal";
 import { Eyebrow, Grad } from "@/components/switchboard/section-head";
 import { FoundingClientForm } from "@/components/marketing/founding-client-form";
 import { FRONT_OFFICE } from "@/lib/front-office";
+
+export const instant = false;
 
 export const metadata: Metadata = {
   title: "Claim a founding spot — Wavva",
@@ -21,10 +24,10 @@ const PERKS = [
   "Your number stays yours; everything goes out under your company's name",
 ];
 
-export default function FoundingClientPage() {
+export default async function FoundingClientPage() {
   return (
     <div className="bg-white font-sb text-sb-ink antialiased">
-      <SessionNav />
+      <PillNav signedIn={!!(await getSessionUser())} />
       <main>
         <section className="relative overflow-hidden pt-40 pb-14 text-center">
           <div aria-hidden className="animate-sb-drift pointer-events-none absolute -left-32 -top-24 h-[420px] w-[420px] rounded-full bg-[#d9cfff] opacity-60 blur-[70px]" />

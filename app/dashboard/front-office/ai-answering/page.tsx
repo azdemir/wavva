@@ -21,11 +21,6 @@ function formatDateTime(iso: string): string {
   });
 }
 
-// @next-codemod-ignore Cache Components adoption: this segment temporarily allows blocking.
-// Remove this opt-out after verifying the segment passes validation without it.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false
-
 export default async function AiAnsweringPage() {
   const view = await getAiAnsweringView();
   const pct = Math.min(100, Math.round((view.minutesUsed / Math.max(1, view.minutesIncluded)) * 100));

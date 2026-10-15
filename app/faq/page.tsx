@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
-import { SessionNav } from "@/components/switchboard/session-nav";
+import { PillNav } from "@/components/switchboard/pill-nav";
+import { getSessionUser } from "@/lib/auth";
 import { Footer } from "@/components/switchboard/footer";
 import { Faq } from "@/components/switchboard/faq";
 import { TrialBand } from "@/components/switchboard/contact";
+
+export const instant = false;
 
 export const metadata: Metadata = {
   title: "FAQs",
@@ -11,10 +14,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "/faq" },
 };
 
-export default function FaqPage() {
+export default async function FaqPage() {
   return (
     <div className="bg-white font-sb text-sb-ink antialiased">
-      <SessionNav />
+      <PillNav signedIn={!!(await getSessionUser())} />
       <main className="pt-24">
         <Faq />
         <TrialBand />

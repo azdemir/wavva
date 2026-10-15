@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { ConfirmActionButton } from "@/components/ui/confirm-action-button";
 import { Field, SelectField, TextareaField } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -166,8 +167,7 @@ export function ChecklistStudio({ initial }: { initial: ChecklistTemplate[] }) {
     ]);
   }
 
-  async function handleDelete(id: string, name: string) {
-    if (!window.confirm(t("ai.deleteConfirm", { name }))) return;
+  async function handleDelete(id: string) {
     const result = await deleteChecklistTemplate(id);
     if (result.ok) setTemplates((prev) => prev.filter((x) => x.id !== id));
   }
@@ -378,7 +378,14 @@ export function ChecklistStudio({ initial }: { initial: ChecklistTemplate[] }) {
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge tone="slate">{t("ai.itemCount", { count: tpl.items.length })}</Badge>
-                    <RemoveButton onClick={() => handleDelete(tpl.id, tpl.name)} label={t("ai.deleteTemplate", { name: tpl.name })} />
+                    <ConfirmActionButton
+                      label={t("ai.deleteTemplate", { name: tpl.name })}
+                      confirmMessage={t("ai.deleteConfirm", { name: tpl.name })}
+                      className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-red-600 dark:hover:bg-slate-800"
+                      action={() => handleDelete(tpl.id)}
+                    >
+                      <span aria-hidden="true" className="block h-4 w-4 text-center text-lg leading-4">&times;</span>
+                    </ConfirmActionButton>
                   </div>
                 </li>
               ))}

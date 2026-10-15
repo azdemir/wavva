@@ -1,1 +1,36 @@
-{"errors":{"invalidInvite":"Ingresa un correo electrónico y un rol válidos.","inviteInvalid":"Este enlace de invitación no es válido o ya se utilizó.","inviteWrongEmail":"Esta invitación se envió a {email}. Inicia sesión con esa dirección para aceptarla.","seatLimit":"Tu plan {plan} incluye {seats, plural, one {# puesto} other {# puestos}}. Actualiza en Configuración → Facturación para invitar a más personas."},"heading":{"description":"Todas las personas con acceso al espacio de trabajo de tu empresa.","title":"Equipo"},"invite":{"emailLabel":"Correo electrónico","emailPlaceholder":"teammate@example.com","note":"El envío por correo electrónico llegará en una etapa posterior; por ahora, comparte directamente el enlace de invitación que aparece abajo.","roleLabel":"Rol","submit":"Enviar invitación","title":"Invitar a un compañero"},"members":{"joinedOn":"Se unió el {date}","title":"Miembros ({count})"},"pending":{"revoke":"Revocar","title":"Invitaciones pendientes"},"roles":{"all":"Todos","cleaner":"Limpiador","manager":"Gerente","owner":"Propietario"}}
+{
+  "errors": {
+    "invalidInvite": "Ingresa un correo electrónico y un rol válidos.",
+    "inviteInvalid": "Este enlace de invitación no es válido o ya se utilizó.",
+    "inviteWrongEmail": "Esta invitación se envió a {email}. Inicia sesión con esa dirección para aceptarla.",
+    "seatLimit": "Tu plan {plan} incluye {seats, plural, one {# puesto} other {# puestos}}. Actualiza en Configuración → Facturación para invitar a más personas."
+  },
+  "heading": {
+    "description": "Todas las personas con acceso al espacio de trabajo de tu empresa.",
+    "title": "Equipo"
+  },
+  "invite": {
+    "emailLabel": "Correo electrónico",
+    "emailPlaceholder": "teammate@example.com",
+    "note": "El envío por correo electrónico llegará en una etapa posterior; por ahora, comparte directamente el enlace de invitación que aparece abajo.",
+    "roleLabel": "Rol",
+    "submit": "Enviar invitación",
+    "title": "Invitar a un compañero",
+    "sending": "Enviando…",
+    "sent": "Invitación enviada — comparte el enlace de abajo."
+  },
+  "members": {
+    "joinedOn": "Se unió el {date}",
+    "title": "Miembros ({count})"
+  },
+  "pending": {
+    "revoke": "Revocar",
+    "title": "Invitaciones pendientes"
+  },
+  "roles": {
+    "all": "Todos",
+    "cleaner": "Limpiador",
+    "manager": "Gerente",
+    "owner": "Propietario"
+  }
+}
