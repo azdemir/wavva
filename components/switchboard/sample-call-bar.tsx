@@ -220,7 +220,7 @@ export function SampleCallBar() {
   const turn = step > 0 && !done ? SCRIPT[Math.min(step, SCRIPT.length - 1)] : null;
 
   return (
-    <Reveal className="relative z-[2] mx-auto mb-12 w-full max-w-[880px]">
+    <Reveal className="relative z-[2] mx-auto w-full max-w-[880px]">
       <div
         id="chatdemo"
         className="scroll-mt-28 overflow-hidden rounded-[24px] bg-white text-left shadow-[0_36px_90px_rgba(20,20,43,0.16)] ring-1 ring-sb-ink/10"
