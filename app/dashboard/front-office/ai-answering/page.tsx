@@ -38,7 +38,7 @@ export default async function AiAnsweringPage() {
           </h1>
           <p className="mt-1 max-w-2xl text-sm text-slate-600 dark:text-slate-400">
             Your AI assistant answers your business line in your company&apos;s name — quotes from
-            your price list, takes booking requests, and texts you when it needs you.
+            your price list, books appointments straight into your calendar, and texts you when it needs you.
           </p>
         </div>
         <Badge tone={view.voiceConfigured ? "brand" : "amber"}>
@@ -123,6 +123,107 @@ export default async function AiAnsweringPage() {
               </a>{" "}
               first — the AI needs your services, prices and business line before it can answer.
             </p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Upcoming AI bookings */}
+      <Card>
+        <CardContent>
+          <h2 className="mb-1 text-base font-semibold text-slate-900 dark:text-white">
+            Upcoming AI bookings
+          </h2>
+          <p className="mb-4 text-sm text-slate-600 dark:text-slate-400">
+            Appointments the AI booked directly. Turn this on in the settings below.
+          </p>
+          {view.upcomingBookings.length === 0 ? (
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              No upcoming bookings. Once direct booking is on, every appointment the AI makes lands here.
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                    <th className="py-2 pr-4 font-medium">When</th>
+                    <th className="py-2 pr-4 font-medium">Caller</th>
+                    <th className="py-2 pr-4 font-medium">Service</th>
+                    <th className="py-2 font-medium">Phone</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {view.upcomingBookings.map((b) => (
+                    <tr
+                      key={b.id}
+                      className="border-b border-slate-100 last:border-0 dark:border-slate-800"
+                    >
+                      <td className="py-2.5 pr-4 whitespace-nowrap text-slate-900 dark:text-slate-100">
+                        {formatDateTime(b.starts_at)}
+                      </td>
+                      <td className="py-2.5 pr-4 text-slate-600 dark:text-slate-400">
+                        {b.caller_name || "—"}
+                      </td>
+                      <td className="py-2.5 pr-4 text-slate-600 dark:text-slate-400">
+                        {b.service_name || "—"}
+                      </td>
+                      <td className="py-2.5 text-slate-600 dark:text-slate-400">
+                        {b.caller_phone || "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Recent AI quotes */}
+      <Card>
+        <CardContent>
+          <h2 className="mb-4 text-base font-semibold text-slate-900 dark:text-white">
+            Recent AI quotes
+          </h2>
+          {view.recentQuotes.length === 0 ? (
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              No quotes yet. Every price the AI speaks on a call is logged here.
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                    <th className="py-2 pr-4 font-medium">When</th>
+                    <th className="py-2 pr-4 font-medium">Service</th>
+                    <th className="py-2 pr-4 font-medium">Quoted</th>
+                    <th className="py-2 font-medium">Phone</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {view.recentQuotes.map((q) => (
+                    <tr
+                      key={q.id}
+                      className="border-b border-slate-100 last:border-0 dark:border-slate-800"
+                    >
+                      <td className="py-2.5 pr-4 whitespace-nowrap text-slate-600 dark:text-slate-400">
+                        {formatDateTime(q.created_at)}
+                      </td>
+                      <td className="py-2.5 pr-4 text-slate-900 dark:text-slate-100">
+                        {q.service_name || "—"}
+                      </td>
+                      <td className="py-2.5 pr-4 font-medium text-slate-900 dark:text-slate-100">
+                        {q.amount_max_cents > q.amount_min_cents
+                          ? `$${(q.amount_min_cents / 100).toFixed(0)}–$${(q.amount_max_cents / 100).toFixed(0)}`
+                          : `$${(q.amount_min_cents / 100).toFixed(0)}`}
+                      </td>
+                      <td className="py-2.5 text-slate-600 dark:text-slate-400">
+                        {q.caller_phone || "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </CardContent>
       </Card>

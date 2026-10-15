@@ -10,6 +10,9 @@ import { normalizePersonName } from "@/lib/validation";
 export type PriceListItem = {
   name: string;
   price_cents: number;
+  /** Optional range: when max > min the AI quotes "typically between min and max". */
+  price_min_cents?: number;
+  price_max_cents?: number;
   unit: string;
 };
 
@@ -26,11 +29,21 @@ export type FrontOfficeSettingsView = {
   quiet_hours_end: string;
 };
 
-const priceItemSchema = z.object({
-  name: z.string().trim().min(1).max(120),
-  price_cents: z.coerce.number().int().min(0),
-  unit: z.string().trim().max(40).default("per visit"),
-});
+const priceItemSchema = z
+  .object({
+    name: z.string().trim().min(1).max(120),
+    price_cents: z.coerce.number().int().min(0),
+    price_min_cents: z.coerce.number().int().min(0).optional(),
+    price_max_cents: z.coerce.number().int().min(0).optional(),
+    unit: z.string().trim().max(40).default("per visit"),
+  })
+  .refine(
+    (i) =>
+      i.price_max_cents === undefined ||
+      i.price_min_cents === undefined ||
+      i.price_max_cents > i.price_min_cents,
+    { message: "Range max must be above min." },
+  );
 
 /** Owner-only: this company's Front Office settings, or null if not started. */
 export async function getFrontOfficeSettings(): Promise<FrontOfficeSettingsView | null> {

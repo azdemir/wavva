@@ -111,6 +111,20 @@ export async function POST(request: Request) {
     );
   }
 
+  // Booking flag lives behind migration 0022 — fetch it separately so calls
+  // keep working if the owner hasn't run that migration yet.
+  let bookingEnabled = false;
+  try {
+    const { data: sched } = await svc
+      .from("front_office_settings")
+      .select("ai_booking_enabled")
+      .eq("company_id", call.company_id)
+      .maybeSingle();
+    bookingEnabled = sched?.ai_booking_enabled === true;
+  } catch {
+    bookingEnabled = false;
+  }
+
   const ctx: AiCompanyContext = {
     companyId: call.company_id,
     companyName: company?.name ?? "our business",
@@ -120,6 +134,7 @@ export async function POST(request: Request) {
     timezone: settings.timezone ?? "America/New_York",
     aiModel: settings.ai_model === "gpt-4o" ? "gpt-4o" : "gpt-4o-mini",
     ownerPhone: settings.owner_phone ?? "",
+    bookingEnabled,
   };
 
   const nextTranscript: AiTurn[] = [...transcript, { role: "caller", text: speech }];

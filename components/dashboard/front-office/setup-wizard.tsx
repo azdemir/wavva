@@ -91,7 +91,7 @@ export function SetupWizard({ initial }: { initial: FrontOfficeSettingsView | nu
       ? initial.price_list
       : [{ name: "", price_cents: 0, unit: "per visit" }],
   );
-  const [draft, setDraft] = useState({ name: "", price: "", unit: "per visit" });
+  const [draft, setDraft] = useState({ name: "", price: "", maxPrice: "", unit: "per visit" });
 
   // Steps 2–4
   const [serviceArea, setServiceArea] = useState(initial?.service_area ?? "");
@@ -255,7 +255,11 @@ export function SetupWizard({ initial }: { initial: FrontOfficeSettingsView | nu
                     </span>
                     <span className="flex items-center gap-3">
                       <span className="font-semibold text-slate-900 dark:text-slate-100">
-                        ${(p.price_cents / 100).toFixed(2)}
+                        {p.price_max_cents != null &&
+                        p.price_min_cents != null &&
+                        p.price_max_cents > p.price_min_cents
+                          ? `$${(p.price_min_cents / 100).toFixed(2)}–$${(p.price_max_cents / 100).toFixed(2)}`
+                          : `$${(p.price_cents / 100).toFixed(2)}`}
                       </span>
                       <button
                         type="button"
@@ -271,7 +275,7 @@ export function SetupWizard({ initial }: { initial: FrontOfficeSettingsView | nu
                   </li>
                 ))}
             </ul>
-            <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_8rem_9rem_auto]">
+            <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_7rem_7rem_8rem_auto]">
               <Field
                 id="price-name"
                 label="Service"
@@ -281,13 +285,24 @@ export function SetupWizard({ initial }: { initial: FrontOfficeSettingsView | nu
               />
               <Field
                 id="price-amount"
-                label="Price ($)"
+                label="Price ($) or from"
                 type="number"
                 min={0}
                 step="0.01"
                 value={draft.price}
                 onChange={(e) => setDraft({ ...draft, price: e.target.value })}
                 placeholder="149.00"
+              />
+              <Field
+                id="price-max"
+                label="Up to ($) — optional"
+                hint="Fill for a range"
+                type="number"
+                min={0}
+                step="0.01"
+                value={draft.maxPrice}
+                onChange={(e) => setDraft({ ...draft, maxPrice: e.target.value })}
+                placeholder="229.00"
               />
               <Field
                 id="price-unit"
@@ -302,22 +317,40 @@ export function SetupWizard({ initial }: { initial: FrontOfficeSettingsView | nu
                   variant="outline"
                   onClick={() => {
                     const cents = Math.round(Number(draft.price) * 100);
+                    const maxCents = draft.maxPrice.trim()
+                      ? Math.round(Number(draft.maxPrice) * 100)
+                      : undefined;
                     if (!draft.name.trim() || Number.isNaN(cents) || cents < 0) {
                       setError("Enter a service name and a price to add it.");
+                      return;
+                    }
+                    if (maxCents !== undefined && (Number.isNaN(maxCents) || maxCents <= cents)) {
+                      setError("The “up to” price must be above the starting price.");
                       return;
                     }
                     setError(null);
                     setPrices((list) => [
                       ...list.filter((p) => p.name.trim()),
-                      { name: draft.name.trim(), price_cents: cents, unit: draft.unit.trim() || "per visit" },
+                      {
+                        name: draft.name.trim(),
+                        price_cents: cents,
+                        ...(maxCents !== undefined
+                          ? { price_min_cents: cents, price_max_cents: maxCents }
+                          : {}),
+                        unit: draft.unit.trim() || "per visit",
+                      },
                     ]);
-                    setDraft({ name: "", price: "", unit: "per visit" });
+                    setDraft({ name: "", price: "", maxPrice: "", unit: "per visit" });
                   }}
                 >
                   Add
                 </Button>
               </div>
             </div>
+            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+              Tip: leave “Up to” empty for a fixed price. With a range, the AI quotes
+              “typically between $X and $Y” — never a number you didn&apos;t set.
+            </p>
           </CardContent>
         </Card>
       )}
