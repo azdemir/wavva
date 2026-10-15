@@ -10,6 +10,8 @@ type BtnProps = {
   size?: "sm" | "md" | "lg";
   className?: string;
   magnetic?: boolean;
+  /** When provided, runs instead of the default anchor navigation. */
+  onClick?: (e: MouseEvent<HTMLAnchorElement>) => void;
 };
 
 const variants: Record<string, string> = {
@@ -36,6 +38,7 @@ export function SbButton({
   size = "md",
   className = "",
   magnetic = true,
+  onClick,
 }: BtnProps) {
   const ref = useRef<HTMLAnchorElement>(null);
 
@@ -63,13 +66,18 @@ export function SbButton({
     <Link
       ref={ref}
       href={href}
-      onClick={(e: MouseEvent) => {
+      onClick={(e: MouseEvent<HTMLAnchorElement>) => {
         // Analytics hook (mirrors TrackedCta contract).
         (window as unknown as { sbTrack?: (n: string, p: Record<string, string>) => void }).sbTrack?.(
           "cta_click",
           { href }
         );
-        void e;
+        // A custom handler takes over navigation (e.g. hash links must scroll
+        // on every click — a plain anchor won't re-scroll to an unchanged hash).
+        if (onClick) {
+          e.preventDefault();
+          onClick(e);
+        }
       }}
       className={`group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full font-sb font-bold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] ${variants[variant]} ${sizes[size]} ${className}`}
     >

@@ -15,6 +15,10 @@ export function Hero() {
     return () => cancelAnimationFrame(t);
   }, []);
 
+  /** Direct scroll — a plain hash anchor won't re-scroll to an unchanged hash. */
+  const scrollTo = (id: string) => () =>
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+
   return (
     <header className="relative overflow-hidden pt-24 text-center">
       {/* pastel blobs */}
@@ -56,8 +60,8 @@ export function Hero() {
           className="sb-reveal sb-hero-rise mt-9 flex flex-wrap justify-center gap-3.5"
           style={{ transitionDelay: "0.3s" }}
         >
-          <SbButton href="#trial" size="lg">Start free 7-day trial</SbButton>
-          <SbButton href="#chatdemo" size="lg" variant="light">Hear a sample call</SbButton>
+          <SbButton href="#trial" size="lg" onClick={scrollTo("trial")}>Start free 7-day trial</SbButton>
+          <SbButton href="#chatdemo" size="lg" variant="light" onClick={scrollTo("chatdemo")}>Hear a sample call</SbButton>
         </div>
         <div
           className="sb-reveal sb-hero-rise mt-7 flex items-center justify-center gap-3 font-sb text-sm font-semibold text-sb-ink2"
