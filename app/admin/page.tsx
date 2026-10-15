@@ -4,10 +4,11 @@ import { Heading } from "@/components/ui/heading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatCents, formatDate } from "@/lib/format";
+import { PLANS, isPlanId, subscriptionInGoodStanding } from "@/lib/plans";
 
 export const instant = false;
 
-/** Platform overview: companies, usage, and invoiced volume. */
+/** Platform overview: companies, plans, AI call usage, and invoiced volume. */
 export default async function AdminPage() {
   await requirePlatformAdmin();
   const svc = await createServiceClient();
@@ -16,23 +17,48 @@ export default async function AdminPage() {
     { count: companyCount },
     { count: userCount },
     { count: bookingCount },
-    { count: jobCount },
     { data: invoices },
     { data: companies },
   ] = await Promise.all([
     svc.from("companies").select("id", { count: "exact", head: true }),
     svc.from("memberships").select("id", { count: "exact", head: true }),
     svc.from("bookings").select("id", { count: "exact", head: true }),
-    svc.from("jobs").select("id", { count: "exact", head: true }),
     svc.from("invoices").select("total_cents, status").neq("status", "void"),
     svc
       .from("companies")
-      .select("id, name, email, phone, timezone, onboarding_completed, created_at, stripe_onboarded")
+      .select(
+        "id, name, email, phone, timezone, plan, subscription_status, onboarding_completed, created_at, stripe_onboarded",
+      )
       .order("created_at", { ascending: false })
       .limit(50),
   ]);
 
   const gmv = (invoices ?? []).reduce((s, i) => s + i.total_cents, 0);
+
+  // AI call usage across the platform. Wrapped so the page still renders if
+  // the AI-answering migrations haven't been run on this environment.
+  let callsAnswered: number | null = null;
+  let aiMinutes: number | null = null;
+  let pendingEscalations: number | null = null;
+  try {
+    const [{ count, data: calls }, { count: escalations }] = await Promise.all([
+      svc.from("front_office_ai_calls").select("duration_seconds", { count: "exact" }),
+      svc
+        .from("front_office_escalations")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "pending"),
+    ]);
+    callsAnswered = count ?? 0;
+    aiMinutes = Math.round(
+      (calls ?? []).reduce(
+        (s, r) => s + ((r as { duration_seconds: number | null }).duration_seconds ?? 0),
+        0,
+      ) / 60,
+    );
+    pendingEscalations = escalations ?? 0;
+  } catch {
+    // Tables not migrated yet — stats show "—".
+  }
 
   // Member counts per company.
   const { data: memberships } = await svc.from("memberships").select("company_id");
@@ -41,11 +67,21 @@ export default async function AdminPage() {
     memberCount.set(m.company_id, (memberCount.get(m.company_id) ?? 0) + 1);
   }
 
+  const dash = (v: number | null) => (v === null ? "—" : v.toLocaleString());
+
   const stats = [
     { label: "Companies", value: String(companyCount ?? 0) },
     { label: "Users", value: String(userCount ?? 0) },
+    { label: "Calls answered", value: dash(callsAnswered) },
+    {
+      label: "AI minutes",
+      value: aiMinutes === null ? "—" : `${aiMinutes.toLocaleString()} min`,
+    },
+    {
+      label: "Escalations pending",
+      value: dash(pendingEscalations),
+    },
     { label: "Bookings", value: String(bookingCount ?? 0) },
-    { label: "Job visits", value: String(jobCount ?? 0) },
     { label: "Invoiced volume", value: formatCents(gmv) },
   ];
 
@@ -56,7 +92,7 @@ export default async function AdminPage() {
         description="All companies on Wavva. This view bypasses RLS via the service role — keep the admin allowlist tight."
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
         {stats.map((s) => (
           <Card key={s.label}>
             <CardContent className="pt-6">
@@ -77,6 +113,7 @@ export default async function AdminPage() {
               <thead>
                 <tr className="border-b border-slate-200 dark:border-slate-800 text-left text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-500">
                   <th className="px-5 py-3 font-medium">Company</th>
+                  <th className="px-5 py-3 font-medium">Plan</th>
                   <th className="px-5 py-3 font-medium">Contact</th>
                   <th className="px-5 py-3 text-center font-medium">Members</th>
                   <th className="px-5 py-3 text-center font-medium">Onboarded</th>
@@ -88,6 +125,17 @@ export default async function AdminPage() {
                 {(companies ?? []).map((c) => (
                   <tr key={c.id}>
                     <td className="px-5 py-3 font-medium text-slate-900 dark:text-slate-100 dark:text-slate-100">{c.name}</td>
+                    <td className="px-5 py-3">
+                      <Badge
+                        tone={
+                          subscriptionInGoodStanding(c.subscription_status)
+                            ? "accent"
+                            : "slate"
+                        }
+                      >
+                        {isPlanId(c.plan) ? PLANS[c.plan].name : (c.plan ?? "—")}
+                      </Badge>
+                    </td>
                     <td className="px-5 py-3 text-slate-600 dark:text-slate-400 dark:text-slate-500 dark:text-slate-500">
                       {[c.email, c.phone].filter(Boolean).join(" · ") || "—"}
                     </td>

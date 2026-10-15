@@ -1,5 +1,5 @@
 /**
- * TidyPro Studio — content registry.
+ * Wavva Studio — content registry.
  *
  * This is the LOW-CODE layer for the marketing site. Every editable piece of
  * website copy is described here once:
@@ -91,7 +91,7 @@ export const CONTENT_REGISTRY: ContentDef[] = [
     label: "Product name",
     help: "Used across the marketing site, emails, and page titles.",
     field: { kind: "text", max: 40 },
-    default: "TidyPro",
+    default: "Wavva",
     paths: ALL,
   },
   {
@@ -100,7 +100,7 @@ export const CONTENT_REGISTRY: ContentDef[] = [
     section: "Brand",
     label: "Tagline",
     field: { kind: "text", max: 120 },
-    default: "Operations software for cleaning businesses",
+    default: "The AI front office for every business",
     paths: ALL,
   },
   {
@@ -111,7 +111,7 @@ export const CONTENT_REGISTRY: ContentDef[] = [
     help: "One-paragraph summary used in metadata and the footer.",
     field: { kind: "textarea", rows: 3, max: 400 },
     default:
-      "TidyPro helps residential and commercial cleaning businesses manage quotes, scheduling, teams, invoices, and customers in one simple place.",
+      "Wavva is the AI front office for every business: every call answered in your business's name, appointments booked, quotes followed up, and invoices collected.",
     paths: ALL,
   },
   {
@@ -120,7 +120,7 @@ export const CONTENT_REGISTRY: ContentDef[] = [
     section: "Brand",
     label: "Contact email",
     field: { kind: "text", max: 200 },
-    default: "hello@tidypro.example",
+    default: "hello@wavva.example",
     paths: ALL,
   },
   {

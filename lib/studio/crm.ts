@@ -9,7 +9,7 @@
 export const CRM_STAGES = [
   { id: "new", label: "New", hint: "Fresh lead, not yet contacted" },
   { id: "contacted", label: "Contacted", hint: "Reached out, in conversation" },
-  { id: "trial", label: "On trial", hint: "Actively trying TidyPro" },
+  { id: "trial", label: "On trial", hint: "Actively trying Wavva" },
   { id: "customer", label: "Customer", hint: "Paying subscriber" },
   { id: "lost", label: "Lost", hint: "Went cold or chose otherwise" },
 ] as const;

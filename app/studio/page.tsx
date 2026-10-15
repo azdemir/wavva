@@ -65,6 +65,53 @@ export default async function StudioPage() {
     0,
   );
 
+  // Platform-wide AI call activity — the core product metric. Wrapped so the
+  // page still renders if the AI-answering migrations haven't been run here.
+  let callsAnswered: number | null = null;
+  let aiMinutes = 0;
+  let pendingEscalations: number | null = null;
+  let topByMinutes: { id: string; name: string; minutes: number }[] = [];
+  try {
+    const [{ count, data: calls }, { count: escalations }] =
+      await Promise.all([
+        svc
+          .from("front_office_ai_calls")
+          .select("company_id, duration_seconds", { count: "exact" }),
+        svc
+          .from("front_office_escalations")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "pending"),
+      ]);
+    callsAnswered = count ?? 0;
+    pendingEscalations = escalations ?? 0;
+    const byCompany = new Map<string, number>();
+    for (const r of (calls ?? []) as {
+      company_id: string;
+      duration_seconds: number | null;
+    }[]) {
+      const secs = r.duration_seconds ?? 0;
+      aiMinutes += secs;
+      byCompany.set(r.company_id, (byCompany.get(r.company_id) ?? 0) + secs);
+    }
+    aiMinutes = Math.round(aiMinutes / 60);
+    const names = new Map(
+      ((companies ?? []) as { id: string; name: string }[]).map((c) => [
+        c.id,
+        c.name,
+      ]),
+    );
+    topByMinutes = [...byCompany.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([id, secs]) => ({
+        id,
+        name: names.get(id) ?? "Unknown company",
+        minutes: Math.round(secs / 60),
+      }));
+  } catch {
+    // Tables not migrated yet — the section shows "—".
+  }
+
   const stats = [
     { label: "Companies", value: String(companyCount ?? 0), href: "/admin" },
     { label: "Users", value: String(userCount ?? 0), href: "/admin" },
@@ -92,7 +139,7 @@ export default async function StudioPage() {
       <CrmSetupNotice />
       <Heading
         title="Studio overview"
-        description="The health of the Wavva business itself — revenue, companies, and your sales pipeline."
+        description="The health of the Wavva business itself — revenue, companies, AI call activity, and your sales pipeline."
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -116,6 +163,72 @@ export default async function StudioPage() {
           </Link>
         ))}
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>AI call activity</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="rounded-xl bg-slate-50 p-4 dark:bg-slate-800/60">
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                Calls answered
+              </p>
+              <p className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+                {callsAnswered === null ? "—" : callsAnswered.toLocaleString()}
+              </p>
+            </div>
+            <div className="rounded-xl bg-slate-50 p-4 dark:bg-slate-800/60">
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                AI minutes used
+              </p>
+              <p className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+                {callsAnswered === null ? "—" : `${aiMinutes.toLocaleString()} min`}
+              </p>
+            </div>
+            <div className="rounded-xl bg-slate-50 p-4 dark:bg-slate-800/60">
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                Escalations pending
+              </p>
+              <p className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+                {pendingEscalations === null
+                  ? "—"
+                  : pendingEscalations.toLocaleString()}
+              </p>
+            </div>
+          </div>
+          {topByMinutes.length > 0 && (
+            <div className="mt-6">
+              <p className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">
+                Top companies by AI minutes
+              </p>
+              <div className="space-y-3">
+                {topByMinutes.map((c) => {
+                  const max = Math.max(1, ...topByMinutes.map((t) => t.minutes));
+                  return (
+                    <div key={c.id} className="flex items-center gap-3">
+                      <span className="w-40 shrink-0 truncate text-sm font-medium text-slate-700 dark:text-slate-300">
+                        {c.name}
+                      </span>
+                      <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                        <div
+                          className="h-full rounded-full bg-brand-500"
+                          style={{
+                            width: `${Math.max(3, Math.round((c.minutes / max) * 100))}%`,
+                          }}
+                        />
+                      </div>
+                      <span className="w-20 text-right text-sm tabular-nums text-slate-500 dark:text-slate-400">
+                        {c.minutes.toLocaleString()} min
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
