@@ -195,6 +195,7 @@ export default async function CustomerDetailPage({
         <CardContent className="pt-6">
           <ConfirmActionButton
             label={t("detail.deleteCustomer")}
+            confirmLabel={t("detail.confirmDeleteCustomer")}
             confirmMessage="Delete this customer? Their addresses will be removed too. This can't be undone."
             pendingLabel="Deleting…"
             className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950"

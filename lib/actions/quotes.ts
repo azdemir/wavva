@@ -40,20 +40,28 @@ export async function createQuote(input: unknown): Promise<ActionResult> {
   // Customer check and the numbering lookup are independent — run together.
   // Numbers come from MAX(existing), not COUNT: deleted numbers are never
   // reused, so the unique constraint can't collide after deletions.
-  const [{ data: customer }, { data: existingNumbers }] = await Promise.all([
-    supabase
-      .from("customers")
-      .select("id")
-      .eq("id", parsed.data.customer_id)
-      .eq("company_id", ctx.company.id)
-      .maybeSingle(),
-    supabase
-      .from("quotes")
-      .select("quote_number")
-      .eq("company_id", ctx.company.id)
-      .like("quote_number", "Q-%"),
-  ]);
+  // CRITICAL: the numbering lookup error must be checked. A failed lookup
+  // used to fall back to an empty list and fabricate Q-0001 — colliding with
+  // the real Q-0001 and surfacing a raw DB error on every create.
+  const [{ data: customer }, { data: existingNumbers, error: numbersErr }] =
+    await Promise.all([
+      supabase
+        .from("customers")
+        .select("id")
+        .eq("id", parsed.data.customer_id)
+        .eq("company_id", ctx.company.id)
+        .maybeSingle(),
+      supabase
+        .from("quotes")
+        .select("quote_number")
+        .eq("company_id", ctx.company.id)
+        .like("quote_number", "Q-%"),
+    ]);
   if (!customer) return { error: t("actions.customerNotFound") };
+  if (numbersErr) {
+    console.error("[createQuote] numbering lookup failed", numbersErr);
+    return { error: t("actions.createFailed") };
+  }
 
   const totals = computeTotals(
     parsed.data.items,
@@ -61,28 +69,53 @@ export async function createQuote(input: unknown): Promise<ActionResult> {
     parsed.data.tax_rate,
   );
 
-  const { data: quote, error: qErr } = await supabase
-    .from("quotes")
-    .insert({
-      company_id: ctx.company.id,
-      customer_id: parsed.data.customer_id,
-      quote_number: nextNumberAfter(
+  // Insert with one retry on a unique-number conflict: another session may
+  // have taken the number between our lookup and our insert. Re-read the
+  // numbers and take the next one instead of failing with raw DB text.
+  let quoteNumber = nextNumberAfter(
+    "Q",
+    (existingNumbers ?? []).map((r) => r.quote_number),
+  );
+  let quote: { id: string } | null = null;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const { data, error: qErr } = await supabase
+      .from("quotes")
+      .insert({
+        company_id: ctx.company.id,
+        customer_id: parsed.data.customer_id,
+        quote_number: quoteNumber,
+        status: "draft",
+        subtotal_cents: totals.subtotal,
+        discount_cents: totals.discount,
+        tax_rate: parsed.data.tax_rate,
+        tax_cents: totals.tax,
+        total_cents: totals.total,
+        valid_until: parsed.data.valid_until || null,
+        notes: parsed.data.notes || null,
+      })
+      .select("id")
+      .single();
+    if (!qErr && data) {
+      quote = data;
+      break;
+    }
+    if (qErr?.code === "23505" && attempt === 0) {
+      const { data: fresh } = await supabase
+        .from("quotes")
+        .select("quote_number")
+        .eq("company_id", ctx.company.id)
+        .like("quote_number", "Q-%");
+      quoteNumber = nextNumberAfter(
         "Q",
-        (existingNumbers ?? []).map((r) => r.quote_number),
-      ),
-      status: "draft",
-      subtotal_cents: totals.subtotal,
-      discount_cents: totals.discount,
-      tax_rate: parsed.data.tax_rate,
-      tax_cents: totals.tax,
-      total_cents: totals.total,
-      valid_until: parsed.data.valid_until || null,
-      notes: parsed.data.notes || null,
-    })
-    .select("id")
-    .single();
-  if (qErr || !quote) {
-    return { error: qErr?.message ?? t("actions.createFailed") };
+        (fresh ?? []).map((r) => r.quote_number),
+      );
+      continue;
+    }
+    console.error("[createQuote] quote insert failed", qErr);
+    break;
+  }
+  if (!quote) {
+    return { error: t("actions.createFailed") };
   }
 
   const { error: iErr } = await supabase.from("quote_line_items").insert(

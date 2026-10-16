@@ -97,7 +97,13 @@ export function QuoteBuilder({
       // leave the button stuck on "Creating…" with no message (regression
       // B-04, 2026-10-15: silent no-op on zero-item submit).
       if (result?.error) setError(result.error);
-    } catch {
+    } catch (e) {
+      // A successful create navigates away via redirect() — a redirect is a
+      // control-flow throw, not a failure. Let it through so the navigation
+      // happens instead of showing a bogus failure message.
+      const digest = (e as { digest?: unknown })?.digest;
+      if (typeof digest === "string" && digest.startsWith("NEXT_REDIRECT"))
+        throw e;
       setError(t("actions.createFailed"));
     } finally {
       setPending(false);

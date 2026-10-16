@@ -113,9 +113,11 @@ export function ConfirmActionButton({
         </p>
       )}
       {open && (
+        // NOTE: the backdrop deliberately does NOT dismiss on click. A
+        // destructive confirm dialog must not vanish from an errant click —
+        // Cancel and the confirm button are the only exits (besides Escape).
         <span
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-          onClick={() => !pending && setOpen(false)}
         >
           <span
             role="dialog"
