@@ -5,6 +5,7 @@ import { HOW_STEPS } from "./copy";
 import { Reveal } from "./reveal";
 import { Eyebrow, Grad } from "./section-head";
 import { WavvaMark } from "./logo";
+import { ChatIcon, PhoneIcon } from "@/components/ui/icons";
 
 /** How-it-works: numbered accordion + orbiting integration visual. */
 export function HowItWorks() {
@@ -68,13 +69,13 @@ export function HowItWorks() {
           <Reveal delay={1} className="relative min-h-[520px] overflow-hidden rounded-[32px] border border-white bg-gradient-to-br from-sb-lav via-sb-pink to-sb-blue lg:sticky lg:top-28">
             <div className="absolute left-1/2 top-1/2 h-[340px] w-[340px] -translate-x-1/2 -translate-y-1/2">
               <div className="animate-sb-spin-slower absolute inset-0 rounded-full border-[1.5px] border-dashed border-sb-violet/35">
-                <span className="absolute -top-7 left-[calc(50%-28px)] grid h-14 w-14 place-items-center rounded-[18px] bg-white text-[22px] shadow-[0_14px_30px_rgba(20,20,43,0.18)]">
-                  📞
+                <span className="absolute -top-7 left-[calc(50%-28px)] grid h-14 w-14 place-items-center rounded-[18px] bg-white shadow-[0_14px_30px_rgba(20,20,43,0.18)]">
+                  <PhoneIcon className="h-[22px] w-[22px] text-sb-ink" />
                 </span>
               </div>
               <div className="animate-sb-spin-rev absolute inset-[52px] rounded-full border-[1.5px] border-dashed border-sb-violet/30">
-                <span className="absolute -top-6 left-[calc(50%-24px)] grid h-12 w-12 place-items-center rounded-[16px] bg-white text-[20px] shadow-[0_14px_30px_rgba(20,20,43,0.18)]">
-                  💬
+                <span className="absolute -top-6 left-[calc(50%-24px)] grid h-12 w-12 place-items-center rounded-[16px] bg-white shadow-[0_14px_30px_rgba(20,20,43,0.18)]">
+                  <ChatIcon className="h-[20px] w-[20px] text-sb-ink" />
                 </span>
               </div>
               <div className="absolute left-1/2 top-1/2 grid h-24 w-24 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-[32px] bg-sb-ink shadow-[0_20px_44px_rgba(20,20,43,0.35)]">

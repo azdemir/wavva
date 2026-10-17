@@ -295,6 +295,19 @@ export function TemplateIcon(props: SVGProps<SVGSVGElement>) {
 }
 
 /**
+ * Live conversation — a rounded speech bubble with three dots. Used where a
+ * call is already represented by PhoneIcon and this marks the reply side.
+ */
+export function ChatIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Base {...props}>
+      <path d="M20.5 11.3c0 4.1-3.8 7.4-8.5 7.4-1 0-2-.2-2.9-.5l-4.6 2.5a.5.5 0 0 1-.8-.6l.9-3.7A7.1 7.1 0 0 1 3.5 11.3C3.5 7.2 7.3 4 12 4s8.5 3.2 8.5 7.3z" />
+      <path d="M9 11.4h.01M12 11.4h.01M15 11.4h.01" strokeWidth={2.4} />
+    </Base>
+  );
+}
+
+/**
  * Automation trigger — a solid lightning bolt. Reads instantly as
  * "fires automatically", where a clock only says "time".
  */
